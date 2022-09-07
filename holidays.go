@@ -224,7 +224,7 @@ func nextMonthName(year int, month HMonth) (string, HMonth) {
 	return nextMonthName, nextMonth
 }
 
-func GetAllHolidaysForYear(year int) []HEvent {
+func getAllHolidaysForYear(year int) []HEvent {
 	events := make([]HEvent, 0, 120)
 	// standard holidays that don't shift based on year
 	for _, h := range staticHolidays {
@@ -523,7 +523,7 @@ func GetAllHolidaysForYear(year int) []HEvent {
 }
 
 func GetHolidaysForYear(year int, il bool) []HEvent {
-	events := GetAllHolidaysForYear(year)
+	events := getAllHolidaysForYear(year)
 	result := make([]HEvent, 0, len(events))
 	for _, ev := range events {
 		if (il && (ev.Flags&CHUL_ONLY) == 0) || (!il && (ev.Flags&IL_ONLY) == 0) {

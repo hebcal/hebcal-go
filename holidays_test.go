@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetAllHolidaysForYear(t *testing.T) {
-	assert.Equal(t, 120, len(GetAllHolidaysForYear(5783)))
+	assert.Equal(t, 120, len(getAllHolidaysForYear(5783)))
 }
 
 func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
