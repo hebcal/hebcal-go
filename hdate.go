@@ -9,34 +9,35 @@ import (
 	"time"
 )
 
+// An HMonth specifies a Hebrew month of the year (Nisan = 1, Tishrei = 7, ...).
 type HMonth int
 
 const (
-	/** Nissan / ניסן */
+	/* Nissan / ניסן */
 	Nisan HMonth = 1 + iota
-	/** Iyyar / אייר */
+	/* Iyyar / אייר */
 	Iyyar
-	/** Sivan / סיון */
+	/* Sivan / סיון */
 	Sivan
-	/** Tamuz (sometimes Tammuz) / תמוז */
+	/* Tamuz (sometimes Tammuz) / תמוז */
 	Tamuz
-	/** Av / אב */
+	/* Av / אב */
 	Av
-	/** Elul / אלול */
+	/* Elul / אלול */
 	Elul
-	/** Tishrei / תִשְׁרֵי */
+	/* Tishrei / תִשְׁרֵי */
 	Tishrei
-	/** Cheshvan / חשון */
+	/* Cheshvan / חשון */
 	Cheshvan
-	/** Kislev / כסלו */
+	/* Kislev / כסלו */
 	Kislev
-	/** Tevet / טבת */
+	/* Tevet / טבת */
 	Tevet
-	/** Sh'vat / שבט */
+	/* Sh'vat / שבט */
 	Shvat
-	/** Adar or Adar Rishon / אדר */
+	/* Adar or Adar Rishon / אדר */
 	Adar1
-	/** Adar Sheini (only on leap years) / אדר ב׳ */
+	/* Adar Sheini (only on leap years) / אדר ב׳ */
 	Adar2
 )
 
@@ -78,20 +79,13 @@ const epoch = -1373428
 // Avg year length in the cycle (19 solar years with 235 lunar months)
 const avgHebrewYearDays = 365.24682220597794
 
-/**
- * Returns true if Hebrew year is a leap year
- * @param {number} year Hebrew year
- * @return {boolean}
- */
+// IsHebLeapYear returns true if Hebrew year is a leap year
 func IsHebLeapYear(year int) bool {
 	return (1+year*7)%19 < 7
 }
 
-/**
- * Number of months in this Hebrew year (either 12 or 13 depending on leap year)
- * @param {number} year Hebrew year
- * @return {number}
- */
+// MonthsInHebYear returns the number of months in this Hebrew year
+// (either 12 or 13 depending on leap year)
 func MonthsInHebYear(year int) int {
 	if IsHebLeapYear(year) {
 		return 13
@@ -100,39 +94,22 @@ func MonthsInHebYear(year int) int {
 	}
 }
 
-/**
- * Number of days in the hebrew YEAR
- * @param {number} year Hebrew year
- * @return {number}
- */
+// DaysInHebYear computes the number of days in the hebrew YEAR
 func DaysInHebYear(year int) int {
 	return elapsedDays(year+1) - elapsedDays(year)
 }
 
-/**
- * true if Cheshvan is long in Hebrew year
- * @param {number} year Hebrew year
- * @return {boolean}
- */
+// LongCheshvan returns true if Cheshvan is long (30 days) in Hebrew year
 func LongCheshvan(year int) bool {
 	return DaysInHebYear(year)%10 == 5
 }
 
-/**
- * true if Kislev is short in Hebrew year
- * @param {number} year Hebrew year
- * @return {boolean}
- */
+// ShortKislev returns true if Kislev is short (29 days) in Hebrew year
 func ShortKislev(year int) bool {
 	return DaysInHebYear(year)%10 == 3
 }
 
-/**
- * Number of days in Hebrew month in a given year (29 or 30)
- * @param {number} month Hebrew month (e.g. months.TISHREI)
- * @param {number} year Hebrew year
- * @return {number}
- */
+// DaysInMonth returns the number of days in Hebrew month in a given year (29 or 30)
 func DaysInMonth(month HMonth, year int) int {
 	switch month {
 	case Iyyar, Tamuz, Elul, Tevet, Adar2:
@@ -159,13 +136,8 @@ func elapsedDays(year int) int {
 	return days
 }
 
-/**
- * Days from sunday prior to start of Hebrew calendar to mean
- * conjunction of Tishrei in Hebrew YEAR
- * @private
- * @param {number} year Hebrew year
- * @return {number}
- */
+// Days from sunday prior to start of Hebrew calendar to mean
+// conjunction of Tishrei in Hebrew YEAR
 func elapsedDays0(year int) int {
 	prevYear := year - 1
 	mElapsed := 235*(prevYear/19) + // Months in complete 19 year lunar (Metonic) cycles so far
@@ -198,6 +170,12 @@ func elapsedDays0(year int) int {
 	}
 }
 
+// Converts Hebrew date to R.D. (Rata Die) fixed days.
+//
+// R.D. 1 is the imaginary date Monday, January 1, 1 on the Gregorian Calendar.
+//
+// Note also that R.D. = Julian Date − 1,721,424.5
+// https://en.wikipedia.org/wiki/Rata_Die#Dershowitz_and_Reingold
 func HebrewToRD(year int, month HMonth, day int) int {
 	tempabs := day
 	if month < Tishrei {
@@ -216,6 +194,7 @@ func HebrewToRD(year int, month HMonth, day int) int {
 	return epoch + elapsedDays(year) + tempabs - 1
 }
 
+// Creates a new HDate from year, Hebrew month, and day of month
 func NewHDate(year int, month HMonth, day int) HDate {
 	if month == Adar2 && !IsHebLeapYear(year) {
 		month = Adar1
@@ -236,6 +215,7 @@ func newYear(year int) int {
 	return epoch + elapsedDays(year)
 }
 
+// Converts absolute R.D. days to Hebrew date.
 func NewHDateFromRD(rataDie int) HDate {
 	approx := int(float64(rataDie-epoch) / avgHebrewYearDays)
 	year := approx
@@ -256,17 +236,22 @@ func NewHDateFromRD(rataDie int) HDate {
 	return HDate{Year: year, Month: month, Day: day, abs: rataDie}
 }
 
+// Creates an HDate from Gregorian year, month and day.
 func NewHDateFromGregorian(year int, month time.Month, day int) HDate {
 	rataDie, _ := GregorianToRD(year, month, day)
 	return NewHDateFromRD(rataDie)
 }
 
+// Creates an HDate from a Time object. Hours, minutes and seconds are ignored.
 func NewHDateFromTime(d time.Time) HDate {
 	year, month, day := d.Date()
 	rataDie, _ := GregorianToRD(year, month, day)
 	return NewHDateFromRD(rataDie)
 }
 
+// Converts Hebrew date to R.D. (Rata Die) fixed days.
+//
+// R.D. 1 is the imaginary date Monday, January 1, 1 on the Gregorian Calendar.
 func (hd *HDate) Abs() int {
 	if hd.abs == 0 {
 		hd.abs = HebrewToRD(hd.Year, hd.Month, hd.Day)
@@ -274,10 +259,12 @@ func (hd *HDate) Abs() int {
 	return hd.abs
 }
 
+// Returns the number of days in this date's month (29 or 30).
 func (hd HDate) DaysInMonth() int {
 	return DaysInMonth(hd.Month, hd.Year)
 }
 
+// Converts this Hebrew Date to Gregorian year, month and day.
 func (hd HDate) Greg() (int, time.Month, int) {
 	return RDtoGregorian(hd.Abs())
 }
@@ -297,18 +284,22 @@ func (hd HDate) Weekday() time.Weekday {
 	return time.Weekday(dayOfWeek)
 }
 
+// Prev returns the previous Hebrew date.
 func (hd HDate) Prev() HDate {
 	return NewHDateFromRD(hd.Abs() - 1)
 }
 
+// Next returns the next Hebrew date.
 func (hd HDate) Next() HDate {
 	return NewHDateFromRD(hd.Abs() + 1)
 }
 
+// IsLeapYear returns true if this HDate occurs during a Hebrew leap year.
 func (hd HDate) IsLeapYear() bool {
 	return IsHebLeapYear(hd.Year)
 }
 
+// Returns a string representation of the month name (e.g. "Tishrei", "Sh'vat", "Adar II")
 func (hd HDate) MonthName() string {
 	switch hd.Month {
 	case Nisan, Iyyar, Sivan, Tamuz, Av, Elul, Tishrei, Cheshvan, Kislev, Tevet, Shvat, Adar2:
@@ -325,40 +316,39 @@ func (hd HDate) MonthName() string {
 	}
 }
 
+// Returns a string representation of the Hebrew date (e.g. "15 Cheshvan 5769")
 func (hd HDate) String() string {
 	return strconv.Itoa(hd.Day) + " " + hd.MonthName() + " " + strconv.Itoa(hd.Year)
 }
 
-/**
- * Converts Hebrew month string name to numeric
- * @param {string} monthName monthName
- * @return {HMonth}
- */
+/*
+MonthFromName parses a Hebrew month string name to determine the month number.
+
+the Hebrew months are unique to their second letter
+
+	N         Nisan  (November?)
+	I         Iyyar
+	E        Elul
+	C        Cheshvan
+	K        Kislev
+	1        1Adar
+	2        2Adar
+	Si Sh     Sivan, Shvat
+	Ta Ti Te Tamuz, Tishrei, Tevet
+	Av Ad    Av, Adar
+
+	אב אד אי אל   אב אדר אייר אלול
+	ח            חשון
+	ט            טבת
+	כ            כסלו
+	נ            ניסן
+	ס            סיון
+	ש            שבט
+	תמ תש        תמוז תשרי
+*/
 func MonthFromName(monthName string) (HMonth, error) {
 	str := s.ToLower(monthName)
 	runes := []rune(str)
-	/*
-		the Hebrew months are unique to their second letter
-		N         Nisan  (November?)
-		I         Iyyar
-		E        Elul
-		C        Cheshvan
-		K        Kislev
-		1        1Adar
-		2        2Adar
-		Si Sh     Sivan, Shvat
-		Ta Ti Te Tamuz, Tishrei, Tevet
-		Av Ad    Av, Adar
-
-		אב אד אי אל   אב אדר אייר אלול
-		ח            חשון
-		ט            טבת
-		כ            כסלו
-		נ            ניסן
-		ס            סיון
-		ש            שבט
-		תמ תש        תמוז תשרי
-	*/
 	switch runes[0] {
 	case 'n':
 	case 'נ':
@@ -437,7 +427,7 @@ func MonthFromName(monthName string) (HMonth, error) {
 	return 0, errors.New("unable to parse month name")
 }
 
-/**
+/*
  * Note: Applying this function to d+6 gives us the DAYNAME on or after an
  * absolute day d. Similarly, applying it to d+3 gives the DAYNAME nearest to
  * absolute date d, applying it to d-1 gives the DAYNAME previous to absolute
@@ -454,69 +444,56 @@ func onOrBefore(dayOfWeek time.Weekday, rataDie int) HDate {
 	return NewHDateFromRD(dayOnOrBefore(dayOfWeek, rataDie))
 }
 
-/**
- * Returns an `HDate` representing the a dayNumber before the current date.
- * Sunday=0, Saturday=6
- * @example
- * new HDate(new Date('Wednesday February 19, 2014')).before(6).greg() // Sat Feb 15 2014
- * @param {number} day day of week
- * @return {HDate}
- */
+/*
+Before returns an HDate representing the a dayNumber before the current date.
+
+For example
+
+	NewHDate(new Date('Wednesday February 19, 2014')).Before(6).Greg() // Sat Feb 15 2014
+*/
 func (hd HDate) Before(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs()-1)
 }
 
-/**
- * Returns an `HDate` representing the a dayNumber on or before the current date.
- * Sunday=0, Saturday=6
- * @example
- * new HDate(new Date('Wednesday February 19, 2014')).onOrBefore(6).greg() // Sat Feb 15 2014
- * new HDate(new Date('Saturday February 22, 2014')).onOrBefore(6).greg() // Sat Feb 22 2014
- * new HDate(new Date('Sunday February 23, 2014')).onOrBefore(6).greg() // Sat Feb 22 2014
- * @param {number} dow day of week
- * @return {HDate}
- */
+/*
+OnOrBefore returns an HDate representing the a dayNumber on or before the current date.
+
+	NewHDate(new Date('Wednesday February 19, 2014')).OnOrBefore(6).Greg() // Sat Feb 15 2014
+	NewHDate(new Date('Saturday February 22, 2014')).OnOrBefore(6).Greg() // Sat Feb 22 2014
+	NewHDate(new Date('Sunday February 23, 2014')).OnOrBefore(6).Greg() // Sat Feb 22 2014
+*/
 func (hd HDate) OnOrBefore(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs())
 }
 
-/**
- * Returns an `HDate` representing the nearest dayNumber to the current date
- * Sunday=0, Saturday=6
- * @example
- * new HDate(new Date('Wednesday February 19, 2014')).nearest(6).greg() // Sat Feb 22 2014
- * new HDate(new Date('Tuesday February 18, 2014')).nearest(6).greg() // Sat Feb 15 2014
- * @param {number} dow day of week
- * @return {HDate}
- */
+/*
+Nearest returns an HDate representing the nearest dayNumber to the current date
+
+	NewHDate(new Date('Wednesday February 19, 2014')).Nearest(6).Greg() // Sat Feb 22 2014
+	NewHDate(new Date('Tuesday February 18, 2014')).Nearest(6).Greg() // Sat Feb 15 2014
+*/
 func (hd HDate) Nearest(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs()+3)
 }
 
-/**
- * Returns an `HDate` representing the a dayNumber on or after the current date.
- * Sunday=0, Saturday=6
- * @example
- * new HDate(new Date('Wednesday February 19, 2014')).onOrAfter(6).greg() // Sat Feb 22 2014
- * new HDate(new Date('Saturday February 22, 2014')).onOrAfter(6).greg() // Sat Feb 22 2014
- * new HDate(new Date('Sunday February 23, 2014')).onOrAfter(6).greg() // Sat Mar 01 2014
- * @param {number} dow day of week
- * @return {HDate}
- */
+/*
+OnOrAfter returns an HDate representing the a dayNumber on or after the current date.
+
+	NewHDate(new Date('Wednesday February 19, 2014')).OnOrAfter(6).Greg() // Sat Feb 22 2014
+	NewHDate(new Date('Saturday February 22, 2014')).OnOrAfter(6).Greg() // Sat Feb 22 2014
+	NewHDate(new Date('Sunday February 23, 2014')).OnOrAfter(6).Greg() // Sat Mar 01 2014
+*/
 func (hd HDate) OnOrAfter(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs()+6)
 }
 
-/**
- * Returns an `HDate` representing the a dayNumber after the current date.
- * Sunday=0, Saturday=6
- * @example
- * new HDate(new Date('Wednesday February 19, 2014')).after(6).greg() // Sat Feb 22 2014
- * new HDate(new Date('Saturday February 22, 2014')).after(6).greg() // Sat Mar 01 2014
- * new HDate(new Date('Sunday February 23, 2014')).after(6).greg() // Sat Mar 01 2014
- * @param {number} day day of week
- * @return {HDate}
- */
+/*
+After returns an HDate representing the a dayNumber after the current date.
+
+		NewHDate(new Date('Wednesday February 19, 2014')).After(6).Greg() // Sat Feb 22 2014
+		NewHDate(new Date('Saturday February 22, 2014')).After(6).Greg() // Sat Mar 01 2014
+	  NewHDate(new Date('Sunday February 23, 2014')).After(6).Greg() // Sat Mar 01 2014
+*/
 func (hd HDate) After(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs()+7)
 }

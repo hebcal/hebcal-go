@@ -14,6 +14,8 @@ const (
 	Complete
 )
 
+// The 54 parshiyot of the Torah as transilterated strings
+// parshiot[0] == 'Bereshit', parshiot[1] == 'Noach', parshiot[53] == "Ha'Azinu".
 var parshiot = []string{
 	"Bereshit",
 	"Noach",
@@ -71,12 +73,12 @@ var parshiot = []string{
 }
 
 /* parsha doubler */
-func D(n int) int {
+func _d(n int) int {
 	return -n
 }
 
 /* parsha undoubler */
-func U(n int) int {
+func _u(n int) int {
 	return -n
 }
 
@@ -96,60 +98,60 @@ func isValidDouble(n int) bool {
  */
 var Sat_short = []int{
 	-1, 52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	17, 18, 19, 20, D(21), 23, 24, -1, 25, D(26), D(28), 30, D(31), 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47,
+	17, 18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47,
 	48, 49, 50}
 
 var Sat_long = []int{
 	-1, 52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	17, 18, 19, 20, D(21), 23, 24, -1, 25, D(26), D(28), 30, D(31), 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47,
-	48, 49, D(50)}
+	17, 18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47,
+	48, 49, _d(50)}
 
 var Mon_short = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-	18, 19, 20, D(21), 23, 24, -1, 25, D(26), D(28), 30, D(31), 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48,
-	49, D(50)}
+	18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47, 48,
+	49, _d(50)}
 
 var Mon_long = []int{
-	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, D(21), 23, 24, -1, 25, D(26), D(28),
-	30, D(31), 33, -1, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)}
+	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28),
+	30, _d(31), 33, -1, 34, 35, 36, 37, _d(38), 40, _d(41), 43, 44, 45, 46, 47, 48, 49, _d(50)}
 
 var Thu_normal = []int{
 	52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-	18, 19, 20, D(21), 23, 24, -1, -1, 25, D(26), D(28), 30, D(31), 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47,
+	18, 19, 20, _d(21), 23, 24, -1, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47,
 	48, 49, 50}
 var Thu_normal_Israel = []int{
 	52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-	16, 17, 18, 19, 20, D(21), 23, 24, -1, 25, D(26), D(28), 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45,
+	16, 17, 18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28), 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45,
 	46, 47, 48, 49, 50}
 
 var Thu_long = []int{
 	52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-	18, 19, 20, 21, 22, 23, 24, -1, 25, D(26), D(28), 30, D(31), 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47,
+	18, 19, 20, 21, 22, 23, 24, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47,
 	48, 49, 50}
 
 var Sat_short_leap = []int{
 	-1, 52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, D(41),
-	43, 44, 45, 46, 47, 48, 49, D(50)}
+	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, _d(41),
+	43, 44, 45, 46, 47, 48, 49, _d(50)}
 
 var Sat_long_leap = []int{
 	-1, 52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, -1, 34, 35, 36, 37, D(38), 40, D(41),
-	43, 44, 45, 46, 47, 48, 49, D(50)}
+	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, -1, 34, 35, 36, 37, _d(38), 40, _d(41),
+	43, 44, 45, 46, 47, 48, 49, _d(50)}
 
 var Mon_short_leap = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, -1, 34, 35, 36, 37, D(38), 40, D(41), 43,
-	44, 45, 46, 47, 48, 49, D(50)}
+	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, -1, 34, 35, 36, 37, _d(38), 40, _d(41), 43,
+	44, 45, 46, 47, 48, 49, _d(50)}
 
 var Mon_short_leap_Israel = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
 	15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-	D(41), 43, 44, 45, 46, 47, 48, 49, D(50)}
+	_d(41), 43, 44, 45, 46, 47, 48, 49, _d(50)}
 
 var Mon_long_leap = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, D(41),
+	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, _d(41),
 	43, 44, 45, 46, 47, 48, 49, 50}
 
 var Mon_long_leap_Israel = []int{
@@ -165,7 +167,7 @@ var Thu_short_leap = []int{
 var Thu_long_leap = []int{
 	52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, -1, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
-	43, 44, 45, 46, 47, 48, 49, D(50)}
+	43, 44, 45, 46, 47, 48, 49, _d(50)}
 
 func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []int {
 	if !leap {
@@ -258,12 +260,27 @@ type Sedra struct {
 	theSedraArray []int
 }
 
+/*
+Result of Sedra.lookup
+
+Name represents the name of the parsha (or parshiyot) read on
+Hebrew date, e.g. {"Noach"} or {"Matot", "Masei"}
+
+Chag is true if this is a regular parasha HaShavua Torah reading,
+false if it's a special holiday reading
+
+Num is the parsha number (or numbers) using 1-indexing. The slice contains
+one number for a regular (single) parsha, and two numbers for a doubled parsha.
+For Parashat Bereshit, Num would be equal to {1}, and for
+Matot-Masei it would be {42, 43}
+*/
 type Parsha struct {
 	Name []string
 	Num  []int
 	Chag bool
 }
 
+// Constructs a new Sedra for the entire Hebrew year.
 func NewSedra(year int, il bool) Sedra {
 	longC := LongCheshvan(year)
 	shortK := ShortKislev(year)
@@ -283,6 +300,7 @@ func NewSedra(year int, il bool) Sedra {
 	return Sedra{Year: year, IL: il, firstSaturday: firstSaturday, theSedraArray: theSedraArray}
 }
 
+// Returns the Parsha that's read on the Saturday on or after R.D. date.
 func (sedra *Sedra) LookupByRD(rataDie int) Parsha {
 	abs := dayOnOrBefore(time.Saturday, rataDie+6)
 	if abs < sedra.firstSaturday {
@@ -301,7 +319,7 @@ func (sedra *Sedra) LookupByRD(rataDie int) Parsha {
 		return Parsha{Chag: true}
 	} else {
 		// undouble
-		p1 := U(idx)
+		p1 := _u(idx)
 		p2 := p1 + 1
 		n1 := parshiot[p1]
 		n2 := parshiot[p2]
@@ -309,10 +327,12 @@ func (sedra *Sedra) LookupByRD(rataDie int) Parsha {
 	}
 }
 
+// Returns the Parsha that's read on the Saturday on or after hd.
 func (sedra *Sedra) Lookup(hd HDate) Parsha {
 	return sedra.LookupByRD(hd.Abs())
 }
 
+// Finds the date on which the parsha number (Bereshit=1) is read.
 func (sedra *Sedra) FindParshaNum(num int) (HDate, error) {
 	parshaNum := num - 1
 	if parshaNum > 53 || (parshaNum < 0 && !isValidDouble(parshaNum)) {

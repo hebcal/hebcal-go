@@ -88,6 +88,10 @@ func num2digits(number int) []int {
 	return digits
 }
 
+// Gematriya converts a numerical value to a string of Hebrew letters.
+//
+// When specifying years of the Hebrew calendar in the present millennium,
+// we omit the thousands (which is presently 5 [ה]).
 func Gematriya(number int) string {
 	thousands := number / 1000
 	str := ""

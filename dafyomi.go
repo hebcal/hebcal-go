@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// DafYomi represents a page of Talmud, such as Pesachim 103
 type DafYomi struct {
 	Name  string
 	Blatt int
@@ -55,6 +56,7 @@ var shas0 = []DafYomi{
 
 var osday, nsday int
 
+// Returns the Daf Yomi for given date.
 func GetDafYomi(date HDate) (DafYomi, error) {
 	if osday == 0 {
 		osday, _ = GregorianToRD(1923, time.September, 11)

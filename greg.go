@@ -9,10 +9,12 @@ import (
 var mlenStd = [13]int{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 var mlenLeap = [13]int{0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
+// Returns true if the Gregorian year is a leap year
 func IsGregLeapYear(year int) bool {
 	return (year%4 == 0) && (year%100 != 0 || year%400 == 0)
 }
 
+// Converts Gregorian date to absolute R.D. (Rata Die) days
 func GregorianToRD(year int, month time.Month, day int) (int, error) {
 	if year == 0 {
 		return 0, errors.New("invalid Gregorian year")
@@ -76,6 +78,13 @@ func negativeRDtoGregorian(rataDie int, year int, d3 int) (int, time.Month, int)
 }
 */
 
+/*
+Converts from Rata Die (R.D. number) to Gregorian date.
+See the footnote on page 384 of “Calendrical Calculations, Part II:
+Three Historical Calendars” by E. M. Reingold,  N. Dershowitz, and S. M.
+Clamen, Software--Practice and Experience, Volume 23, Number 4
+(April, 1993), pages 383-404 for an explanation.
+*/
 func RDtoGregorian(rataDie int) (int, time.Month, int) {
 	d0 := rataDie - 1
 	n400 := d0 / 146097

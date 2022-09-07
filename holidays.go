@@ -522,6 +522,8 @@ func getAllHolidaysForYear(year int) []HEvent {
 	return events
 }
 
+// Returns a slice of holidays for the year.
+// For Israel holiday schedule, specify il=true.
 func GetHolidaysForYear(year int, il bool) []HEvent {
 	events := getAllHolidaysForYear(year)
 	result := make([]HEvent, 0, len(events))
