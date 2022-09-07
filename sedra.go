@@ -96,75 +96,75 @@ func isValidDouble(n int) bool {
  * These arrays determine the correct indices into the parsha names
  * -1 means no parsha that week.
  */
-var Sat_short = []int{
+var sat_short = []int{
 	-1, 52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	17, 18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47,
 	48, 49, 50}
 
-var Sat_long = []int{
+var sat_long = []int{
 	-1, 52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	17, 18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47,
 	48, 49, _d(50)}
 
-var Mon_short = []int{
+var mon_short = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 	18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47, 48,
 	49, _d(50)}
 
-var Mon_long = []int{
+var mon_long = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28),
 	30, _d(31), 33, -1, 34, 35, 36, 37, _d(38), 40, _d(41), 43, 44, 45, 46, 47, 48, 49, _d(50)}
 
-var Thu_normal = []int{
+var thu_normal = []int{
 	52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 	18, 19, 20, _d(21), 23, 24, -1, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47,
 	48, 49, 50}
-var Thu_normal_Israel = []int{
+var thu_normal_Israel = []int{
 	52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	16, 17, 18, 19, 20, _d(21), 23, 24, -1, 25, _d(26), _d(28), 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45,
 	46, 47, 48, 49, 50}
 
-var Thu_long = []int{
+var thu_long = []int{
 	52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 	18, 19, 20, 21, 22, 23, 24, -1, 25, _d(26), _d(28), 30, _d(31), 33, 34, 35, 36, 37, 38, 39, 40, _d(41), 43, 44, 45, 46, 47,
 	48, 49, 50}
 
-var Sat_short_leap = []int{
+var sat_short_leap = []int{
 	-1, 52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, _d(41),
 	43, 44, 45, 46, 47, 48, 49, _d(50)}
 
-var Sat_long_leap = []int{
+var sat_long_leap = []int{
 	-1, 52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, -1, 34, 35, 36, 37, _d(38), 40, _d(41),
 	43, 44, 45, 46, 47, 48, 49, _d(50)}
 
-var Mon_short_leap = []int{
+var mon_short_leap = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, -1, 34, 35, 36, 37, _d(38), 40, _d(41), 43,
 	44, 45, 46, 47, 48, 49, _d(50)}
 
-var Mon_short_leap_Israel = []int{
+var mon_short_leap_Israel = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
 	15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
 	_d(41), 43, 44, 45, 46, 47, 48, 49, _d(50)}
 
-var Mon_long_leap = []int{
+var mon_long_leap = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, _d(41),
 	43, 44, 45, 46, 47, 48, 49, 50}
 
-var Mon_long_leap_Israel = []int{
+var mon_long_leap_Israel = []int{
 	51, 52, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
 	15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
 	41, 42, 43, 44, 45, 46, 47, 48, 49, 50}
 
-var Thu_short_leap = []int{
+var thu_short_leap = []int{
 	52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, -1, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
 	43, 44, 45, 46, 47, 48, 49, 50}
 
-var Thu_long_leap = []int{
+var thu_long_leap = []int{
 	52, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, -1, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
 	43, 44, 45, 46, 47, 48, 49, _d(50)}
@@ -174,37 +174,37 @@ func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []
 		switch rhDay {
 		case time.Saturday:
 			if yearType == Incomplete {
-				return Sat_short
+				return sat_short
 			} else if yearType == Complete {
-				return Sat_long
+				return sat_long
 			}
 		case time.Monday:
 			if yearType == Incomplete {
-				return Mon_short
+				return mon_short
 			} else if yearType == Complete {
 				if il {
-					return Mon_short
+					return mon_short
 				} else {
-					return Mon_long
+					return mon_long
 				}
 			}
 		case time.Tuesday:
 			if yearType == Regular {
 				if il {
-					return Mon_short
+					return mon_short
 				} else {
-					return Mon_long
+					return mon_long
 				}
 			}
 		case time.Thursday:
 			if yearType == Regular {
 				if il {
-					return Thu_normal_Israel
+					return thu_normal_Israel
 				} else {
-					return Thu_normal
+					return thu_normal
 				}
 			} else if yearType == Complete {
-				return Thu_long
+				return thu_long
 			}
 		}
 	} else {
@@ -212,41 +212,41 @@ func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []
 		switch rhDay {
 		case time.Saturday:
 			if yearType == Incomplete {
-				return Sat_short_leap
+				return sat_short_leap
 			} else if yearType == Complete {
 				if il {
-					return Sat_short_leap
+					return sat_short_leap
 				} else {
-					return Sat_long_leap
+					return sat_long_leap
 				}
 			}
 		case time.Monday:
 			if yearType == Incomplete {
 				if il {
-					return Mon_short_leap_Israel
+					return mon_short_leap_Israel
 				} else {
-					return Mon_short_leap
+					return mon_short_leap
 				}
 			} else if yearType == Complete {
 				if il {
-					return Mon_long_leap_Israel
+					return mon_long_leap_Israel
 				} else {
-					return Mon_long_leap
+					return mon_long_leap
 				}
 			}
 		case time.Tuesday:
 			if yearType == Regular {
 				if il {
-					return Mon_long_leap_Israel
+					return mon_long_leap_Israel
 				} else {
-					return Mon_long_leap
+					return mon_long_leap
 				}
 			}
 		case time.Thursday:
 			if yearType == Incomplete {
-				return Thu_short_leap
+				return thu_short_leap
 			} else if yearType == Complete {
-				return Thu_long_leap
+				return thu_long_leap
 			}
 		}
 	}
