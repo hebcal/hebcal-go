@@ -1,7 +1,7 @@
 package hebcal
 
-const GERESH = "׳"
-const GERSHAYIM = "״"
+const geresh = "׳"
+const gershayim = "״"
 
 func num2heb(num int) string {
 	switch num {
@@ -100,15 +100,15 @@ func Gematriya(number int) string {
 		for _, digit := range tdigits {
 			str += num2heb(digit)
 		}
-		str += GERESH
+		str += geresh
 	}
 	digits := num2digits(number % 1000)
 	if len(digits) == 1 {
-		return str + num2heb(digits[0]) + GERESH
+		return str + num2heb(digits[0]) + geresh
 	}
 	for idx, digit := range digits {
 		if idx+1 == len(digits) {
-			str += GERSHAYIM
+			str += gershayim
 		}
 		str += num2heb(digit)
 	}
