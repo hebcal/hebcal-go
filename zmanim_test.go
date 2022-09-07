@@ -1,6 +1,7 @@
 package hebcal
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -167,4 +168,13 @@ func TestZmanimHelsinki(t *testing.T) {
 		"Sat, 01 Aug 2020 23:31:14 +0300",
 	}
 	assert.Equal(expected, actual)
+}
+
+func ExampleZmanim_SunsetOffset() {
+	latitude := 41.85003
+	longitude := -87.65005
+	dt := time.Date(2020, time.June, 5, 12, 0, 0, 0, time.UTC)
+	zmanim := NewZmanim(latitude, longitude, dt, "America/Chicago")
+	fmt.Println(zmanim.SunsetOffset(-18))
+	// Output: 2020-06-05 20:04:00 -0500 CDT
 }

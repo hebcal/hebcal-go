@@ -1,13 +1,14 @@
 package hebcal
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSedra(t *testing.T) {
+func TestSedra_Lookup(t *testing.T) {
 	assert := assert.New(t)
 	sedra := NewSedra(5749, false)
 	assert.Equal(
@@ -27,4 +28,18 @@ func TestSedra(t *testing.T) {
 	assert.Equal(
 		Parsha{Name: []string{"Bereshit"}, Num: []int{1}, Chag: false},
 		sedra.Lookup(NewHDateFromGregorian(2020, time.October, 17)))
+}
+
+func ExampleSedra_Lookup() {
+	sedra := NewSedra(5749, false)
+	parsha := sedra.Lookup(NewHDateFromGregorian(1989, time.July, 15))
+	fmt.Println(parsha)
+	// Output: Parashat Chukat-Balak
+}
+
+func ExampleSedra_FindParshaNum() {
+	sedra := NewSedra(5749, false)
+	date, _ := sedra.FindParshaNum(16)
+	fmt.Println(date)
+	// Output: 15 Sh'vat 5749
 }

@@ -55,7 +55,7 @@ const (
 	CHOL_HAMOED
 	// Mishna Yomi
 	MISHNA_YOMI
-	// Yom Kippur Katan, minor day of atonement on the day preceeding each Rosh Chodesh
+	// Yom Kippur Katan, minor day of atonement on the day preceding each Rosh Chodesh
 	YOM_KIPPUR_KATAN
 )
 

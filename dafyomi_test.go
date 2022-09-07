@@ -1,6 +1,7 @@
 package hebcal
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -46,4 +47,10 @@ func TestDafYomiEarlyCycles(t *testing.T) {
 	assert.Equal(DafYomi{Name: "Shekalim", Blatt: 14}, daf)
 	daf, _ = GetDafYomi(NewHDateFromGregorian(1976, time.September, 22))
 	assert.Equal(DafYomi{Name: "Shekalim", Blatt: 15}, daf)
+}
+
+func ExampleGetDafYomi() {
+	daf, _ := GetDafYomi(NewHDateFromGregorian(1995, time.December, 17))
+	fmt.Println(daf)
+	// Output: Avodah Zarah 68
 }

@@ -3,6 +3,7 @@ package hebcal
 import (
 	"errors"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -341,4 +342,9 @@ func (sedra *Sedra) FindParshaNum(num int) (HDate, error) {
 		}
 	}
 	panic("not found parsha num " + strconv.Itoa(num))
+}
+
+// Returns a string representation of the parsha
+func (parsha Parsha) String() string {
+	return "Parashat " + strings.Join(parsha.Name, "-")
 }

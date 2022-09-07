@@ -1,6 +1,7 @@
 package hebcal
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -235,4 +236,23 @@ func TestGreg(t *testing.T) {
 	assert.Equal(2005, gy)
 	assert.Equal(time.April, gm)
 	assert.Equal(2, gd)
+}
+
+func ExampleNewHDateFromTime() {
+	d := time.Date(2008, time.November, 13, 0, 0, 0, 0, time.UTC)
+	fmt.Println(NewHDateFromTime(d).String())
+	// Output: 15 Cheshvan 5769
+}
+
+func ExampleNewHDateFromRD() {
+	fmt.Println(NewHDateFromRD(733359).String())
+	// Output: 15 Cheshvan 5769
+}
+
+func ExampleMonthFromName() {
+	m1, _ := MonthFromName("Shvat")
+	m2, _ := MonthFromName("cheshvan")
+	m3, _ := MonthFromName("טבת")
+	fmt.Printf("%s (%d), %s (%d), %s (%d)", m1, int(m1), m2, int(m2), m3, int(m3))
+	// Output: Sh'vat (11), Cheshvan (8), Tevet (10)
 }

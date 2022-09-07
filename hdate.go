@@ -360,8 +360,7 @@ func MonthFromName(monthName string) (HMonth, error) {
 	str := s.ToLower(monthName)
 	runes := []rune(str)
 	switch runes[0] {
-	case 'n':
-	case 'נ':
+	case 'n', 'נ':
 		if runes[1] == 'o' {
 			break /* this catches "november" */
 		}
@@ -370,11 +369,9 @@ func MonthFromName(monthName string) (HMonth, error) {
 		return Iyyar, nil
 	case 'e':
 		return Elul, nil
-	case 'c':
-	case 'ח':
+	case 'c', 'ח':
 		return Cheshvan, nil
-	case 'k':
-	case 'כ':
+	case 'k', 'כ':
 		return Kislev, nil
 	case 's':
 		switch runes[1] {

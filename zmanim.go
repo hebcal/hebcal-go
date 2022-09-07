@@ -225,16 +225,22 @@ func (z *Zmanim) riseSetOffset(t time.Time, offset int) time.Time {
 }
 
 // Returns sunrise + offset minutes (either positive or negative).
-//
-// For candle-lighting time, use offset -18 (or -40 in Jerusalem).
 func (z *Zmanim) SunriseOffset(offset int) time.Time {
 	return z.riseSetOffset(z.Sunrise(), offset)
 }
 
 // Returns sunset + offset minutes (either positive or negative).
 //
-// For Tzeit Rabbeinu Tam, use 72 (when 3 small stars are observable
-// in the night sky with the naked eye [fixed 72 minutes after sunset])
+// This function is used with a negative offset to calculate candle-lighting times,
+// typically -18 minutes before sundown (or -40 in Jerusalem).
+//
+// This function can be used with a positive offset to calculate Tzeit (nightfall).
+//
+// For Havdalah according to Rabbeinu Tam, use 72, which approximates
+// when 3 small stars are observable in the night sky with the naked eye
+//
+// Other typical values include 50 minutes (3 small stars) or 42 minutes
+// (3 medium stars)
 func (z *Zmanim) SunsetOffset(offset int) time.Time {
 	return z.riseSetOffset(z.Sunset(), offset)
 }

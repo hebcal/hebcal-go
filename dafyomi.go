@@ -2,6 +2,7 @@ package hebcal
 
 import (
 	"errors"
+	"strconv"
 	"time"
 )
 
@@ -114,4 +115,9 @@ func GetDafYomi(date HDate) (DafYomi, error) {
 		}
 	}
 	return DafYomi{Name: shas[count].Name, Blatt: blatt}, nil
+}
+
+// Returns a string representation of the Daf Yomi
+func (daf DafYomi) String() string {
+	return daf.Name + " " + strconv.Itoa(daf.Blatt)
 }

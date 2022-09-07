@@ -8,7 +8,7 @@ import (
 /*
 GetYahrzeit calculates yahrzeit.
 hyear must be after original date of death.
-Returns an error when requested year preceeds or is same as original year.
+Returns an error when requested year precedes or is same as original year.
 
 Hebcal uses the algorithm defined in "Calendrical Calculations"
 by Edward M. Reingold and Nachum Dershowitz.
@@ -69,7 +69,7 @@ func GetYahrzeit(hyear int, date HDate) (HDate, error) {
 /*
 GetBirthdayOrAnniversary calculates a birthday or anniversary (non-yahrzeit).
 hyear must be after original date of anniversary.
-Returns an error when requested year preceeds or is same as original year.
+Returns an error when requested year precedes or is same as original year.
 
 Hebcal uses the algorithm defined in "Calendrical Calculations"
 by Edward M. Reingold and Nachum Dershowitz.
