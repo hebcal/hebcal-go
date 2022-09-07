@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-type YearType int
+type yearType int
 
 const (
-	Incomplete YearType = 1 + iota
+	Incomplete yearType = 1 + iota
 	Regular
 	Complete
 )
@@ -170,19 +170,19 @@ var thu_long_leap = []int{
 	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, -1, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
 	43, 44, 45, 46, 47, 48, 49, _d(50)}
 
-func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []int {
+func getSedraArray(leap bool, rhDay time.Weekday, ytype yearType, il bool) []int {
 	if !leap {
 		switch rhDay {
 		case time.Saturday:
-			if yearType == Incomplete {
+			if ytype == Incomplete {
 				return sat_short
-			} else if yearType == Complete {
+			} else if ytype == Complete {
 				return sat_long
 			}
 		case time.Monday:
-			if yearType == Incomplete {
+			if ytype == Incomplete {
 				return mon_short
-			} else if yearType == Complete {
+			} else if ytype == Complete {
 				if il {
 					return mon_short
 				} else {
@@ -190,7 +190,7 @@ func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []
 				}
 			}
 		case time.Tuesday:
-			if yearType == Regular {
+			if ytype == Regular {
 				if il {
 					return mon_short
 				} else {
@@ -198,13 +198,13 @@ func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []
 				}
 			}
 		case time.Thursday:
-			if yearType == Regular {
+			if ytype == Regular {
 				if il {
 					return thu_normal_Israel
 				} else {
 					return thu_normal
 				}
-			} else if yearType == Complete {
+			} else if ytype == Complete {
 				return thu_long
 			}
 		}
@@ -212,9 +212,9 @@ func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []
 		/* leap year */
 		switch rhDay {
 		case time.Saturday:
-			if yearType == Incomplete {
+			if ytype == Incomplete {
 				return sat_short_leap
-			} else if yearType == Complete {
+			} else if ytype == Complete {
 				if il {
 					return sat_short_leap
 				} else {
@@ -222,13 +222,13 @@ func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []
 				}
 			}
 		case time.Monday:
-			if yearType == Incomplete {
+			if ytype == Incomplete {
 				if il {
 					return mon_short_leap_Israel
 				} else {
 					return mon_short_leap
 				}
-			} else if yearType == Complete {
+			} else if ytype == Complete {
 				if il {
 					return mon_long_leap_Israel
 				} else {
@@ -236,7 +236,7 @@ func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []
 				}
 			}
 		case time.Tuesday:
-			if yearType == Regular {
+			if ytype == Regular {
 				if il {
 					return mon_long_leap_Israel
 				} else {
@@ -244,9 +244,9 @@ func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []
 				}
 			}
 		case time.Thursday:
-			if yearType == Incomplete {
+			if ytype == Incomplete {
 				return thu_short_leap
-			} else if yearType == Complete {
+			} else if ytype == Complete {
 				return thu_long_leap
 			}
 		}
@@ -282,19 +282,19 @@ type Parsha struct {
 func NewSedra(year int, il bool) Sedra {
 	longC := LongCheshvan(year)
 	shortK := ShortKislev(year)
-	var yearType YearType
+	var ytype yearType
 	if longC && !shortK {
-		yearType = Complete
+		ytype = Complete
 	} else if !longC && shortK {
-		yearType = Incomplete
+		ytype = Incomplete
 	} else {
-		yearType = Regular
+		ytype = Regular
 	}
 	rh := HebrewToRD(year, Tishrei, 1)
 	rhDay := time.Weekday(rh % 7)
 	leap := IsHebLeapYear(year)
 	firstSaturday := dayOnOrBefore(time.Saturday, rh+6)
-	theSedraArray := getSedraArray(leap, rhDay, yearType, il)
+	theSedraArray := getSedraArray(leap, rhDay, ytype, il)
 	return Sedra{Year: year, IL: il, firstSaturday: firstSaturday, theSedraArray: theSedraArray}
 }
 
