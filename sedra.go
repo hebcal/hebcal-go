@@ -254,10 +254,10 @@ func getSedraArray(leap bool, rhDay time.Weekday, yearType YearType, il bool) []
 }
 
 type Sedra struct {
-	Year          int
-	IL            bool
-	firstSaturday int
-	theSedraArray []int
+	Year          int   // Hebrew year
+	IL            bool  // Israel flag (true for Israel schedule, false for Diaspora)
+	firstSaturday int   // R.D. date of the first Shabbat of the year
+	theSedraArray []int // read-only array of parshiot read this year
 }
 
 // A Parsha object represents a Weekly Torah Reading (Parashat haShavua)

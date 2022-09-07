@@ -78,10 +78,10 @@ func (m HMonth) String() string {
 }
 
 type HDate struct {
-	Year  int
-	Month HMonth
-	Day   int
-	abs   int
+	Year  int    // Hebrew year
+	Month HMonth // Hebrew month (1-13)
+	Day   int    // Hebrew day of month (1-30)
+	abs   int    // R.D. absolute date
 }
 
 const epoch = -1373428

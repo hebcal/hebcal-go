@@ -7,8 +7,8 @@ import (
 
 // DafYomi represents a page of Talmud, such as Pesachim 103
 type DafYomi struct {
-	Name  string
-	Blatt int
+	Name  string // Tractate name (e..g Berachot)
+	Blatt int    // Page number
 }
 
 var shas0 = []DafYomi{

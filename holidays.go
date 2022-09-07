@@ -60,12 +60,12 @@ const (
 )
 
 type HEvent struct {
-	Date          HDate
-	Desc          string
-	Flags         HolidayFlags
-	Emoji         string
-	CholHaMoedDay int
-	ChanukahDay   int
+	Date          HDate        // Holiday date of occurrence
+	Desc          string       // Description (e.g. "Pesach III (CH''M)")
+	Flags         HolidayFlags // Event flag bitmask
+	Emoji         string       // Holiday-specific emoji
+	CholHaMoedDay int          // used only for Pesach and Sukkot
+	ChanukahDay   int          // used only for Chanukah
 }
 
 type holiday struct {
