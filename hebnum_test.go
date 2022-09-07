@@ -1,6 +1,7 @@
 package hebcal
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,4 +31,9 @@ func TestGematriya(t *testing.T) {
 	assert.Equal("א׳קכ״ג", Gematriya(1123))
 	assert.Equal("ו׳", Gematriya(6000))
 	assert.Equal("ז׳ז׳", Gematriya(7007))
+}
+
+func ExampleGematriya() {
+	fmt.Println(Gematriya(5749))
+	// Output: תשמ״ט
 }

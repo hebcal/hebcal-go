@@ -6,68 +6,6 @@ import (
 	"time"
 )
 
-type HolidayFlags uint32
-
-const (
-	// Chag, yontiff, yom tov
-	CHAG HolidayFlags = 1 << iota
-	// Light candles 18 minutes before sundown
-	LIGHT_CANDLES
-	// End of holiday (end of Yom Tov)
-	YOM_TOV_ENDS
-	// Observed only in the Diaspora (chutz l'aretz)
-	CHUL_ONLY
-	// Observed only in Israel
-	IL_ONLY
-	// Light candles in the evening at Tzeit time (3 small stars)
-	LIGHT_CANDLES_TZEIS
-	// Candle-lighting for Chanukah
-	CHANUKAH_CANDLES
-	// Rosh Chodesh, beginning of a new Hebrew month
-	ROSH_CHODESH
-	// Minor fasts like Tzom Tammuz, Ta'anit Esther, ...
-	MINOR_FAST
-	// Shabbat Shekalim, Zachor, ...
-	SPECIAL_SHABBAT
-	// Weekly sedrot on Saturdays
-	PARSHA_HASHAVUA
-	// Daily page of Talmud
-	DAF_YOMI
-	// Days of the Omer
-	OMER_COUNT
-	// Yom HaShoah, Yom HaAtzma'ut, ...
-	MODERN_HOLIDAY
-	// Yom Kippur and Tish'a B'Av
-	MAJOR_FAST
-	// On the Saturday before Rosh Chodesh
-	SHABBAT_MEVARCHIM
-	// Molad
-	MOLAD
-	// Yahrzeit or Hebrew Anniversary
-	USER_EVENT
-	// Daily Hebrew date ("11th of Sivan, 5780")
-	HEBREW_DATE
-	// A holiday that's not major, modern, rosh chodesh, or a fast day
-	MINOR_HOLIDAY
-	// Evening before a major or minor holiday
-	EREV
-	// Chol haMoed, intermediate days of Pesach or Sukkot
-	CHOL_HAMOED
-	// Mishna Yomi
-	MISHNA_YOMI
-	// Yom Kippur Katan, minor day of atonement on the day preceding each Rosh Chodesh
-	YOM_KIPPUR_KATAN
-)
-
-type HEvent struct {
-	Date          HDate        // Holiday date of occurrence
-	Desc          string       // Description (e.g. "Pesach III (CH''M)")
-	Flags         HolidayFlags // Event flag bitmask
-	Emoji         string       // Holiday-specific emoji
-	CholHaMoedDay int          // used only for Pesach and Sukkot
-	ChanukahDay   int          // used only for Chanukah
-}
-
 type holiday struct {
 	mm     HMonth
 	dd     int
@@ -197,7 +135,7 @@ func taanitBechorotDate(pesach HDate) HDate {
 	}
 }
 
-type byDate []HEvent
+type byDate []HolidayEvent
 
 func (s byDate) Len() int {
 	return len(s)
@@ -224,11 +162,11 @@ func nextMonthName(year int, month HMonth) (string, HMonth) {
 	return nextMonthName, nextMonth
 }
 
-func getAllHolidaysForYear(year int) []HEvent {
-	events := make([]HEvent, 0, 120)
+func getAllHolidaysForYear(year int) []HolidayEvent {
+	events := make([]HolidayEvent, 0, 120)
 	// standard holidays that don't shift based on year
 	for _, h := range staticHolidays {
-		events = append(events, HEvent{Date: NewHDate(year, h.mm, h.dd),
+		events = append(events, HolidayEvent{Date: NewHDate(year, h.mm, h.dd),
 			Desc: h.desc, Flags: h.flags, Emoji: h.emoji, CholHaMoedDay: h.chmDay})
 	}
 	// variable holidays
@@ -237,70 +175,70 @@ func getAllHolidaysForYear(year int) []HEvent {
 	pesach := NewHDate(year, Nisan, 15)
 	pesachAbs := pesach.Abs()
 	events = append(events,
-		HEvent{
+		HolidayEvent{
 			Date:  roshHashana,
 			Desc:  "Rosh Hashana " + strconv.Itoa(year),
 			Flags: CHAG | LIGHT_CANDLES_TZEIS,
 			Emoji: "🍏🍯"},
-		HEvent{
+		HolidayEvent{
 			Date:  NewHDateFromRD(dayOnOrBefore(time.Saturday, 7+roshHashana.Abs())),
 			Desc:  "Shabbat Shuva",
 			Flags: SPECIAL_SHABBAT,
 			Emoji: "🕍"},
-		HEvent{
+		HolidayEvent{
 			Date:  tzomGedaliahDate(roshHashana),
 			Desc:  "Tzom Gedaliah",
 			Flags: MINOR_FAST},
-		HEvent{
+		HolidayEvent{
 			Date:  NewHDateFromRD(dayOnOrBefore(time.Saturday, pesachAbs-43)),
 			Desc:  "Shabbat Shekalim",
 			Flags: SPECIAL_SHABBAT,
 			Emoji: "🕍"},
-		HEvent{
+		HolidayEvent{
 			Date:  NewHDateFromRD(dayOnOrBefore(time.Saturday, pesachAbs-30)),
 			Desc:  "Shabbat Zachor",
 			Flags: SPECIAL_SHABBAT,
 			Emoji: "🕍"},
-		HEvent{
+		HolidayEvent{
 			Date:  taanitEstherDate(pesach),
 			Desc:  "Ta'anit Esther",
 			Flags: MINOR_FAST},
-		HEvent{
+		HolidayEvent{
 			Date:  shushanPurimDate(pesach),
 			Desc:  "Shushan Purim",
 			Flags: MINOR_HOLIDAY, Emoji: "🎭️📜"},
-		HEvent{
+		HolidayEvent{
 			Date:  NewHDateFromRD(dayOnOrBefore(time.Saturday, pesachAbs-14) - 7),
 			Desc:  "Shabbat Parah",
 			Flags: SPECIAL_SHABBAT,
 			Emoji: "🕍"},
-		HEvent{
+		HolidayEvent{
 			Date: NewHDateFromRD(dayOnOrBefore(time.Saturday, pesachAbs-14)),
 			Desc: "Shabbat HaChodesh", Flags: SPECIAL_SHABBAT,
 			Emoji: "🕍"},
-		HEvent{
+		HolidayEvent{
 			Date: NewHDateFromRD(dayOnOrBefore(time.Saturday, pesachAbs-1)),
 			Desc: "Shabbat HaGadol", Flags: SPECIAL_SHABBAT,
 			Emoji: "🕍"},
-		HEvent{
+		HolidayEvent{
 			Date:  taanitBechorotDate(pesach),
 			Desc:  "Ta'anit Bechorot",
 			Flags: MINOR_FAST},
-		HEvent{
+		HolidayEvent{
 			Date:  NewHDateFromRD(dayOnOrBefore(time.Saturday, nextRh.Abs()-4)),
 			Desc:  "Leil Selichot",
 			Flags: MINOR_HOLIDAY,
 			Emoji: "🕍"},
 	)
 	if IsHebLeapYear(year) {
-		events = append(events, HEvent{
+		events = append(events, HolidayEvent{
 			Date:  NewHDate(year, Adar1, 14),
 			Desc:  "Purim Katan",
 			Flags: MINOR_HOLIDAY,
 			Emoji: "🎭️"})
 	}
 	for candles := 2; candles <= 6; candles++ {
-		events = append(events, HEvent{
+		events = append(events, HolidayEvent{
 			Date:        NewHDate(year, Kislev, 23+candles),
 			Desc:        "Chanukah: " + strconv.Itoa(candles) + " Candles",
 			Flags:       MINOR_HOLIDAY | CHANUKAH_CANDLES,
@@ -315,19 +253,19 @@ func getAllHolidaysForYear(year int) []HEvent {
 	}
 	chanukah8 := chanukah7.Next()
 	events = append(events,
-		HEvent{
+		HolidayEvent{
 			Date:        chanukah7,
 			Desc:        "Chanukah: 7 Candles",
 			Flags:       MINOR_HOLIDAY | CHANUKAH_CANDLES,
 			Emoji:       chanukahEmoji,
 			ChanukahDay: 6},
-		HEvent{
+		HolidayEvent{
 			Date:        chanukah8,
 			Desc:        "Chanukah: 8 Candles",
 			Flags:       MINOR_HOLIDAY | CHANUKAH_CANDLES,
 			Emoji:       chanukahEmoji,
 			ChanukahDay: 7},
-		HEvent{
+		HolidayEvent{
 			Date:        chanukah8.Next(),
 			Desc:        "Chanukah: 8th Day",
 			Flags:       MINOR_HOLIDAY,
@@ -340,7 +278,7 @@ func getAllHolidaysForYear(year int) []HEvent {
 		tamuz17 = tamuz17.Next()
 	}
 	events = append(events,
-		HEvent{Date: tamuz17, Desc: "Tzom Tammuz", Flags: MINOR_FAST})
+		HolidayEvent{Date: tamuz17, Desc: "Tzom Tammuz", Flags: MINOR_FAST})
 
 	var av9dt = NewHDate(year, Av, 9)
 	var av9title = "Tish'a B'Av"
@@ -350,14 +288,14 @@ func getAllHolidaysForYear(year int) []HEvent {
 	}
 	var av9abs = av9dt.Abs()
 	events = append(events,
-		HEvent{
+		HolidayEvent{
 			Date:  NewHDateFromRD(dayOnOrBefore(time.Saturday, av9abs)),
 			Desc:  "Shabbat Chazon",
 			Flags: SPECIAL_SHABBAT,
 			Emoji: "🕍"},
-		HEvent{Date: av9dt.Prev(), Desc: "Erev Tish'a B'Av", Flags: EREV | MAJOR_FAST},
-		HEvent{Date: av9dt, Desc: av9title, Flags: MAJOR_FAST},
-		HEvent{
+		HolidayEvent{Date: av9dt.Prev(), Desc: "Erev Tish'a B'Av", Flags: EREV | MAJOR_FAST},
+		HolidayEvent{Date: av9dt, Desc: av9title, Flags: MAJOR_FAST},
+		HolidayEvent{
 			Date:  NewHDateFromRD(dayOnOrBefore(time.Saturday, av9abs+7)),
 			Desc:  "Shabbat Nachamu",
 			Flags: SPECIAL_SHABBAT,
@@ -380,8 +318,8 @@ func getAllHolidaysForYear(year int) []HEvent {
 		}
 		var tmpDate = NewHDate(year, Iyyar, day)
 		events = append(events,
-			HEvent{Date: tmpDate, Desc: "Yom HaZikaron", Flags: MODERN_HOLIDAY, Emoji: "🇮🇱"},
-			HEvent{Date: tmpDate.Next(), Desc: "Yom HaAtzma'ut", Flags: MODERN_HOLIDAY, Emoji: "🇮🇱"},
+			HolidayEvent{Date: tmpDate, Desc: "Yom HaZikaron", Flags: MODERN_HOLIDAY, Emoji: "🇮🇱"},
+			HolidayEvent{Date: tmpDate.Next(), Desc: "Yom HaAtzma'ut", Flags: MODERN_HOLIDAY, Emoji: "🇮🇱"},
 		)
 	}
 
@@ -400,13 +338,13 @@ func getAllHolidaysForYear(year int) []HEvent {
 			nisan27dt = nisan27dt.Next()
 		}
 		events = append(events,
-			HEvent{Date: nisan27dt, Desc: "Yom HaShoah", Flags: MODERN_HOLIDAY})
+			HolidayEvent{Date: nisan27dt, Desc: "Yom HaShoah", Flags: MODERN_HOLIDAY})
 	}
 
 	if year >= 5727 {
 		// Yom Yerushalayim only celebrated after 1967
 		events = append(events,
-			HEvent{
+			HolidayEvent{
 				Date:  NewHDate(year, Iyyar, 28),
 				Desc:  "Yom Yerushalayim",
 				Flags: MODERN_HOLIDAY,
@@ -415,7 +353,7 @@ func getAllHolidaysForYear(year int) []HEvent {
 
 	if year >= 5769 {
 		events = append(events,
-			HEvent{
+			HolidayEvent{
 				Date:  NewHDate(year, Cheshvan, 29),
 				Desc:  "Sigd",
 				Flags: MODERN_HOLIDAY})
@@ -423,12 +361,12 @@ func getAllHolidaysForYear(year int) []HEvent {
 
 	if year >= 5777 {
 		events = append(events,
-			HEvent{
+			HolidayEvent{
 				Date:  NewHDate(year, Cheshvan, 7),
 				Desc:  "Yom HaAliyah School Observance",
 				Flags: MODERN_HOLIDAY,
 				Emoji: "🇮🇱"},
-			HEvent{
+			HolidayEvent{
 				Date:  NewHDate(year, Nisan, 10),
 				Desc:  "Yom HaAliyah",
 				Flags: MODERN_HOLIDAY,
@@ -453,12 +391,12 @@ func getAllHolidaysForYear(year int) []HEvent {
 		desc := "Rosh Chodesh " + monthName
 		if prevMonthNumDays == 30 {
 			events = append(events,
-				HEvent{
+				HolidayEvent{
 					Date:  NewHDate(year, prevMonth, 30),
 					Desc:  desc,
 					Flags: ROSH_CHODESH,
 					Emoji: "🌒"},
-				HEvent{
+				HolidayEvent{
 					Date:  NewHDate(year, month, 1),
 					Desc:  desc,
 					Flags: ROSH_CHODESH,
@@ -466,7 +404,7 @@ func getAllHolidaysForYear(year int) []HEvent {
 			)
 		} else if month != Tishrei {
 			events = append(events,
-				HEvent{
+				HolidayEvent{
 					Date:  NewHDate(year, month, 1),
 					Desc:  desc,
 					Flags: ROSH_CHODESH,
@@ -479,7 +417,7 @@ func getAllHolidaysForYear(year int) []HEvent {
 		}
 		nextMonthName, _ := nextMonthName(year, month)
 		events = append(events,
-			HEvent{
+			HolidayEvent{
 				Date:  NewHDate(year, month, 29).OnOrBefore(time.Saturday),
 				Desc:  "Shabbat Mevarchim Chodesh " + nextMonthName,
 				Flags: SHABBAT_MEVARCHIM,
@@ -503,7 +441,7 @@ func getAllHolidaysForYear(year int) []HEvent {
 		}
 
 		events = append(events,
-			HEvent{
+			HolidayEvent{
 				Date:  ykk,
 				Desc:  "Yom Kippur Katan " + nextMonthName,
 				Flags: MINOR_FAST | YOM_KIPPUR_KATAN})
@@ -512,7 +450,7 @@ func getAllHolidaysForYear(year int) []HEvent {
 	sedra := NewSedra(year, false)
 	beshalachHd, _ := sedra.FindParshaNum(16)
 	events = append(events,
-		HEvent{
+		HolidayEvent{
 			Date:  beshalachHd,
 			Desc:  "Shabbat Shirah",
 			Flags: SPECIAL_SHABBAT,
@@ -524,9 +462,9 @@ func getAllHolidaysForYear(year int) []HEvent {
 
 // Returns a slice of holidays for the year.
 // For Israel holiday schedule, specify il=true.
-func GetHolidaysForYear(year int, il bool) []HEvent {
+func GetHolidaysForYear(year int, il bool) []HolidayEvent {
 	events := getAllHolidaysForYear(year)
-	result := make([]HEvent, 0, len(events))
+	result := make([]HolidayEvent, 0, len(events))
 	for _, ev := range events {
 		if (il && (ev.Flags&CHUL_ONLY) == 0) || (!il && (ev.Flags&IL_ONLY) == 0) {
 			result = append(result, ev)
