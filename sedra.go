@@ -262,22 +262,18 @@ type Sedra struct {
 
 // A Parsha object represents a Weekly Torah Reading (Parashat haShavua)
 type Parsha struct {
-	/*
-		Name represents the name of the parsha (or parshiyot) read on
-		Hebrew date, e.g. {"Noach"} or {"Matot", "Masei"}
-	*/
+	// Name represents the name of the parsha (or parshiyot) read on
+	// Hebrew date, e.g. {"Noach"} or {"Matot", "Masei"}
 	Name []string
-	/*
-		Num is the parsha number (or numbers) using 1-indexing. The slice contains
-		one number for a regular (single) parsha, and two numbers for a doubled parsha.
-		For Parashat Bereshit, Num would be equal to {1}, and for
-		Matot-Masei it would be {42, 43}
-	*/
+
+	// Num is the parsha number (or numbers) using 1-indexing. The slice contains
+	// one number for a regular (single) parsha, and two numbers for a doubled parsha.
+	// For Parashat Bereshit, Num would be equal to {1}, and for
+	// Matot-Masei it would be {42, 43}
 	Num []int
-	/*
-		Chag is true if this is a regular parasha HaShavua Torah reading,
-		false if it's a special holiday reading
-	*/
+
+	// Chag is true if this is a regular parasha HaShavua Torah reading,
+	// false if it's a special holiday reading
 	Chag bool
 }
 

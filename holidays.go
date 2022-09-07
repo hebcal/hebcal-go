@@ -9,53 +9,53 @@ import (
 type HolidayFlags uint32
 
 const (
-	/* Chag, yontiff, yom tov */
+	// Chag, yontiff, yom tov
 	CHAG HolidayFlags = 1 << iota
-	/* Light candles 18 minutes before sundown */
+	// Light candles 18 minutes before sundown
 	LIGHT_CANDLES
-	/* End of holiday (end of Yom Tov)  */
+	// End of holiday (end of Yom Tov)
 	YOM_TOV_ENDS
-	/* Observed only in the Diaspora (chutz l'aretz)  */
+	// Observed only in the Diaspora (chutz l'aretz)
 	CHUL_ONLY
-	/* Observed only in Israel */
+	// Observed only in Israel
 	IL_ONLY
-	/* Light candles in the evening at Tzeit time (3 small stars) */
+	// Light candles in the evening at Tzeit time (3 small stars)
 	LIGHT_CANDLES_TZEIS
-	/* Candle-lighting for Chanukah */
+	// Candle-lighting for Chanukah
 	CHANUKAH_CANDLES
-	/* Rosh Chodesh, beginning of a new Hebrew month */
+	// Rosh Chodesh, beginning of a new Hebrew month
 	ROSH_CHODESH
-	/* Minor fasts like Tzom Tammuz, Ta'anit Esther, ... */
+	// Minor fasts like Tzom Tammuz, Ta'anit Esther, ...
 	MINOR_FAST
-	/* Shabbat Shekalim, Zachor, ... */
+	// Shabbat Shekalim, Zachor, ...
 	SPECIAL_SHABBAT
-	/* Weekly sedrot on Saturdays */
+	// Weekly sedrot on Saturdays
 	PARSHA_HASHAVUA
-	/* Daily page of Talmud */
+	// Daily page of Talmud
 	DAF_YOMI
-	/* Days of the Omer */
+	// Days of the Omer
 	OMER_COUNT
-	/* Yom HaShoah, Yom HaAtzma'ut, ... */
+	// Yom HaShoah, Yom HaAtzma'ut, ...
 	MODERN_HOLIDAY
-	/* Yom Kippur and Tish'a B'Av */
+	// Yom Kippur and Tish'a B'Av
 	MAJOR_FAST
-	/* On the Saturday before Rosh Chodesh */
+	// On the Saturday before Rosh Chodesh
 	SHABBAT_MEVARCHIM
-	/* Molad */
+	// Molad
 	MOLAD
-	/* Yahrzeit or Hebrew Anniversary */
+	// Yahrzeit or Hebrew Anniversary
 	USER_EVENT
-	/* Daily Hebrew date ("11th of Sivan, 5780") */
+	// Daily Hebrew date ("11th of Sivan, 5780")
 	HEBREW_DATE
-	/* A holiday that's not major, modern, rosh chodesh, or a fast day */
+	// A holiday that's not major, modern, rosh chodesh, or a fast day
 	MINOR_HOLIDAY
-	/* Evening before a major or minor holiday */
+	// Evening before a major or minor holiday
 	EREV
-	/* Chol haMoed, intermediate days of Pesach or Sukkot */
+	// Chol haMoed, intermediate days of Pesach or Sukkot
 	CHOL_HAMOED
-	/* Mishna Yomi */
+	// Mishna Yomi
 	MISHNA_YOMI
-	/* Yom Kippur Katan, minor day of atonement on the day preceeding each Rosh Chodesh */
+	// Yom Kippur Katan, minor day of atonement on the day preceeding each Rosh Chodesh
 	YOM_KIPPUR_KATAN
 )
 

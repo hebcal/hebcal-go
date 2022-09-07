@@ -23,31 +23,31 @@ import (
 type HMonth int
 
 const (
-	/* Nissan / ניסן */
+	// Nissan / ניסן
 	Nisan HMonth = 1 + iota
-	/* Iyyar / אייר */
+	// Iyyar / אייר
 	Iyyar
-	/* Sivan / סיון */
+	// Sivan / סיון
 	Sivan
-	/* Tamuz (sometimes Tammuz) / תמוז */
+	// Tamuz (sometimes Tammuz) / תמוז
 	Tamuz
-	/* Av / אב */
+	// Av / אב
 	Av
-	/* Elul / אלול */
+	// Elul / אלול
 	Elul
-	/* Tishrei / תִשְׁרֵי */
+	// Tishrei / תִשְׁרֵי
 	Tishrei
-	/* Cheshvan / חשון */
+	// Cheshvan / חשון
 	Cheshvan
-	/* Kislev / כסלו */
+	// Kislev / כסלו
 	Kislev
-	/* Tevet / טבת */
+	// Tevet / טבת
 	Tevet
-	/* Sh'vat / שבט */
+	// Sh'vat / שבט
 	Shvat
-	/* Adar or Adar Rishon / אדר */
+	// Adar or Adar Rishon / אדר
 	Adar1
-	/* Adar Sheini (only on leap years) / אדר ב׳ */
+	// Adar Sheini (only on leap years) / אדר ב׳
 	Adar2
 )
 
