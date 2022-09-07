@@ -260,23 +260,24 @@ type Sedra struct {
 	theSedraArray []int
 }
 
-/*
-Result of Sedra.lookup
-
-Name represents the name of the parsha (or parshiyot) read on
-Hebrew date, e.g. {"Noach"} or {"Matot", "Masei"}
-
-Chag is true if this is a regular parasha HaShavua Torah reading,
-false if it's a special holiday reading
-
-Num is the parsha number (or numbers) using 1-indexing. The slice contains
-one number for a regular (single) parsha, and two numbers for a doubled parsha.
-For Parashat Bereshit, Num would be equal to {1}, and for
-Matot-Masei it would be {42, 43}
-*/
+// A Parsha object represents a Weekly Torah Reading (Parashat haShavua)
 type Parsha struct {
+	/*
+		Name represents the name of the parsha (or parshiyot) read on
+		Hebrew date, e.g. {"Noach"} or {"Matot", "Masei"}
+	*/
 	Name []string
-	Num  []int
+	/*
+		Num is the parsha number (or numbers) using 1-indexing. The slice contains
+		one number for a regular (single) parsha, and two numbers for a doubled parsha.
+		For Parashat Bereshit, Num would be equal to {1}, and for
+		Matot-Masei it would be {42, 43}
+	*/
+	Num []int
+	/*
+		Chag is true if this is a regular parasha HaShavua Torah reading,
+		false if it's a special holiday reading
+	*/
 	Chag bool
 }
 
@@ -327,7 +328,7 @@ func (sedra *Sedra) LookupByRD(rataDie int) Parsha {
 	}
 }
 
-// Returns the Parsha that's read on the Saturday on or after hd.
+// Returns the Parsha that is read on the Saturday on or after hd.
 func (sedra *Sedra) Lookup(hd HDate) Parsha {
 	return sedra.LookupByRD(hd.Abs())
 }
