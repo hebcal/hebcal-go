@@ -16,84 +16,100 @@
 package hebcal
 
 import (
-	"strconv"
+	"fmt"
+	"strings"
 	"time"
 )
 
-type HavdalahEvent struct {
-	Date        HDate        // Holiday date of occurrence
-	Flags       HolidayFlags // Event flag bitmask
-	mins        int
-	eventTime   time.Time
-	linkedEvent *HolidayEvent
-	loc         *HLocation
+/*
+type TimedEvent2 interface {
+	GetDate() HDate         // Holiday date of occurrence
+	Render() string         // Description (e.g. "Pesach III (CH''M)")
+	GetFlags() HolidayFlags // Event flag bitmask
+	GetEmoji() string       // Holiday-specific emoji
+	GetTime() time.Time
+	GetLinkedEvent() HEvent
+	GetLocation() *HLocation
+}
+*/
+
+type TimedEvent struct {
+	HolidayEvent
+	eventTime    time.Time
+	sunsetOffset int
+	loc          *HLocation
+	linkedEvent  HEvent
 }
 
-func (ev HavdalahEvent) GetDate() HDate {
-	return ev.Date
-}
-
-func (ev HavdalahEvent) Render() string {
-	prefix := "Havdalah"
-	if ev.mins != 0 {
-		prefix = "Havdalah (" + strconv.Itoa(ev.mins) + " mins)"
+func NewTimedEvent(hd HDate, desc string, flags HolidayFlags, t time.Time, sunsetOffset int, linkedEvent HEvent, loc *HLocation) TimedEvent {
+	if t == nilTime {
+		return TimedEvent{}
 	}
-	return prefix + ": " + ev.eventTime.Format(time.Kitchen)
+	var emoji string
+	switch flags {
+	case LIGHT_CANDLES, LIGHT_CANDLES_TZEIS:
+		emoji = "🕯️"
+	case YOM_TOV_ENDS:
+		emoji = "✨"
+	case CHANUKAH_CANDLES:
+		emoji = chanukahEmoji
+	}
+	return TimedEvent{
+		HolidayEvent: HolidayEvent{
+			Date:  hd,
+			Desc:  desc,
+			Flags: flags,
+			Emoji: emoji,
+		},
+		eventTime:    t,
+		linkedEvent:  linkedEvent,
+		loc:          loc,
+		sunsetOffset: sunsetOffset,
+	}
 }
 
-func (ev HavdalahEvent) GetFlags() HolidayFlags {
-	return ev.Flags
-}
-
-func (ev HavdalahEvent) GetEmoji() string {
-	return "✨"
-}
-
-type CandleLightingEvent struct {
-	Date        HDate        // Holiday date of occurrence
-	Flags       HolidayFlags // Event flag bitmask
-	eventTime   time.Time
-	linkedEvent *HolidayEvent
-	loc         *HLocation
-}
-
-func (ev CandleLightingEvent) GetDate() HDate {
+func (ev TimedEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev CandleLightingEvent) Render() string {
-	return "Candle lighting: " + ev.eventTime.Format(time.Kitchen)
+func (ev TimedEvent) Render() string {
+	desc := ev.Desc
+	if desc == "Havdalah" && ev.sunsetOffset != 0 {
+		desc = fmt.Sprintf("Havdalah (%d min)", ev.sunsetOffset)
+	}
+	timeStr := ev.eventTime.Format(time.Kitchen)
+	return fmt.Sprintf("%s: %s", desc, timeStr[0:len(timeStr)-2])
 }
 
-func (ev CandleLightingEvent) GetFlags() HolidayFlags {
+func (ev TimedEvent) GetFlags() HolidayFlags {
 	return ev.Flags
 }
 
-func (ev CandleLightingEvent) GetEmoji() string {
-	return "🕯️"
+func (ev TimedEvent) GetEmoji() string {
+	return ev.Emoji
 }
 
-func makeCandleEvent(hd HDate, opts *CalOptions, ev *HolidayEvent) HEvent {
+func makeCandleEvent(hd HDate, opts *CalOptions, ev HEvent) TimedEvent {
 	havdalahTitle := false
 	useHavdalahOffset := false
 	dow := hd.Weekday()
 	if dow == time.Saturday {
 		useHavdalahOffset = true
 	}
-	mask := LIGHT_CANDLES
+	flags := LIGHT_CANDLES
 	if ev != nil {
-		mask = ev.Flags
+		flags = ev.GetFlags()
 		if dow != time.Friday {
-			if (mask & (LIGHT_CANDLES_TZEIS | CHANUKAH_CANDLES)) != 0 {
+			if (flags & (LIGHT_CANDLES_TZEIS | CHANUKAH_CANDLES)) != 0 {
 				useHavdalahOffset = true
-			} else if (mask & YOM_TOV_ENDS) != 0 {
+			} else if (flags & YOM_TOV_ENDS) != 0 {
 				havdalahTitle = true
 				useHavdalahOffset = true
 			}
 		}
 	} else if dow == time.Saturday {
 		havdalahTitle = true
-		mask = LIGHT_CANDLES_TZEIS
+		flags = LIGHT_CANDLES_TZEIS
 	}
 	// if offset is 0 or undefined, we'll use tzeit time
 	offset := opts.CandleLightingMins
@@ -104,31 +120,69 @@ func makeCandleEvent(hd HDate, opts *CalOptions, ev *HolidayEvent) HEvent {
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	loc := opts.Location
 	zmanim := NewZmanim(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
-	var time time.Time
+	var eventTime time.Time
 	if offset != 0 {
-		time = zmanim.SunsetOffset(offset)
+		eventTime = zmanim.SunsetOffset(offset)
 	} else {
-		time = zmanim.Tzeit(opts.HavdalahDeg)
+		eventTime = zmanim.Tzeit(opts.HavdalahDeg)
 	}
-	if time == nilTime {
-		return HolidayEvent{} // no sunset
+	if eventTime == nilTime {
+		return TimedEvent{} // no sunset
 	}
+	desc := "Candle lighting"
 	if havdalahTitle {
-		return HavdalahEvent{
-			Date:        hd,
-			Flags:       mask,
-			eventTime:   time,
-			mins:        opts.HavdalahMins,
-			linkedEvent: ev,
-			loc:         loc,
-		}
+		desc = "Havdalah"
+	}
+	return NewTimedEvent(hd, desc, flags, eventTime, offset, ev, loc)
+}
+
+func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
+	hd := ev.Date
+	dow := hd.Weekday()
+	if dow == time.Friday || dow == time.Saturday {
+		return makeCandleEvent(hd, opts, ev)
+	}
+	loc := opts.Location
+	year, month, day := hd.Greg()
+	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	zmanim := NewZmanim(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	candleLightingTime := zmanim.Dusk()
+	return TimedEvent{
+		HolidayEvent: ev,
+		eventTime:    candleLightingTime,
+		linkedEvent:  &ev,
+		loc:          loc,
+	}
+}
+
+// This method returns the tzais (nightfall) based on the opinion of the
+// Geonim calculated as 30 minutes after sunset during the equinox
+// (on March 16, about 4 days before the astronomical equinox, the day that
+// a solar hour is 60 minutes) in Yerushalayim.
+// @see {https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/ComplexZmanimCalendar.html#getTzaisGeonim7Point083Degrees()}
+const TZEIT_3MEDIUM_STARS = 7.083
+
+func makeFastStartEnd(ev HEvent, loc *HLocation) (TimedEvent, TimedEvent) {
+	year, month, day := ev.GetDate().Greg()
+	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	zmanim := NewZmanim(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	hd := ev.GetDate()
+	desc := ev.Render()
+	flags := ev.GetFlags()
+	var startEvent, endEvent TimedEvent
+	if desc == "Erev Tish'a B'Av" {
+		sunset := zmanim.Sunset()
+		startEvent = NewTimedEvent(hd, "Fast begins", flags, sunset, 0, ev, loc)
+	} else if strings.HasPrefix(desc, "Tish'a B'Av") {
+		tzeit := zmanim.Tzeit(TZEIT_3MEDIUM_STARS)
+		endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, loc)
 	} else {
-		return CandleLightingEvent{
-			Date:        hd,
-			Flags:       mask,
-			eventTime:   time,
-			linkedEvent: ev,
-			loc:         loc,
+		dawn := zmanim.AlotHaShachar()
+		startEvent = NewTimedEvent(hd, "Fast begins", flags, dawn, 0, ev, loc)
+		if hd.Weekday() != time.Friday && !(hd.Day == 14 && hd.Month == Nisan) {
+			tzeit := zmanim.Tzeit(TZEIT_3MEDIUM_STARS)
+			endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, loc)
 		}
 	}
+	return startEvent, endEvent
 }

@@ -30,9 +30,9 @@ type CalOptions struct {
 	/* generate calendar for multiple years (default 1) */
 	NumYears int
 	/* use specific start date (requires end date) */
-	Start *HDate
+	Start HDate
 	/* use specific end date (requires start date) */
-	End *HDate
+	End HDate
 	/* calculate candle-lighting and havdalah times */
 	CandleLighting bool
 	/* minutes before sundown to light candles (default 18) */
@@ -86,7 +86,7 @@ type CalOptions struct {
 	/* print the Hebrew date for dates with some events */
 	AddHebrewDatesForEvents bool
 	/* use bitmask from `flags` to filter events */
-	Mask int
+	Mask HolidayFlags
 	/*
 	 * include Yom Kippur Katan (default `false`).
 	 * יוֹם כִּפּוּר קָטָן is a minor day of atonement occurring monthly on the day preceeding each Rosh Chodesh.
