@@ -1,3 +1,18 @@
+// Hebcal - A Jewish Calendar Generator
+// Copyright (c) 2022 Michael J. Radwin
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
 package hebcal
 
 import (
@@ -11,6 +26,7 @@ type HavdalahEvent struct {
 	mins        int
 	eventTime   time.Time
 	linkedEvent *HolidayEvent
+	loc         *HLocation
 }
 
 func (ev HavdalahEvent) GetDate() HDate {
@@ -38,6 +54,7 @@ type CandleLightingEvent struct {
 	Flags       HolidayFlags // Event flag bitmask
 	eventTime   time.Time
 	linkedEvent *HolidayEvent
+	loc         *HLocation
 }
 
 func (ev CandleLightingEvent) GetDate() HDate {
@@ -56,7 +73,7 @@ func (ev CandleLightingEvent) GetEmoji() string {
 	return "🕯️"
 }
 
-func makeCandleEvent(hd HDate, loc *HLocation, ev *HolidayEvent) HEvent {
+func makeCandleEvent(hd HDate, opts *CalOptions, ev *HolidayEvent) HEvent {
 	havdalahTitle := false
 	useHavdalahOffset := false
 	dow := hd.Weekday()
@@ -79,19 +96,19 @@ func makeCandleEvent(hd HDate, loc *HLocation, ev *HolidayEvent) HEvent {
 		mask = LIGHT_CANDLES_TZEIS
 	}
 	// if offset is 0 or undefined, we'll use tzeit time
-	// const offset = useHavdalahOffset ? options.havdalahMins : options.candleLightingMins;
-	var offset int = -18
+	offset := opts.CandleLightingMins
 	if useHavdalahOffset {
-		offset = 42
+		offset = opts.HavdalahMins
 	}
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	loc := opts.Location
 	zmanim := NewZmanim(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
 	var time time.Time
 	if offset != 0 {
 		time = zmanim.SunsetOffset(offset)
 	} else {
-		time = zmanim.Tzeit(8.5)
+		time = zmanim.Tzeit(opts.HavdalahDeg)
 	}
 	if time == nilTime {
 		return HolidayEvent{} // no sunset
@@ -101,8 +118,9 @@ func makeCandleEvent(hd HDate, loc *HLocation, ev *HolidayEvent) HEvent {
 			Date:        hd,
 			Flags:       mask,
 			eventTime:   time,
-			mins:        42,
+			mins:        opts.HavdalahMins,
 			linkedEvent: ev,
+			loc:         loc,
 		}
 	} else {
 		return CandleLightingEvent{
@@ -110,6 +128,7 @@ func makeCandleEvent(hd HDate, loc *HLocation, ev *HolidayEvent) HEvent {
 			Flags:       mask,
 			eventTime:   time,
 			linkedEvent: ev,
+			loc:         loc,
 		}
 	}
 }
