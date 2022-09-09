@@ -140,7 +140,10 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	hd := ev.Date
 	dow := hd.Weekday()
 	if dow == time.Friday || dow == time.Saturday {
-		return makeCandleEvent(hd, opts, ev)
+		timedEv := makeCandleEvent(hd, opts, ev)
+		timedEv.Desc = ev.Desc
+		timedEv.ChanukahDay = ev.ChanukahDay
+		return timedEv
 	}
 	loc := opts.Location
 	year, month, day := hd.Greg()
