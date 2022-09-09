@@ -12,3 +12,6 @@ Hebcal was created in 1992 by Danny Sadinoff as a Unix/Linux program
 written in C, inspired by similar functionality written in Emacs Lisp.
 
 This golang implementation was released in 2022 by Michael J. Radwin.
+
+Many users of this library will utilize the HebrewCalendar and HDate
+interfaces.

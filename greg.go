@@ -23,8 +23,15 @@ import (
 )
 
 // 1-based month lengths
-var mlenStd = [13]int{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
-var mlenLeap = [13]int{0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+var monthLen = [13]int{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+
+// DaysIn returns the number of days in the Gregorian month
+func DaysIn(m time.Month, year int) int {
+	if m == time.February && IsGregLeapYear(year) {
+		return 29
+	}
+	return monthLen[m]
+}
 
 // Returns true if the Gregorian year is a leap year
 func IsGregLeapYear(year int) bool {
@@ -105,6 +112,7 @@ func negativeRDtoGregorian(rataDie int, year int, d3 int) (int, time.Month, int)
 
 /*
 Converts from Rata Die (R.D. number) to Gregorian date.
+
 See the footnote on page 384 of “Calendrical Calculations, Part II:
 Three Historical Calendars” by E. M. Reingold,  N. Dershowitz, and S. M.
 Clamen, Software--Practice and Experience, Volume 23, Number 4
@@ -128,16 +136,10 @@ func RDtoGregorian(rataDie int) (int, time.Month, int) {
 	// }
 	year++
 	var day = (d3 % 365) + 1
-	var month = 1
-	var mlen [13]int
-	if IsGregLeapYear(year) {
-		mlen = mlenLeap
-	} else {
-		mlen = mlenStd
-	}
-	for numDays := mlen[month]; numDays < day; numDays = mlen[month] {
+	var month = time.January
+	for numDays := DaysIn(month, year); numDays < day; numDays = DaysIn(month, year) {
 		day -= numDays
 		month++
 	}
-	return year, time.Month(month), day
+	return year, month, day
 }

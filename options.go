@@ -18,7 +18,7 @@ package hebcal
 
 import "time"
 
-// CalOptions are used by HebrewCalendar() to generate a slice of events
+// CalOptions are used by HebrewCalendar() to configure which events are returned
 type CalOptions struct {
 	/* latitude/longitude/tzid used for candle-lighting */
 	Location *HLocation
@@ -42,14 +42,13 @@ type CalOptions struct {
 	 * minutes after sundown for Havdalah (typical values are 42, 50, or 72).
 	 * If `undefined` (the default), calculate Havdalah according to Tzeit Hakochavim -
 	 * Nightfall (the point when 3 small stars are observable in the night time sky with
-	 * the naked eye). If `0`, Havdalah times are supressed.
+	 * the naked eye).
 	 */
 	HavdalahMins int
 	/*
 	 * degrees for solar depression for Havdalah.
 	 * Default is 8.5 degrees for 3 small stars.
 	 * Use 7.083 degress for 3 medium-sized stars.
-	 * Havdalah times are supressed when `havdalahDeg=0`.
 	 */
 	HavdalahDeg float64
 	/* calculate parashah hashavua on Saturdays */

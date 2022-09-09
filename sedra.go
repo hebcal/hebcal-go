@@ -366,6 +366,7 @@ func (parsha Parsha) String() string {
 	return "Parashat " + strings.Join(parsha.Name, "-")
 }
 
+// Represents one of 54 weekly Torah portions, always on a Saturday
 type parshaEvent struct {
 	Date   HDate
 	Parsha Parsha

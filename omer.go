@@ -25,7 +25,7 @@ type omerEvent struct {
 	DaysWithinWeeks int
 }
 
-func NewOmerEvent(hd HDate, omerDay int) omerEvent {
+func newOmerEvent(hd HDate, omerDay int) omerEvent {
 	if omerDay < 1 || omerDay > 49 {
 		panic("invalid omerDay")
 	}

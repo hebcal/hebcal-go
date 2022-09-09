@@ -34,6 +34,7 @@ type TimedEvent2 interface {
 }
 */
 
+// TimedEvent is used for Candle-lighting, Havdalah, and fast start/end
 type TimedEvent struct {
 	HolidayEvent
 	eventTime    time.Time

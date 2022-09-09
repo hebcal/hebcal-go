@@ -77,6 +77,7 @@ type HEvent interface {
 	GetEmoji() string       // Holiday-specific emoji
 }
 
+// HolidayEvent represents a built-in holiday like Pesach, Purim or Tu BiShvat
 type HolidayEvent struct {
 	Date          HDate        // Holiday date of occurrence
 	Desc          string       // Description (e.g. "Pesach III (CH''M)")

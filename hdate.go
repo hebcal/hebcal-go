@@ -188,10 +188,10 @@ func elapsedDays0(year int) int {
 }
 
 // Converts Hebrew date to R.D. (Rata Die) fixed days.
-//
 // R.D. 1 is the imaginary date Monday, January 1, 1 on the Gregorian Calendar.
 //
 // Note also that R.D. = Julian Date − 1,721,424.5
+//
 // https://en.wikipedia.org/wiki/Rata_Die#Dershowitz_and_Reingold
 func HebrewToRD(year int, month HMonth, day int) int {
 	tempabs := day

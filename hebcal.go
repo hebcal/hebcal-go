@@ -161,7 +161,7 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		}
 		if opts.Omer && abs >= beginOmer && abs <= endOmer {
 			omerDay := abs - beginOmer + 1
-			events = append(events, NewOmerEvent(hd, omerDay))
+			events = append(events, newOmerEvent(hd, omerDay))
 		}
 		/*
 			const hmonth = hd.getMonth();
@@ -227,13 +227,7 @@ func getStartAndEnd(opts *CalOptions) (int, int, error) {
 		}
 		startAbs, _ := GregorianToRD(year, month, 1)
 		if opts.Month != 0 {
-			var mlen [13]int
-			if IsGregLeapYear(year) {
-				mlen = mlenLeap
-			} else {
-				mlen = mlenStd
-			}
-			endAbs := startAbs + mlen[opts.Month]
+			endAbs := startAbs + DaysIn(opts.Month, year)
 			return startAbs, endAbs - 1, nil
 		}
 		endAbs, _ := GregorianToRD(year+numYears, time.January, 1)
