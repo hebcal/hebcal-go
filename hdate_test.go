@@ -72,9 +72,9 @@ func TestMonthNames(t *testing.T) {
 func TestMonthNames2(t *testing.T) {
 	assert := assert.New(t)
 	hd := NewHDate(5782, Adar1, 15)
-	assert.Equal("Adar I", hd.MonthName())
+	assert.Equal("Adar I", hd.MonthName("en"))
 	hd = NewHDate(5783, Adar1, 15)
-	assert.Equal("Adar", hd.MonthName())
+	assert.Equal("Adar", hd.MonthName("en"))
 }
 
 func TestAdar2ResetToAdar1(t *testing.T) {
@@ -307,9 +307,11 @@ func ExampleHDate_Weekday() {
 
 func ExampleHDate_MonthName() {
 	hd := NewHDate(5765, Adar2, 22)
-	monthName := hd.MonthName()
-	fmt.Println(monthName)
-	// Output: Adar II
+	fmt.Println(hd.MonthName("en"))
+	fmt.Println(hd.MonthName("he"))
+	// Output:
+	// Adar II
+	// אַדָר ב׳
 }
 
 func ExampleHDate_IsLeapYear() {

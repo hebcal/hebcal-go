@@ -41,7 +41,7 @@ func (ev omerEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev omerEvent) Render() string {
+func (ev omerEvent) Render(locale string) string {
 	return strconv.Itoa(ev.OmerDay) + " day of the Omer"
 }
 
@@ -51,4 +51,8 @@ func (ev omerEvent) GetFlags() HolidayFlags {
 
 func (ev omerEvent) GetEmoji() string {
 	return ""
+}
+
+func (ev omerEvent) Basename() string {
+	return ev.Render("en")
 }

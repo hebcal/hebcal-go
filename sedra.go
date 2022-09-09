@@ -377,7 +377,7 @@ func (ev parshaEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev parshaEvent) Render() string {
+func (ev parshaEvent) Render(locale string) string {
 	return ev.Parsha.String()
 }
 
@@ -387,4 +387,8 @@ func (ev parshaEvent) GetFlags() HolidayFlags {
 
 func (ev parshaEvent) GetEmoji() string {
 	return ""
+}
+
+func (ev parshaEvent) Basename() string {
+	return strings.Join(ev.Parsha.Name, "-")
 }

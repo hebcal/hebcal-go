@@ -74,7 +74,7 @@ func (ev TimedEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev TimedEvent) Render() string {
+func (ev TimedEvent) Render(locale string) string {
 	desc := ev.Desc
 	if desc == "Havdalah" && ev.sunsetOffset != 0 {
 		desc = fmt.Sprintf("Havdalah (%d min)", ev.sunsetOffset)
@@ -177,7 +177,7 @@ func makeFastStartEnd(ev HEvent, loc *HLocation) (TimedEvent, TimedEvent) {
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	zmanim := NewZmanim(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
 	hd := ev.GetDate()
-	desc := ev.Render()
+	desc := ev.Render("en")
 	flags := ev.GetFlags()
 	var startEvent, endEvent TimedEvent
 	if desc == "Erev Tish'a B'Av" {

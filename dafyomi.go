@@ -151,7 +151,7 @@ func (ev dafYomiEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev dafYomiEvent) Render() string {
+func (ev dafYomiEvent) Render(locale string) string {
 	return ev.Daf.String()
 }
 
@@ -161,4 +161,8 @@ func (ev dafYomiEvent) GetFlags() HolidayFlags {
 
 func (ev dafYomiEvent) GetEmoji() string {
 	return ""
+}
+
+func (ev dafYomiEvent) Basename() string {
+	return ev.Daf.String()
 }

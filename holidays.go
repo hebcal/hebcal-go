@@ -175,7 +175,7 @@ func nextMonthName(year int, month HMonth) (string, HMonth) {
 	if month == HMonth(monthsInYear) {
 		nextMonth = Nisan
 	}
-	nextMonthName := NewHDate(year, nextMonth, 1).MonthName()
+	nextMonthName := NewHDate(year, nextMonth, 1).MonthName("en")
 	return nextMonthName, nextMonth
 }
 
@@ -404,7 +404,7 @@ func getAllHolidaysForYear(year int) []HolidayEvent {
 		prevMonth := HMonth(prevMonthNum)
 		prevMonthNumDays := DaysInMonth(prevMonth, prevMonthYear)
 		month := HMonth(i)
-		monthName := NewHDate(year, month, 1).MonthName()
+		monthName := NewHDate(year, month, 1).MonthName("en")
 		desc := "Rosh Chodesh " + monthName
 		if prevMonthNumDays == 30 {
 			events = append(events,

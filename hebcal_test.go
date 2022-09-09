@@ -38,7 +38,7 @@ func TestHebrewCalendar(t *testing.T) {
 	}
 	actual := make([]string, 0, len(events))
 	for _, ev := range events {
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render())
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
 		actual = append(actual, line)
 	}
 	assert.Equal(expected, actual)
@@ -106,7 +106,7 @@ func TestHebrewCalendarSedrotOnly(t *testing.T) {
 	}
 	actual := make([]string, 0, len(events))
 	for _, ev := range events {
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render())
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
 		actual = append(actual, line)
 	}
 	assert.Equal(expected, actual)
@@ -144,7 +144,7 @@ func TestHebrewCalendarCandles(t *testing.T) {
 	}
 	actual := make([]string, 0, len(events))
 	for _, ev := range events {
-		desc := ev.Render()
+		desc := ev.Render("en")
 		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
 		actual = append(actual, line)
 	}
@@ -180,7 +180,7 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 	}
 	actual := make([]string, 0, len(events))
 	for _, ev := range events {
-		desc := ev.Render()
+		desc := ev.Render("en")
 		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
 		// fmt.Printf("\"%s\",\n", line)
 		actual = append(actual, line)
@@ -224,7 +224,7 @@ func TestHebrewCalendarMask(t *testing.T) {
 	}
 	actual := make([]string, 0, len(events))
 	for _, ev := range events {
-		desc := ev.Render()
+		desc := ev.Render("en")
 		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
 		actual = append(actual, line)
 	}
@@ -244,7 +244,7 @@ func ExampleHebrewCalendar() {
 	for i := 0; i < 6; i++ {
 		ev := events[i]
 		dateStr := ev.GetDate().Gregorian().Format("Mon 02-Jan-2006")
-		title := ev.Render()
+		title := ev.Render("en")
 		fmt.Println(dateStr, title)
 	}
 	// Output:

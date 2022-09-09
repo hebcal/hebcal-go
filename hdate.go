@@ -76,6 +76,22 @@ var longMonthNames = []string{
 	"Nisan",
 }
 
+var heMonthNames = map[HMonth]string{
+	Adar1:    "אַדָר א׳",
+	Adar2:    "אַדָר ב׳",
+	Av:       "אָב",
+	Cheshvan: "חֶשְׁוָן",
+	Elul:     "אֱלוּל",
+	Iyyar:    "אִיָיר",
+	Kislev:   "כִּסְלֵו",
+	Nisan:    "נִיסָן",
+	Shvat:    "שְׁבָט",
+	Sivan:    "סִיוָן",
+	Tamuz:    "תַּמּוּז",
+	Tevet:    "טֵבֵת",
+	Tishrei:  "תִשְׁרֵי",
+}
+
 // String returns the English name of the month ("Nisan", "Iyyar", ...).
 func (m HMonth) String() string {
 	if Nisan <= m && m <= Adar2 {
@@ -333,26 +349,29 @@ func (hd HDate) IsLeapYear() bool {
 	return IsHebLeapYear(hd.Year)
 }
 
-// Returns a string representation of the month name (e.g. "Tishrei", "Sh'vat", "Adar II").
-func (hd HDate) MonthName() string {
-	switch hd.Month {
-	case Nisan, Iyyar, Sivan, Tamuz, Av, Elul, Tishrei, Cheshvan, Kislev, Tevet, Shvat, Adar2:
-		return hd.Month.String()
-	case Adar1:
-		if hd.IsLeapYear() {
-			return "Adar I"
-		} else {
-			return "Adar"
+// MonthName returns a string representation of the month name.
+//
+// If locale is "he", returns Hebrew (e.g. "תִשְׁרֵי", "שְׁבָט", "אַדָר ב׳")
+//
+// Otherwise returns an English transliteration
+// (e.g. "Tishrei", "Sh'vat", "Adar II").
+func (hd HDate) MonthName(locale string) string {
+	if locale == "he" {
+		if hd.Month == Adar1 && !hd.IsLeapYear() {
+			return "אַדָר"
 		}
-	default:
-		/*NOTREACHED*/
-		return ""
+		return heMonthNames[hd.Month]
 	}
+	if hd.Month == Adar1 && !hd.IsLeapYear() {
+		return "Adar"
+	}
+	return hd.Month.String()
 }
 
-// Returns a string representation of the Hebrew date (e.g. "15 Cheshvan 5769").
+// String returns a string representation of the Hebrew date
+// in English transliteration (e.g. "15 Cheshvan 5769").
 func (hd HDate) String() string {
-	return strconv.Itoa(hd.Day) + " " + hd.MonthName() + " " + strconv.Itoa(hd.Year)
+	return strconv.Itoa(hd.Day) + " " + hd.MonthName("en") + " " + strconv.Itoa(hd.Year)
 }
 
 /*

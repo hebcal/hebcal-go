@@ -1,5 +1,10 @@
 package hebcal
 
+import (
+	"regexp"
+	"strconv"
+)
+
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
 // Derived from original C version, Copyright (C) 1994-2004 Danny Sadinoff
@@ -71,10 +76,16 @@ const (
 )
 
 type HEvent interface {
-	GetDate() HDate         // Holiday date of occurrence
-	Render() string         // Description (e.g. "Pesach III (CH''M)")
-	GetFlags() HolidayFlags // Event flag bitmask
-	GetEmoji() string       // Holiday-specific emoji
+	GetDate() HDate              // Holiday date of occurrence
+	Render(locale string) string // Description (e.g. "Pesach III (CH''M)")
+	GetFlags() HolidayFlags      // Event flag bitmask
+	GetEmoji() string            // Holiday-specific emoji
+	// Returns a simplified (untranslated) description for this event.
+	// For example, HolidayEvent supports "Erev Pesach" => "Pesach",
+	// and "Sukkot III (CH''M)" => "Sukkot".
+	// For many holidays the basename and the event description are
+	// the same.
+	Basename() string
 }
 
 // HolidayEvent represents a built-in holiday like Pesach, Purim or Tu BiShvat
@@ -91,7 +102,7 @@ func (ev HolidayEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev HolidayEvent) Render() string {
+func (ev HolidayEvent) Render(locale string) string {
 	return ev.Desc
 }
 
@@ -101,4 +112,70 @@ func (ev HolidayEvent) GetFlags() HolidayFlags {
 
 func (ev HolidayEvent) GetEmoji() string {
 	return ev.Emoji
+}
+
+var regexes = []*regexp.Regexp{
+	regexp.MustCompile(` \d{4}$`),
+	regexp.MustCompile(` \(CH''M\)$`),
+	regexp.MustCompile(` \(observed\)$`),
+	regexp.MustCompile(` \(Hoshana Raba\)$`),
+	regexp.MustCompile(` [IV]+$`),
+	regexp.MustCompile(`: \d Candles?$`),
+	regexp.MustCompile(`: 8th Day$`),
+	regexp.MustCompile(`^Erev `),
+}
+
+func (ev HolidayEvent) Basename() string {
+	str := ev.Desc
+	for _, regex := range regexes {
+		str = regex.ReplaceAllString(str, "")
+	}
+	return str
+}
+
+func getEnOrdinal(n int) string {
+	str := strconv.Itoa(n)
+	i := n % 100
+	if i/10 == 1 {
+		return str + "th"
+	}
+	switch i % 10 {
+	case 1:
+		return str + "st"
+	case 2:
+		return str + "nd"
+	case 3:
+		return str + "rd"
+	default:
+		return str + "th"
+	}
+}
+
+type hebrewDateEvent struct {
+	Date HDate
+}
+
+func (ev hebrewDateEvent) GetDate() HDate {
+	return ev.Date
+}
+
+func (ev hebrewDateEvent) Render(locale string) string {
+	hd := ev.Date
+	if locale == "he" {
+		return Gematriya(hd.Day) + " " + hd.MonthName("he") + " " + Gematriya(hd.Year)
+	}
+	return getEnOrdinal(hd.Day) + " of " + hd.MonthName("en") +
+		", " + strconv.Itoa(hd.Year)
+}
+
+func (ev hebrewDateEvent) GetFlags() HolidayFlags {
+	return HEBREW_DATE
+}
+
+func (ev hebrewDateEvent) GetEmoji() string {
+	return ""
+}
+
+func (ev hebrewDateEvent) Basename() string {
+	return ev.Date.String()
 }

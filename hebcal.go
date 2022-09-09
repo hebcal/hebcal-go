@@ -365,7 +365,7 @@ func appendHolidayAndRelated(events []HEvent, candlesEv TimedEvent, ev HEvent, o
 	isMajorFast := (mask & MAJOR_FAST) != 0
 	isMinorFast := (mask & MINOR_FAST) != 0
 	var startEvent, endEvent TimedEvent
-	if opts.CandleLighting && (isMajorFast || isMinorFast) && ev.Render() != "Yom Kippur" {
+	if opts.CandleLighting && (isMajorFast || isMinorFast) && ev.Render("en") != "Yom Kippur" {
 		startEvent, endEvent = makeFastStartEnd(ev, loc)
 		if (startEvent != TimedEvent{}) && (isMajorFast || (isMinorFast && !opts.NoMinorFast)) {
 			events = append(events, startEvent)
@@ -392,24 +392,4 @@ func appendHolidayAndRelated(events []HEvent, candlesEv TimedEvent, ev HEvent, o
 		events = append(events, endEvent)
 	}
 	return events, candlesEv
-}
-
-type hebrewDateEvent struct {
-	Date HDate
-}
-
-func (ev hebrewDateEvent) GetDate() HDate {
-	return ev.Date
-}
-
-func (ev hebrewDateEvent) Render() string {
-	return ev.Date.String()
-}
-
-func (ev hebrewDateEvent) GetFlags() HolidayFlags {
-	return HEBREW_DATE
-}
-
-func (ev hebrewDateEvent) GetEmoji() string {
-	return ""
 }
