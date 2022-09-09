@@ -1,3 +1,5 @@
+package hebcal
+
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
 // Derived from original JavaScript version, Copyright (C) 2014 Eyal Schachter
@@ -14,7 +16,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package hebcal
 
 import (
 	"time"
@@ -225,7 +226,7 @@ func (z *Zmanim) PlagHaMincha() time.Time {
 // For 3 medium stars use 7.083°
 func (z *Zmanim) Tzeit(angle float64) time.Time {
 	if angle == 0 {
-		angle = 8.5
+		angle = Tzeit3SmallStars
 	}
 	return z.timeAtAngle(angle, false)
 }

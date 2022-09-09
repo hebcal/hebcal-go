@@ -1,3 +1,5 @@
+package hebcal
+
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
 // Derived from original C version, Copyright (C) 1994-2004 Danny Sadinoff
@@ -14,7 +16,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package hebcal
 
 import (
 	"errors"
@@ -151,12 +152,12 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		if opts.Sedrot && dow == time.Saturday && hyear >= 3762 {
 			parsha := sedra.LookupByRD(abs)
 			if !parsha.Chag {
-				events = append(events, ParshaEvent{Date: hd, Parsha: parsha, IL: il})
+				events = append(events, parshaEvent{Date: hd, Parsha: parsha, IL: il})
 			}
 		}
 		if opts.DafYomi && hyear >= 5684 {
 			daf, _ := GetDafYomi(hd)
-			events = append(events, DafYomiEvent{Date: hd, Daf: daf})
+			events = append(events, dafYomiEvent{Date: hd, Daf: daf})
 		}
 		if opts.Omer && abs >= beginOmer && abs <= endOmer {
 			omerDay := abs - beginOmer + 1
@@ -176,7 +177,7 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 			events = append(events, candlesEv)
 		}
 		if opts.AddHebrewDates || (opts.AddHebrewDatesForEvents && prevEventsLength != len(events)) {
-			events = append(events, HebrewDateEvent{Date: hd})
+			events = append(events, hebrewDateEvent{Date: hd})
 		}
 	}
 	return events, nil
@@ -264,12 +265,12 @@ func checkCandleOptions(opts *CalOptions) error {
 	} else if opts.HavdalahDeg != 0.0 {
 		opts.HavdalahDeg = math.Abs(opts.HavdalahDeg)
 	} else {
-		opts.HavdalahDeg = 8.5
+		opts.HavdalahDeg = Tzeit3SmallStars
 	}
 	return nil
 }
 
-const MASK_LIGHT_CANDLES = LIGHT_CANDLES |
+const maskLightCandles = LIGHT_CANDLES |
 	LIGHT_CANDLES_TZEIS |
 	CHANUKAH_CANDLES |
 	YOM_TOV_ENDS
@@ -312,7 +313,8 @@ func getMaskFromOptions(opts *CalOptions) HolidayFlags {
 	var mask HolidayFlags
 	// default opts
 	if !opts.NoHolidays {
-		mask |= ROSH_CHODESH | YOM_TOV_ENDS | MINOR_FAST | SPECIAL_SHABBAT | MODERN_HOLIDAY | MAJOR_FAST |
+		mask |= ROSH_CHODESH | YOM_TOV_ENDS | MINOR_FAST |
+			SPECIAL_SHABBAT | MODERN_HOLIDAY | MAJOR_FAST |
 			MINOR_HOLIDAY | EREV | CHOL_HAMOED |
 			LIGHT_CANDLES | LIGHT_CANDLES_TZEIS | CHANUKAH_CANDLES
 	}
@@ -376,7 +378,7 @@ func appendHolidayAndRelated(events []HEvent, candlesEv TimedEvent, ev HEvent, o
 		}
 	}
 	if (mask & opts.Mask) != 0 {
-		if opts.CandleLighting && (mask&MASK_LIGHT_CANDLES) != 0 {
+		if opts.CandleLighting && (mask&maskLightCandles) != 0 {
 			if (mask&CHANUKAH_CANDLES) != 0 && !opts.NoHolidays {
 				// Replace Chanukah event with a clone that includes candle lighting time.
 				// For clarity, allow a "duplicate" candle lighting event to remain for Shabbat
@@ -398,22 +400,22 @@ func appendHolidayAndRelated(events []HEvent, candlesEv TimedEvent, ev HEvent, o
 	return events, candlesEv
 }
 
-type HebrewDateEvent struct {
+type hebrewDateEvent struct {
 	Date HDate
 }
 
-func (ev HebrewDateEvent) GetDate() HDate {
+func (ev hebrewDateEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev HebrewDateEvent) Render() string {
+func (ev hebrewDateEvent) Render() string {
 	return ev.Date.String()
 }
 
-func (ev HebrewDateEvent) GetFlags() HolidayFlags {
+func (ev hebrewDateEvent) GetFlags() HolidayFlags {
 	return HEBREW_DATE
 }
 
-func (ev HebrewDateEvent) GetEmoji() string {
+func (ev hebrewDateEvent) GetEmoji() string {
 	return ""
 }

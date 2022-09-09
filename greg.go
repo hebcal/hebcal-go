@@ -1,3 +1,5 @@
+package hebcal
+
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
 // Derived from original C version, Copyright (C) 1994-2004 Danny Sadinoff
@@ -14,7 +16,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package hebcal
 
 import (
 	"errors"
@@ -30,7 +31,15 @@ func IsGregLeapYear(year int) bool {
 	return (year%4 == 0) && (year%100 != 0 || year%400 == 0)
 }
 
-// Converts Gregorian date to absolute R.D. (Rata Die) days
+// Converts Gregorian date to absolute R.D. (Rata Die) days.
+// Hours, minutes and seconds are ignored
+func GregorianDateToRD(t time.Time) int {
+	year, month, day := t.Date()
+	abs, _ := GregorianToRD(year, month, day)
+	return abs
+}
+
+// Converts Gregorian date to absolute R.D. (Rata Die) days.
 func GregorianToRD(year int, month time.Month, day int) (int, error) {
 	if year == 0 {
 		return 0, errors.New("invalid Gregorian year")

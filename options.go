@@ -1,3 +1,5 @@
+package hebcal
+
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
 //
@@ -13,7 +15,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package hebcal
 
 import "time"
 
@@ -73,7 +74,7 @@ type CalOptions struct {
 	/* include Days of the Omer */
 	Omer bool
 	/* include event announcing the molad */
-	Molad bool
+	// Molad bool
 	/*
 	 * translate event titles according to a locale
 	 * Default value is `en`, also built-in are `he` and `ashkenazi`.

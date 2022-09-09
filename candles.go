@@ -1,3 +1,5 @@
+package hebcal
+
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
 //
@@ -13,7 +15,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package hebcal
 
 import (
 	"fmt"
@@ -158,12 +159,17 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	}
 }
 
-// This method returns the tzais (nightfall) based on the opinion of the
+// Tzais (nightfall) based on the opinion of the Geonim calculated at
+// the sun's position at 8.5° below the western horizon.
+// https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/ComplexZmanimCalendar.html#getTzaisGeonim8Point5Degrees()
+const Tzeit3SmallStars = 8.5
+
+// Tzais (nightfall) based on the opinion of the
 // Geonim calculated as 30 minutes after sunset during the equinox
 // (on March 16, about 4 days before the astronomical equinox, the day that
 // a solar hour is 60 minutes) in Yerushalayim.
-// @see {https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/ComplexZmanimCalendar.html#getTzaisGeonim7Point083Degrees()}
-const TZEIT_3MEDIUM_STARS = 7.083
+// https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/ComplexZmanimCalendar.html#getTzaisGeonim7Point083Degrees()
+const Tzeit3MediumStars = 7.083
 
 func makeFastStartEnd(ev HEvent, loc *HLocation) (TimedEvent, TimedEvent) {
 	year, month, day := ev.GetDate().Greg()
@@ -177,13 +183,13 @@ func makeFastStartEnd(ev HEvent, loc *HLocation) (TimedEvent, TimedEvent) {
 		sunset := zmanim.Sunset()
 		startEvent = NewTimedEvent(hd, "Fast begins", flags, sunset, 0, ev, loc)
 	} else if strings.HasPrefix(desc, "Tish'a B'Av") {
-		tzeit := zmanim.Tzeit(TZEIT_3MEDIUM_STARS)
+		tzeit := zmanim.Tzeit(Tzeit3MediumStars)
 		endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, loc)
 	} else {
 		dawn := zmanim.AlotHaShachar()
 		startEvent = NewTimedEvent(hd, "Fast begins", flags, dawn, 0, ev, loc)
 		if hd.Weekday() != time.Friday && !(hd.Day == 14 && hd.Month == Nisan) {
-			tzeit := zmanim.Tzeit(TZEIT_3MEDIUM_STARS)
+			tzeit := zmanim.Tzeit(Tzeit3MediumStars)
 			endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, loc)
 		}
 	}

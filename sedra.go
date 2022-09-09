@@ -1,3 +1,5 @@
+package hebcal
+
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
 // Derived from original C version, Copyright (C) 1994-2004 Danny Sadinoff
@@ -14,7 +16,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package hebcal
 
 import (
 	"errors"
@@ -26,9 +27,9 @@ import (
 type yearType int
 
 const (
-	Incomplete yearType = 1 + iota
-	Regular
-	Complete
+	incomplete yearType = 1 + iota
+	regular
+	complete
 )
 
 // The 54 parshiyot of the Torah as transilterated strings
@@ -190,15 +191,15 @@ func getSedraArray(leap bool, rhDay time.Weekday, ytype yearType, il bool) []int
 	if !leap {
 		switch rhDay {
 		case time.Saturday:
-			if ytype == Incomplete {
+			if ytype == incomplete {
 				return sat_short
-			} else if ytype == Complete {
+			} else if ytype == complete {
 				return sat_long
 			}
 		case time.Monday:
-			if ytype == Incomplete {
+			if ytype == incomplete {
 				return mon_short
-			} else if ytype == Complete {
+			} else if ytype == complete {
 				if il {
 					return mon_short
 				} else {
@@ -206,7 +207,7 @@ func getSedraArray(leap bool, rhDay time.Weekday, ytype yearType, il bool) []int
 				}
 			}
 		case time.Tuesday:
-			if ytype == Regular {
+			if ytype == regular {
 				if il {
 					return mon_short
 				} else {
@@ -214,13 +215,13 @@ func getSedraArray(leap bool, rhDay time.Weekday, ytype yearType, il bool) []int
 				}
 			}
 		case time.Thursday:
-			if ytype == Regular {
+			if ytype == regular {
 				if il {
 					return thu_normal_Israel
 				} else {
 					return thu_normal
 				}
-			} else if ytype == Complete {
+			} else if ytype == complete {
 				return thu_long
 			}
 		}
@@ -228,9 +229,9 @@ func getSedraArray(leap bool, rhDay time.Weekday, ytype yearType, il bool) []int
 		/* leap year */
 		switch rhDay {
 		case time.Saturday:
-			if ytype == Incomplete {
+			if ytype == incomplete {
 				return sat_short_leap
-			} else if ytype == Complete {
+			} else if ytype == complete {
 				if il {
 					return sat_short_leap
 				} else {
@@ -238,13 +239,13 @@ func getSedraArray(leap bool, rhDay time.Weekday, ytype yearType, il bool) []int
 				}
 			}
 		case time.Monday:
-			if ytype == Incomplete {
+			if ytype == incomplete {
 				if il {
 					return mon_short_leap_Israel
 				} else {
 					return mon_short_leap
 				}
-			} else if ytype == Complete {
+			} else if ytype == complete {
 				if il {
 					return mon_long_leap_Israel
 				} else {
@@ -252,7 +253,7 @@ func getSedraArray(leap bool, rhDay time.Weekday, ytype yearType, il bool) []int
 				}
 			}
 		case time.Tuesday:
-			if ytype == Regular {
+			if ytype == regular {
 				if il {
 					return mon_long_leap_Israel
 				} else {
@@ -260,9 +261,9 @@ func getSedraArray(leap bool, rhDay time.Weekday, ytype yearType, il bool) []int
 				}
 			}
 		case time.Thursday:
-			if ytype == Incomplete {
+			if ytype == incomplete {
 				return thu_short_leap
-			} else if ytype == Complete {
+			} else if ytype == complete {
 				return thu_long_leap
 			}
 		}
@@ -300,11 +301,11 @@ func NewSedra(year int, il bool) Sedra {
 	shortK := ShortKislev(year)
 	var ytype yearType
 	if longC && !shortK {
-		ytype = Complete
+		ytype = complete
 	} else if !longC && shortK {
-		ytype = Incomplete
+		ytype = incomplete
 	} else {
-		ytype = Regular
+		ytype = regular
 	}
 	rh := HebrewToRD(year, Tishrei, 1)
 	rhDay := time.Weekday(rh % 7)
@@ -365,24 +366,24 @@ func (parsha Parsha) String() string {
 	return "Parashat " + strings.Join(parsha.Name, "-")
 }
 
-type ParshaEvent struct {
+type parshaEvent struct {
 	Date   HDate
 	Parsha Parsha
 	IL     bool
 }
 
-func (ev ParshaEvent) GetDate() HDate {
+func (ev parshaEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev ParshaEvent) Render() string {
+func (ev parshaEvent) Render() string {
 	return ev.Parsha.String()
 }
 
-func (ev ParshaEvent) GetFlags() HolidayFlags {
+func (ev parshaEvent) GetFlags() HolidayFlags {
 	return PARSHA_HASHAVUA
 }
 
-func (ev ParshaEvent) GetEmoji() string {
+func (ev parshaEvent) GetEmoji() string {
 	return ""
 }

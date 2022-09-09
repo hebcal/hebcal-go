@@ -1,3 +1,5 @@
+package hebcal
+
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
 // Derived from original C version, Copyright (C) 1994-2004 Danny Sadinoff
@@ -14,7 +16,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package hebcal
 
 import (
 	"errors"
@@ -138,23 +139,23 @@ func (daf DafYomi) String() string {
 	return daf.Name + " " + strconv.Itoa(daf.Blatt)
 }
 
-type DafYomiEvent struct {
+type dafYomiEvent struct {
 	Date HDate
 	Daf  DafYomi
 }
 
-func (ev DafYomiEvent) GetDate() HDate {
+func (ev dafYomiEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev DafYomiEvent) Render() string {
+func (ev dafYomiEvent) Render() string {
 	return ev.Daf.String()
 }
 
-func (ev DafYomiEvent) GetFlags() HolidayFlags {
+func (ev dafYomiEvent) GetFlags() HolidayFlags {
 	return DAF_YOMI
 }
 
-func (ev DafYomiEvent) GetEmoji() string {
+func (ev dafYomiEvent) GetEmoji() string {
 	return ""
 }

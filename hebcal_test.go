@@ -187,3 +187,46 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 	}
 	assert.Equal(expected, actual)
 }
+
+func TestHebrewCalendarMask(t *testing.T) {
+	assert := assert.New(t)
+	opts := CalOptions{
+		Year: 2020,
+		Mask: ROSH_CHODESH | MODERN_HOLIDAY,
+	}
+	events, err := HebrewCalendar(&opts)
+	assert.Equal(nil, err)
+	assert.Equal(23, len(events))
+	expected := []string{
+		"2020-01-27 Rosh Chodesh Sh'vat",
+		"2020-02-25 Rosh Chodesh Adar",
+		"2020-02-26 Rosh Chodesh Adar",
+		"2020-03-26 Rosh Chodesh Nisan",
+		"2020-04-04 Yom HaAliyah",
+		"2020-04-21 Yom HaShoah",
+		"2020-04-24 Rosh Chodesh Iyyar",
+		"2020-04-25 Rosh Chodesh Iyyar",
+		"2020-04-28 Yom HaZikaron",
+		"2020-04-29 Yom HaAtzma'ut",
+		"2020-05-22 Yom Yerushalayim",
+		"2020-05-24 Rosh Chodesh Sivan",
+		"2020-06-22 Rosh Chodesh Tamuz",
+		"2020-06-23 Rosh Chodesh Tamuz",
+		"2020-07-22 Rosh Chodesh Av",
+		"2020-08-20 Rosh Chodesh Elul",
+		"2020-08-21 Rosh Chodesh Elul",
+		"2020-10-18 Rosh Chodesh Cheshvan",
+		"2020-10-19 Rosh Chodesh Cheshvan",
+		"2020-10-25 Yom HaAliyah School Observance",
+		"2020-11-16 Sigd",
+		"2020-11-17 Rosh Chodesh Kislev",
+		"2020-12-16 Rosh Chodesh Tevet",
+	}
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		desc := ev.Render()
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
+		actual = append(actual, line)
+	}
+	assert.Equal(expected, actual)
+}

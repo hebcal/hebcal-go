@@ -1,3 +1,5 @@
+package hebcal
+
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
 //
@@ -13,18 +15,17 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package hebcal
 
 import "strconv"
 
-type OmerEvent struct {
+type omerEvent struct {
 	Date            HDate
 	OmerDay         int
 	WeekNumber      int
 	DaysWithinWeeks int
 }
 
-func NewOmerEvent(hd HDate, omerDay int) OmerEvent {
+func NewOmerEvent(hd HDate, omerDay int) omerEvent {
 	if omerDay < 1 || omerDay > 49 {
 		panic("invalid omerDay")
 	}
@@ -33,21 +34,21 @@ func NewOmerEvent(hd HDate, omerDay int) OmerEvent {
 	if days == 0 {
 		days = 7
 	}
-	return OmerEvent{Date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
+	return omerEvent{Date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
 }
 
-func (ev OmerEvent) GetDate() HDate {
+func (ev omerEvent) GetDate() HDate {
 	return ev.Date
 }
 
-func (ev OmerEvent) Render() string {
+func (ev omerEvent) Render() string {
 	return strconv.Itoa(ev.OmerDay) + " day of the Omer"
 }
 
-func (ev OmerEvent) GetFlags() HolidayFlags {
+func (ev omerEvent) GetFlags() HolidayFlags {
 	return OMER_COUNT
 }
 
-func (ev OmerEvent) GetEmoji() string {
+func (ev omerEvent) GetEmoji() string {
 	return ""
 }
