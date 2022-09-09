@@ -103,13 +103,13 @@ const epoch = -1373428
 // Avg year length in the cycle (19 solar years with 235 lunar months)
 const avgHebrewYearDays = 365.24682220597794
 
-// IsHebLeapYear returns true if Hebrew year is a leap year
+// IsHebLeapYear returns true if Hebrew year is a leap year.
 func IsHebLeapYear(year int) bool {
 	return (1+year*7)%19 < 7
 }
 
 // MonthsInHebYear returns the number of months in this Hebrew year
-// (either 12 or 13 depending on leap year)
+// (either 12 or 13 depending on leap year).
 func MonthsInHebYear(year int) int {
 	if IsHebLeapYear(year) {
 		return 13
@@ -118,22 +118,24 @@ func MonthsInHebYear(year int) int {
 	}
 }
 
-// DaysInHebYear computes the number of days in the hebrew YEAR
+// DaysInHebYear computes the number of days in the Hebrew year.
+//
+// The year can be 353, 354, 355, 383, 384 or 385 days long.
 func DaysInHebYear(year int) int {
 	return elapsedDays(year+1) - elapsedDays(year)
 }
 
-// LongCheshvan returns true if Cheshvan is long (30 days) in Hebrew year
+// LongCheshvan returns true if Cheshvan is long (30 days) in Hebrew year.
 func LongCheshvan(year int) bool {
 	return DaysInHebYear(year)%10 == 5
 }
 
-// ShortKislev returns true if Kislev is short (29 days) in Hebrew year
+// ShortKislev returns true if Kislev is short (29 days) in Hebrew year.
 func ShortKislev(year int) bool {
 	return DaysInHebYear(year)%10 == 3
 }
 
-// DaysInMonth returns the number of days in Hebrew month in a given year (29 or 30)
+// DaysInMonth returns the number of days in Hebrew month in a given year (29 or 30).
 func DaysInMonth(month HMonth, year int) int {
 	switch month {
 	case Iyyar, Tamuz, Elul, Tevet, Adar2:
@@ -218,7 +220,7 @@ func HebrewToRD(year int, month HMonth, day int) int {
 	return epoch + elapsedDays(year) + tempabs - 1
 }
 
-// Creates a new HDate from year, Hebrew month, and day of month
+// Creates a new HDate from year, Hebrew month, and day of month.
 func NewHDate(year int, month HMonth, day int) HDate {
 	if month == Adar2 && !IsHebLeapYear(year) {
 		month = Adar1
@@ -239,7 +241,7 @@ func newYear(year int) int {
 	return epoch + elapsedDays(year)
 }
 
-// Converts absolute R.D. days to Hebrew date.
+// Converts absolute Rata Die days to Hebrew date.
 func NewHDateFromRD(rataDie int) HDate {
 	approx := int(float64(rataDie-epoch) / avgHebrewYearDays)
 	year := approx
@@ -293,6 +295,14 @@ func (hd HDate) Greg() (int, time.Month, int) {
 	return RDtoGregorian(hd.Abs())
 }
 
+// Converts this Hebrew Date to a Gregorian time object.
+//
+// Hours, minutes and seconds are set to 0, and timezone is set to UTC.
+func (hd HDate) Gregorian() time.Time {
+	year, month, day := hd.Greg()
+	return time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+}
+
 func mod(x, y int) int {
 	return x - y*int(math.Floor(float64(x)/float64(y)))
 }
@@ -323,7 +333,7 @@ func (hd HDate) IsLeapYear() bool {
 	return IsHebLeapYear(hd.Year)
 }
 
-// Returns a string representation of the month name (e.g. "Tishrei", "Sh'vat", "Adar II")
+// Returns a string representation of the month name (e.g. "Tishrei", "Sh'vat", "Adar II").
 func (hd HDate) MonthName() string {
 	switch hd.Month {
 	case Nisan, Iyyar, Sivan, Tamuz, Av, Elul, Tishrei, Cheshvan, Kislev, Tevet, Shvat, Adar2:
@@ -340,7 +350,7 @@ func (hd HDate) MonthName() string {
 	}
 }
 
-// Returns a string representation of the Hebrew date (e.g. "15 Cheshvan 5769")
+// Returns a string representation of the Hebrew date (e.g. "15 Cheshvan 5769").
 func (hd HDate) String() string {
 	return strconv.Itoa(hd.Day) + " " + hd.MonthName() + " " + strconv.Itoa(hd.Year)
 }

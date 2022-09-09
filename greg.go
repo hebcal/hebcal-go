@@ -25,7 +25,7 @@ import (
 // 1-based month lengths
 var monthLen = [13]int{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
-// DaysIn returns the number of days in the Gregorian month
+// DaysIn returns the number of days in the Gregorian month.
 func DaysIn(m time.Month, year int) int {
 	if m == time.February && IsGregLeapYear(year) {
 		return 29
@@ -33,7 +33,7 @@ func DaysIn(m time.Month, year int) int {
 	return monthLen[m]
 }
 
-// Returns true if the Gregorian year is a leap year
+// Returns true if the Gregorian year is a leap year.
 func IsGregLeapYear(year int) bool {
 	return (year%4 == 0) && (year%100 != 0 || year%400 == 0)
 }

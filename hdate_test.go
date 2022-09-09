@@ -274,3 +274,52 @@ func ExampleHebrewToRD() {
 	fmt.Println(rataDie)
 	// Output: 733359
 }
+
+func ExampleHDate_Greg() {
+	hd := NewHDate(5765, Adar2, 22)
+	year, month, day := hd.Greg()
+	fmt.Println(year, month, day)
+	// Output: 2005 April 2
+}
+
+func ExampleHDate_Abs() {
+	hd := NewHDate(5765, Adar2, 22)
+	rataDie := hd.Abs()
+	fmt.Println(rataDie)
+	// Output: 732038
+}
+
+func ExampleHDate_DaysInMonth() {
+	hd := NewHDate(5765, Adar2, 22)
+	days := hd.DaysInMonth()
+	fmt.Println(days)
+	// Output: 29
+}
+
+func ExampleHDate_Weekday() {
+	hd := NewHDate(5765, Adar2, 22)
+	dayOfWeek := hd.Weekday()
+	fmt.Println(dayOfWeek)
+	// Output: Saturday
+}
+
+func ExampleHDate_MonthName() {
+	hd := NewHDate(5765, Adar2, 22)
+	monthName := hd.MonthName()
+	fmt.Println(monthName)
+	// Output: Adar II
+}
+
+func ExampleHDate_IsLeapYear() {
+	hd := NewHDate(5765, Adar2, 22)
+	leap := hd.IsLeapYear()
+	fmt.Println(leap)
+	// Output: true
+}
+
+func ExampleHDate_Gregorian() {
+	hd := NewHDate(5765, Adar2, 22)
+	t := hd.Gregorian()
+	fmt.Println(t)
+	// Output: 2005-04-02 00:00:00 +0000 UTC
+}
