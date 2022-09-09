@@ -230,3 +230,28 @@ func TestHebrewCalendarMask(t *testing.T) {
 	}
 	assert.Equal(expected, actual)
 }
+
+func ExampleHebrewCalendar() {
+	loc := LookupCity("Providence")
+	opts := CalOptions{
+		Year:           2022,
+		Sedrot:         true,
+		CandleLighting: true,
+		Location:       &loc,
+		HavdalahMins:   50,
+	}
+	events, _ := HebrewCalendar(&opts)
+	for i := 0; i < 6; i++ {
+		ev := events[i]
+		dateStr := ev.GetDate().Gregorian().Format("Mon 02-Jan-2006")
+		title := ev.Render()
+		fmt.Println(dateStr, title)
+	}
+	// Output:
+	// Sat 01-Jan-2022 Parashat Vaera
+	// Sat 01-Jan-2022 Havdalah (50 min): 5:15
+	// Mon 03-Jan-2022 Rosh Chodesh Sh'vat
+	// Fri 07-Jan-2022 Candle lighting: 4:12
+	// Sat 08-Jan-2022 Parashat Bo
+	// Sat 08-Jan-2022 Havdalah (50 min): 5:22
+}

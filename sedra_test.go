@@ -32,14 +32,15 @@ func TestSedra_Lookup(t *testing.T) {
 
 func ExampleSedra_Lookup() {
 	sedra := NewSedra(5749, false)
-	parsha := sedra.Lookup(NewHDateFromGregorian(1989, time.July, 15))
+	hd := NewHDateFromGregorian(1989, time.July, 15)
+	parsha := sedra.Lookup(hd)
 	fmt.Println(parsha)
 	// Output: Parashat Chukat-Balak
 }
 
 func ExampleSedra_FindParshaNum() {
 	sedra := NewSedra(5749, false)
-	date, _ := sedra.FindParshaNum(16)
-	fmt.Println(date)
+	hd, _ := sedra.FindParshaNum(16)
+	fmt.Println(hd)
 	// Output: 15 Sh'vat 5749
 }

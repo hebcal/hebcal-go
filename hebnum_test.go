@@ -34,6 +34,7 @@ func TestGematriya(t *testing.T) {
 }
 
 func ExampleGematriya() {
-	fmt.Println(Gematriya(5749))
+	gematriya := Gematriya(5749)
+	fmt.Println(gematriya)
 	// Output: תשמ״ט
 }

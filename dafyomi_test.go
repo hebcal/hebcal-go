@@ -50,7 +50,8 @@ func TestDafYomiEarlyCycles(t *testing.T) {
 }
 
 func ExampleGetDafYomi() {
-	daf, _ := GetDafYomi(NewHDateFromGregorian(1995, time.December, 17))
+	hd := NewHDateFromGregorian(1995, time.December, 17)
+	daf, _ := GetDafYomi(hd)
 	fmt.Println(daf)
 	// Output: Avodah Zarah 68
 }

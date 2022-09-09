@@ -239,13 +239,15 @@ func TestGreg(t *testing.T) {
 }
 
 func ExampleNewHDateFromTime() {
-	d := time.Date(2008, time.November, 13, 0, 0, 0, 0, time.UTC)
-	fmt.Println(NewHDateFromTime(d).String())
+	t := time.Date(2008, time.November, 13, 0, 0, 0, 0, time.UTC)
+	hd := NewHDateFromTime(t)
+	fmt.Println(hd)
 	// Output: 15 Cheshvan 5769
 }
 
 func ExampleNewHDateFromRD() {
-	fmt.Println(NewHDateFromRD(733359).String())
+	hd := NewHDateFromRD(733359)
+	fmt.Println(hd)
 	// Output: 15 Cheshvan 5769
 }
 
