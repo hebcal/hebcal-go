@@ -28,6 +28,25 @@ type HLocation struct {
 	TimeZoneId  string  // timezone identifier such as "America/Los_Angeles" or "Asia/Jerusalem"
 }
 
+// NewLocation creates an instance of an HLocation object.
+//
+// This function panics if the latitude or longitude are out of range.
+func NewLocation(name string, countryCode string, latitude float64, longitude float64, tzid string) HLocation {
+	if latitude < -90 || latitude > 90 {
+		panic("Latitude out of range [-90,90]")
+	}
+	if longitude < -180 || longitude > 180 {
+		panic("Longitude out of range [-180,180]")
+	}
+	return HLocation{
+		Name:        name,
+		CountryCode: countryCode,
+		Latitude:    latitude,
+		Longitude:   longitude,
+		TimeZoneId:  tzid,
+	}
+}
+
 var classicCities = []HLocation{
 	{"Ashdod", "IL", 31.79213, 34.64966, "Asia/Jerusalem"},
 	{"Atlanta", "US", 33.749, -84.38798, "America/New_York"},
@@ -97,7 +116,26 @@ var classicCities = []HLocation{
 }
 
 // LookupCity returns an HLocation object of one of 60 "classic" Hebcal city names.
+//
 // If not found, returns HLocation{}
+//
+// The following city names are supported:
+//
+// Ashdod, Atlanta, Austin, Baghdad, Beer Sheva,
+// Berlin, Baltimore, Bogota, Boston, Budapest,
+// Buenos Aires, Buffalo, Chicago, Cincinnati, Cleveland,
+// Dallas, Denver, Detroit, Eilat, Gibraltar, Haifa,
+// Hawaii, Helsinki, Houston, Jerusalem, Johannesburg,
+// Kiev, La Paz, Livingston, Las Vegas, London, Los Angeles,
+// Marseilles, Miami, Minneapolis, Melbourne, Mexico City,
+// Montreal, Moscow, New York, Omaha, Ottawa, Panama City,
+// Paris, Pawtucket, Petach Tikvah, Philadelphia, Phoenix,
+// Pittsburgh, Providence, Portland, Saint Louis, Saint Petersburg,
+// San Diego, San Francisco, Sao Paulo, Seattle, Sydney,
+// Tel Aviv, Tiberias, Toronto, Vancouver, White Plains,
+// Washington DC, Worcester
+//
+// City name lookup is case-insensitive.
 func LookupCity(name string) HLocation {
 	str := strings.ToLower(name)
 	for _, loc := range classicCities {

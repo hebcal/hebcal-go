@@ -256,3 +256,21 @@ func ExampleMonthFromName() {
 	fmt.Printf("%s (%d), %s (%d), %s (%d)", m1, int(m1), m2, int(m2), m3, int(m3))
 	// Output: Sh'vat (11), Cheshvan (8), Tevet (10)
 }
+
+func ExampleDaysInHebYear() {
+	days := DaysInHebYear(5782)
+	fmt.Println(days)
+	// Output: 384
+}
+
+func ExampleDaysInMonth() {
+	days := DaysInMonth(Kislev, 5783)
+	fmt.Println(days)
+	// Output: 30
+}
+
+func ExampleHebrewToRD() {
+	rataDie := HebrewToRD(5769, Cheshvan, 15)
+	fmt.Println(rataDie)
+	// Output: 733359
+}

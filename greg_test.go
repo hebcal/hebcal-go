@@ -1,6 +1,7 @@
 package hebcal
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -170,3 +171,28 @@ func TestRD2GregNegative(t *testing.T) {
 	assert.Equal(20, day)
 }
 */
+
+func ExampleDaysIn() {
+	days := DaysIn(time.February, 2004)
+	fmt.Println(days)
+	// Output: 29
+}
+
+func ExampleGregorianDateToRD() {
+	t := time.Date(2014, time.February, 19, 0, 0, 0, 0, time.UTC)
+	rataDie := GregorianDateToRD(t)
+	fmt.Println(rataDie)
+	// Output: 735283
+}
+
+func ExampleGregorianToRD() {
+	rataDie, _ := GregorianToRD(1995, time.December, 17)
+	fmt.Println(rataDie)
+	// Output: 728644
+}
+
+func ExampleRDtoGregorian() {
+	year, month, day := RDtoGregorian(737553)
+	fmt.Println(year, month, day)
+	// Output: 2020 May 8
+}

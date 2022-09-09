@@ -74,7 +74,10 @@ var shas0 = []DafYomi{
 
 var osday, nsday int
 
-// Returns the Daf Yomi for given date.
+// GetDafYomi calculates the Daf Yomi for given date.
+//
+// Returns an error if the date is before Daf Yomi cycle began
+// (Hebrew year 5684, 11 September 1923).
 func GetDafYomi(date HDate) (DafYomi, error) {
 	if osday == 0 {
 		osday, _ = GregorianToRD(1923, time.September, 11)

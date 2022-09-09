@@ -84,6 +84,13 @@ func (m HMonth) String() string {
 	return "%!HMonth(" + strconv.Itoa(int(m)) + ")"
 }
 
+// HDate represents a Hebrew date.
+//
+// To keep things simple, HDate represents just a day, month, and year.
+//
+// Although Hebrew dates begin at sunset, HDate does not attempt
+// to represent any concept of the time of day. For halachic times,
+// see the Zmanim interface.
 type HDate struct {
 	Year  int    // Hebrew year
 	Month HMonth // Hebrew month (1-13)
