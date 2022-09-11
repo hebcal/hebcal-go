@@ -23,9 +23,9 @@ func TestZmanimChicago(t *testing.T) {
 		"Fri, 05 Jun 2020 04:42:37 -0500",
 		"Fri, 05 Jun 2020 05:16:28 -0500",
 		"Fri, 05 Jun 2020 09:02:54 -0500",
-		"Fri, 05 Jun 2020 08:26:30 -0500",
+		"Fri, 05 Jun 2020 08:26:54 -0500",
 		"Fri, 05 Jun 2020 10:18:23 -0500",
-		"Fri, 05 Jun 2020 09:54:00 -0500",
+		"Fri, 05 Jun 2020 09:54:23 -0500",
 		"Fri, 05 Jun 2020 12:49:21 -0500",
 		"Fri, 05 Jun 2020 13:27:05 -0500",
 		"Fri, 05 Jun 2020 17:13:32 -0500",
@@ -81,9 +81,9 @@ func TestZmanimTelAviv(t *testing.T) {
 		"Sat, 06 Mar 2021 05:38:01 +0200",
 		"Sat, 06 Mar 2021 06:02:30 +0200",
 		"Sat, 06 Mar 2021 08:57:23 +0200",
-		"Sat, 06 Mar 2021 08:21:00 +0200",
+		"Sat, 06 Mar 2021 08:21:23 +0200",
 		"Sat, 06 Mar 2021 09:55:41 +0200",
-		"Sat, 06 Mar 2021 09:31:20 +0200",
+		"Sat, 06 Mar 2021 09:31:41 +0200",
 		"Sat, 06 Mar 2021 11:52:17 +0200",
 		"Sat, 06 Mar 2021 12:21:26 +0200",
 		"Sat, 06 Mar 2021 15:16:20 +0200",
@@ -145,7 +145,7 @@ func TestZmanimHelsinki(t *testing.T) {
 		zman := New(latitude, longitude, dt, "Europe/Helsinki")
 		var t time.Time
 		if dt.Weekday() == time.Friday {
-			t = zman.SunsetOffset(-18)
+			t = zman.SunsetOffset(-18, true)
 		} else {
 			t = zman.Tzeit(8.5)
 		}
@@ -175,6 +175,9 @@ func ExampleZmanim_SunsetOffset() {
 	longitude := -87.65005
 	dt := time.Date(2020, time.June, 5, 12, 0, 0, 0, time.UTC)
 	zman := New(latitude, longitude, dt, "America/Chicago")
-	fmt.Println(zman.SunsetOffset(-18))
-	// Output: 2020-06-05 20:04:00 -0500 CDT
+	fmt.Println(zman.SunsetOffset(-18, true))
+	fmt.Println(zman.SunsetOffset(50, true))
+	// Output:
+	// 2020-06-05 20:04:00 -0500 CDT
+	// 2020-06-05 21:12:00 -0500 CDT
 }

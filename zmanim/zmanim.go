@@ -198,8 +198,8 @@ func (z *Zmanim) SofZmanTfilla() time.Time {
 }
 
 func (z *Zmanim) sofZmanMGA(hours int) time.Time {
-	alot72 := z.SunriseOffset(-72)
-	tzeit72 := z.SunsetOffset(72)
+	alot72 := z.SunriseOffset(-72, false)
+	tzeit72 := z.SunsetOffset(72, false)
 	alot72ms := alot72.UnixMilli()
 	temporalHour := (tzeit72.UnixMilli() - alot72ms) / 12 // ms in hour
 	millis := alot72ms + (int64(hours) * temporalHour)
@@ -243,22 +243,27 @@ func (z *Zmanim) Tzeit(angle float64) time.Time {
 	return z.timeAtAngle(angle, false)
 }
 
-func (z *Zmanim) riseSetOffset(t time.Time, offset int) time.Time {
+func (z *Zmanim) riseSetOffset(t time.Time, offset int, roundTime bool) time.Time {
 	if t == nilTime {
 		return t
 	}
 	year, month, day := t.Date()
 	hour, min, sec := t.Clock()
-	// For positive offsets only, round up to next minute if needed
-	if offset > 0 && sec >= 30 {
-		offset++
+	if roundTime {
+		// For positive offsets only, round up to next minute if needed
+		if offset > 0 && sec >= 30 {
+			offset++
+		}
+		sec = 0
 	}
-	return time.Date(year, month, day, hour, min+offset, 0, 0, z.loc)
+	return time.Date(year, month, day, hour, min+offset, sec, 0, z.loc)
 }
 
 // Returns sunrise + offset minutes (either positive or negative).
-func (z *Zmanim) SunriseOffset(offset int) time.Time {
-	return z.riseSetOffset(z.Sunrise(), offset)
+//
+// If roundTime is true, rounds to the nearest minute (setting seconds to zero).
+func (z *Zmanim) SunriseOffset(offset int, roundTime bool) time.Time {
+	return z.riseSetOffset(z.Sunrise(), offset, roundTime)
 }
 
 // Returns sunset + offset minutes (either positive or negative).
@@ -269,10 +274,11 @@ func (z *Zmanim) SunriseOffset(offset int) time.Time {
 // This function can be used with a positive offset to calculate Tzeit (nightfall).
 //
 // For Havdalah according to Rabbeinu Tam, use 72, which approximates
-// when 3 small stars are observable in the night sky with the naked eye
-//
+// when 3 small stars are observable in the night sky with the naked eye.
 // Other typical values include 50 minutes (3 small stars) or 42 minutes
-// (3 medium stars)
-func (z *Zmanim) SunsetOffset(offset int) time.Time {
-	return z.riseSetOffset(z.Sunset(), offset)
+// (3 medium stars).
+//
+// If roundTime is true, rounds to the nearest minute (setting seconds to zero).
+func (z *Zmanim) SunsetOffset(offset int, roundTime bool) time.Time {
+	return z.riseSetOffset(z.Sunset(), offset, roundTime)
 }

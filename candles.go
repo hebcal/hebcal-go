@@ -127,7 +127,7 @@ func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev HEvent) TimedEvent {
 	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
 	var eventTime time.Time
 	if offset != 0 {
-		eventTime = z.SunsetOffset(offset)
+		eventTime = z.SunsetOffset(offset, true)
 	} else {
 		eventTime = z.Tzeit(opts.HavdalahDeg)
 	}
