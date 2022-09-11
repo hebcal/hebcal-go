@@ -22,6 +22,12 @@ import (
 	"math"
 	"strings"
 	"time"
+
+	"github.com/hebcal/hebcal-go/dafyomi"
+	"github.com/hebcal/hebcal-go/greg"
+	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/sedra"
+	"github.com/hebcal/hebcal-go/zmanim"
 )
 
 /*
@@ -122,23 +128,23 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		il           bool = opts.IL
 		currentYear  int  = -1
 		holidaysYear []HolidayEvent
-		sedra        Sedra
+		sedraYear    sedra.Sedra
 		beginOmer    int
 		endOmer      int
 	)
 	events := make([]HEvent, 0, 20)
 	for abs := startAbs; abs <= endAbs; abs++ {
-		hd := NewHDateFromRD(abs)
+		hd := hdate.FromRD(abs)
 		hyear := hd.Year
 		if hd.Year != currentYear {
 			currentYear = hyear
 			holidaysYear = GetHolidaysForYear(hyear, il)
 			if opts.Sedrot && currentYear >= 3762 {
-				sedra = NewSedra(hyear, il)
+				sedraYear = sedra.New(hyear, il)
 			}
 			if opts.Omer {
-				beginOmer = HebrewToRD(hyear, Nisan, 16)
-				endOmer = HebrewToRD(hyear, Sivan, 5)
+				beginOmer = hdate.HebrewToRD(hyear, hdate.Nisan, 16)
+				endOmer = hdate.HebrewToRD(hyear, hdate.Sivan, 5)
 			}
 		}
 		dow := hd.Weekday()
@@ -150,13 +156,13 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 			}
 		}
 		if opts.Sedrot && dow == time.Saturday && hyear >= 3762 {
-			parsha := sedra.LookupByRD(abs)
+			parsha := sedraYear.LookupByRD(abs)
 			if !parsha.Chag {
 				events = append(events, parshaEvent{Date: hd, Parsha: parsha, IL: il})
 			}
 		}
 		if opts.DafYomi && hyear >= 5684 {
-			daf, _ := GetDafYomi(hd)
+			daf, _ := dafyomi.New(hd)
 			events = append(events, dafYomiEvent{Date: hd, Daf: daf})
 		}
 		if opts.Omer && abs >= beginOmer && abs <= endOmer {
@@ -184,10 +190,10 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 }
 
 func getStartAndEnd(opts *CalOptions) (int, int, error) {
-	if (opts.Start != HDate{} && opts.End == HDate{}) ||
-		(opts.Start == HDate{} && opts.End != HDate{}) {
+	if (opts.Start != hdate.HDate{} && opts.End == hdate.HDate{}) ||
+		(opts.Start == hdate.HDate{} && opts.End != hdate.HDate{}) {
 		return 0, 0, errors.New("opts.Start requires opts.End")
-	} else if (opts.Start != HDate{}) && (opts.End != HDate{}) {
+	} else if (opts.Start != hdate.HDate{}) && (opts.End != hdate.HDate{}) {
 		return opts.Start.Abs(), opts.End.Abs(), nil
 	}
 	year := opts.Year
@@ -195,7 +201,7 @@ func getStartAndEnd(opts *CalOptions) (int, int, error) {
 		t := time.Now()
 		gy, gm, gd := t.Date()
 		if opts.IsHebrewYear {
-			today := NewHDateFromGregorian(gy, gm, gd)
+			today := hdate.FromGregorian(gy, gm, gd)
 			year = today.Year
 		} else {
 			year = gy
@@ -208,12 +214,12 @@ func getStartAndEnd(opts *CalOptions) (int, int, error) {
 		numYears = 1
 	}
 	if opts.IsHebrewYear {
-		startDate := NewHDate(year, Tishrei, 1)
+		startDate := hdate.New(year, hdate.Tishrei, 1)
 		// for full Hebrew year, start on Erev Rosh Hashana which
 		// is technically in the previous Hebrew year
 		// (but conveniently lets us get candle-lighting time for Erev)
 		startAbs := startDate.Abs() - 1
-		endDate := NewHDate(year+numYears, Tishrei, 1)
+		endDate := hdate.New(year+numYears, hdate.Tishrei, 1)
 		endAbs := endDate.Abs() - 1
 		return startAbs, endAbs, nil
 	} else {
@@ -225,14 +231,21 @@ func getStartAndEnd(opts *CalOptions) (int, int, error) {
 		if opts.Month != 0 {
 			month = opts.Month
 		}
-		startAbs, _ := GregorianToRD(year, month, 1)
+		startAbs, _ := greg.ToRD(year, month, 1)
 		if opts.Month != 0 {
-			endAbs := startAbs + DaysIn(opts.Month, year)
+			endAbs := startAbs + greg.DaysIn(opts.Month, year)
 			return startAbs, endAbs - 1, nil
 		}
-		endAbs, _ := GregorianToRD(year+numYears, time.January, 1)
+		endAbs, _ := greg.ToRD(year+numYears, time.January, 1)
 		return startAbs, endAbs - 1, nil
 	}
+}
+
+func intAbs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
 
 func checkCandleOptions(opts *CalOptions) error {
@@ -259,7 +272,7 @@ func checkCandleOptions(opts *CalOptions) error {
 	} else if opts.HavdalahDeg != 0.0 {
 		opts.HavdalahDeg = math.Abs(opts.HavdalahDeg)
 	} else {
-		opts.HavdalahDeg = Tzeit3SmallStars
+		opts.HavdalahDeg = zmanim.Tzeit3SmallStars
 	}
 	return nil
 }

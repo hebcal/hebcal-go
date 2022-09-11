@@ -1,4 +1,4 @@
-package hebcal
+package hdate
 
 import (
 	"fmt"
@@ -46,18 +46,18 @@ func TestHebrew2RD(t *testing.T) {
 
 func TestRD2Hebrew(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal(HDate{Year: 5769, Month: Cheshvan, Day: 15, abs: 733359}, NewHDateFromRD(733359))
-	assert.Equal(HDate{Year: 5708, Month: Iyyar, Day: 6, abs: 711262}, NewHDateFromRD(711262))
-	assert.Equal(HDate{Year: 3762, Month: Tishrei, Day: 1, abs: 249}, NewHDateFromRD(249))
-	assert.Equal(HDate{Year: 3761, Month: Nisan, Day: 1, abs: 72}, NewHDateFromRD(72))
-	assert.Equal(HDate{Year: 3761, Month: Nisan, Day: 8, abs: 79}, NewHDateFromRD(79))
-	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 18, abs: 1}, NewHDateFromRD(1))
-	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 17, abs: 0}, NewHDateFromRD(0))
-	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 16, abs: -1}, NewHDateFromRD(-1))
-	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 1, abs: -16}, NewHDateFromRD(-16))
-	assert.Equal(HDate{Year: 3761, Month: Kislev, Day: 30, abs: -17}, NewHDateFromRD(-17))
-	assert.Equal(HDate{Year: 9999, Month: Elul, Day: 29, abs: 2278650}, NewHDateFromRD(2278650))
-	assert.Equal(HDate{Year: 5765, Month: Adar2, Day: 22, abs: 732038}, NewHDateFromRD(732038))
+	assert.Equal(HDate{Year: 5769, Month: Cheshvan, Day: 15, abs: 733359}, FromRD(733359))
+	assert.Equal(HDate{Year: 5708, Month: Iyyar, Day: 6, abs: 711262}, FromRD(711262))
+	assert.Equal(HDate{Year: 3762, Month: Tishrei, Day: 1, abs: 249}, FromRD(249))
+	assert.Equal(HDate{Year: 3761, Month: Nisan, Day: 1, abs: 72}, FromRD(72))
+	assert.Equal(HDate{Year: 3761, Month: Nisan, Day: 8, abs: 79}, FromRD(79))
+	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 18, abs: 1}, FromRD(1))
+	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 17, abs: 0}, FromRD(0))
+	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 16, abs: -1}, FromRD(-1))
+	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 1, abs: -16}, FromRD(-16))
+	assert.Equal(HDate{Year: 3761, Month: Kislev, Day: 30, abs: -17}, FromRD(-17))
+	assert.Equal(HDate{Year: 9999, Month: Elul, Day: 29, abs: 2278650}, FromRD(2278650))
+	assert.Equal(HDate{Year: 5765, Month: Adar2, Day: 22, abs: 732038}, FromRD(732038))
 }
 
 func TestMonthNames(t *testing.T) {
@@ -71,21 +71,21 @@ func TestMonthNames(t *testing.T) {
 
 func TestMonthNames2(t *testing.T) {
 	assert := assert.New(t)
-	hd := NewHDate(5782, Adar1, 15)
+	hd := New(5782, Adar1, 15)
 	assert.Equal("Adar I", hd.MonthName("en"))
-	hd = NewHDate(5783, Adar1, 15)
+	hd = New(5783, Adar1, 15)
 	assert.Equal("Adar", hd.MonthName("en"))
 }
 
 func TestAdar2ResetToAdar1(t *testing.T) {
 	assert := assert.New(t)
-	hd := NewHDate(5782, Adar1, 15)
+	hd := New(5782, Adar1, 15)
 	assert.Equal(Adar1, hd.Month)
-	hd = NewHDate(5782, Adar2, 15)
+	hd = New(5782, Adar2, 15)
 	assert.Equal(Adar2, hd.Month)
-	hd = NewHDate(5783, Adar1, 15)
+	hd = New(5783, Adar1, 15)
 	assert.Equal(Adar1, hd.Month)
-	hd = NewHDate(5783, Adar2, 15)
+	hd = New(5783, Adar2, 15)
 	assert.Equal(Adar1, hd.Month)
 }
 
@@ -109,30 +109,30 @@ func TestMonthFromName(t *testing.T) {
 
 func TestDaysInHebYear(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal(385, DaysInHebYear(5779))
-	assert.Equal(355, DaysInHebYear(5780))
-	assert.Equal(353, DaysInHebYear(5781))
-	assert.Equal(384, DaysInHebYear(5782))
-	assert.Equal(355, DaysInHebYear(5783))
-	assert.Equal(383, DaysInHebYear(5784))
-	assert.Equal(355, DaysInHebYear(5785))
-	assert.Equal(354, DaysInHebYear(5786))
-	assert.Equal(385, DaysInHebYear(5787))
-	assert.Equal(355, DaysInHebYear(5788))
-	assert.Equal(354, DaysInHebYear(5789))
-	assert.Equal(383, DaysInHebYear(3762))
-	assert.Equal(354, DaysInHebYear(3671))
-	assert.Equal(353, DaysInHebYear(1234))
-	assert.Equal(355, DaysInHebYear(123))
-	assert.Equal(355, DaysInHebYear(2))
-	assert.Equal(355, DaysInHebYear(1))
+	assert.Equal(385, DaysInYear(5779))
+	assert.Equal(355, DaysInYear(5780))
+	assert.Equal(353, DaysInYear(5781))
+	assert.Equal(384, DaysInYear(5782))
+	assert.Equal(355, DaysInYear(5783))
+	assert.Equal(383, DaysInYear(5784))
+	assert.Equal(355, DaysInYear(5785))
+	assert.Equal(354, DaysInYear(5786))
+	assert.Equal(385, DaysInYear(5787))
+	assert.Equal(355, DaysInYear(5788))
+	assert.Equal(354, DaysInYear(5789))
+	assert.Equal(383, DaysInYear(3762))
+	assert.Equal(354, DaysInYear(3671))
+	assert.Equal(353, DaysInYear(1234))
+	assert.Equal(355, DaysInYear(123))
+	assert.Equal(355, DaysInYear(2))
+	assert.Equal(355, DaysInYear(1))
 
-	assert.Equal(353, DaysInHebYear(5761))
-	assert.Equal(354, DaysInHebYear(5762))
-	assert.Equal(385, DaysInHebYear(5763))
-	assert.Equal(355, DaysInHebYear(5764))
-	assert.Equal(383, DaysInHebYear(5765))
-	assert.Equal(354, DaysInHebYear(5766))
+	assert.Equal(353, DaysInYear(5761))
+	assert.Equal(354, DaysInYear(5762))
+	assert.Equal(385, DaysInYear(5763))
+	assert.Equal(355, DaysInYear(5764))
+	assert.Equal(383, DaysInYear(5765))
+	assert.Equal(354, DaysInYear(5766))
 }
 
 func TestDaysInMonth(t *testing.T) {
@@ -152,22 +152,22 @@ func TestDaysInMonth(t *testing.T) {
 
 func TestWeekday(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal(time.Thursday, NewHDate(5769, Cheshvan, 15).Weekday())
-	assert.Equal(time.Saturday, NewHDate(5708, Iyyar, 6).Weekday())
-	assert.Equal(time.Sunday, NewHDate(5708, Iyyar, 7).Weekday())
-	assert.Equal(time.Thursday, NewHDate(3762, Tishrei, 1).Weekday())
-	assert.Equal(time.Tuesday, NewHDate(3761, Nisan, 1).Weekday())
-	assert.Equal(time.Monday, NewHDate(3761, Tevet, 18).Weekday())
-	assert.Equal(time.Sunday, NewHDate(3761, Tevet, 17).Weekday())
-	assert.Equal(time.Saturday, NewHDate(3761, Tevet, 16).Weekday())
-	assert.Equal(time.Friday, NewHDate(3761, Tevet, 1).Weekday())
-	assert.Equal(time.Tuesday, NewHDate(3333, Sivan, 29).Weekday())
-	assert.Equal(time.Monday, NewHDate(3333, Sivan, 28).Weekday())
-	assert.Equal(time.Sunday, NewHDate(3333, Sivan, 27).Weekday())
-	assert.Equal(time.Saturday, NewHDate(3333, Sivan, 26).Weekday())
-	assert.Equal(time.Friday, NewHDate(3333, Sivan, 25).Weekday())
-	assert.Equal(time.Thursday, NewHDate(3333, Sivan, 24).Weekday())
-	assert.Equal(time.Wednesday, NewHDate(3333, Sivan, 23).Weekday())
+	assert.Equal(time.Thursday, New(5769, Cheshvan, 15).Weekday())
+	assert.Equal(time.Saturday, New(5708, Iyyar, 6).Weekday())
+	assert.Equal(time.Sunday, New(5708, Iyyar, 7).Weekday())
+	assert.Equal(time.Thursday, New(3762, Tishrei, 1).Weekday())
+	assert.Equal(time.Tuesday, New(3761, Nisan, 1).Weekday())
+	assert.Equal(time.Monday, New(3761, Tevet, 18).Weekday())
+	assert.Equal(time.Sunday, New(3761, Tevet, 17).Weekday())
+	assert.Equal(time.Saturday, New(3761, Tevet, 16).Weekday())
+	assert.Equal(time.Friday, New(3761, Tevet, 1).Weekday())
+	assert.Equal(time.Tuesday, New(3333, Sivan, 29).Weekday())
+	assert.Equal(time.Monday, New(3333, Sivan, 28).Weekday())
+	assert.Equal(time.Sunday, New(3333, Sivan, 27).Weekday())
+	assert.Equal(time.Saturday, New(3333, Sivan, 26).Weekday())
+	assert.Equal(time.Friday, New(3333, Sivan, 25).Weekday())
+	assert.Equal(time.Thursday, New(3333, Sivan, 24).Weekday())
+	assert.Equal(time.Wednesday, New(3333, Sivan, 23).Weekday())
 }
 
 func hd2iso(hd HDate) string {
@@ -179,74 +179,74 @@ func hd2iso(hd HDate) string {
 func TestBefore(t *testing.T) {
 	assert := assert.New(t)
 	d := time.Date(2014, time.February, 19, 0, 0, 0, 0, time.UTC)
-	hd := NewHDateFromTime(d)
+	hd := FromTime(d)
 	assert.Equal("2014-02-15", hd2iso(hd.Before(time.Saturday)))
 }
 
 func TestOnOrBefore(t *testing.T) {
 	assert := assert.New(t)
 	d := time.Date(2014, time.February, 19, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-02-15", hd2iso(NewHDateFromTime(d).OnOrBefore(time.Saturday)))
+	assert.Equal("2014-02-15", hd2iso(FromTime(d).OnOrBefore(time.Saturday)))
 	d = time.Date(2014, time.February, 22, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-02-22", hd2iso(NewHDateFromTime(d).OnOrBefore(time.Saturday)))
+	assert.Equal("2014-02-22", hd2iso(FromTime(d).OnOrBefore(time.Saturday)))
 	d = time.Date(2014, time.February, 23, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-02-22", hd2iso(NewHDateFromTime(d).OnOrBefore(time.Saturday)))
+	assert.Equal("2014-02-22", hd2iso(FromTime(d).OnOrBefore(time.Saturday)))
 
 }
 
 func TestNearest(t *testing.T) {
 	assert := assert.New(t)
 	d := time.Date(2014, time.February, 19, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-02-22", hd2iso(NewHDateFromTime(d).Nearest(time.Saturday)))
+	assert.Equal("2014-02-22", hd2iso(FromTime(d).Nearest(time.Saturday)))
 	d = time.Date(2014, time.February, 18, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-02-15", hd2iso(NewHDateFromTime(d).Nearest(time.Saturday)))
+	assert.Equal("2014-02-15", hd2iso(FromTime(d).Nearest(time.Saturday)))
 }
 
 func TestOnOrAfter(t *testing.T) {
 	assert := assert.New(t)
 	d := time.Date(2014, time.February, 19, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-02-22", hd2iso(NewHDateFromTime(d).OnOrAfter(time.Saturday)))
+	assert.Equal("2014-02-22", hd2iso(FromTime(d).OnOrAfter(time.Saturday)))
 	d = time.Date(2014, time.February, 22, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-02-22", hd2iso(NewHDateFromTime(d).OnOrAfter(time.Saturday)))
+	assert.Equal("2014-02-22", hd2iso(FromTime(d).OnOrAfter(time.Saturday)))
 	d = time.Date(2014, time.February, 23, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-03-01", hd2iso(NewHDateFromTime(d).OnOrAfter(time.Saturday)))
+	assert.Equal("2014-03-01", hd2iso(FromTime(d).OnOrAfter(time.Saturday)))
 }
 
 func TestAfter(t *testing.T) {
 	assert := assert.New(t)
 	d := time.Date(2014, time.February, 19, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-02-22", hd2iso(NewHDateFromTime(d).After(time.Saturday)))
+	assert.Equal("2014-02-22", hd2iso(FromTime(d).After(time.Saturday)))
 	d = time.Date(2014, time.February, 22, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-03-01", hd2iso(NewHDateFromTime(d).After(time.Saturday)))
+	assert.Equal("2014-03-01", hd2iso(FromTime(d).After(time.Saturday)))
 	d = time.Date(2014, time.February, 23, 0, 0, 0, 0, time.UTC)
-	assert.Equal("2014-03-01", hd2iso(NewHDateFromTime(d).After(time.Saturday)))
+	assert.Equal("2014-03-01", hd2iso(FromTime(d).After(time.Saturday)))
 }
 
 func TestToString(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal("4 Tevet 5511", NewHDate(5511, Tevet, 4).String())
-	assert.Equal("4 Elul 5782", NewHDate(5782, Elul, 4).String())
-	assert.Equal("29 Adar II 5749", NewHDate(5749, Adar2, 29).String())
+	assert.Equal("4 Tevet 5511", New(5511, Tevet, 4).String())
+	assert.Equal("4 Elul 5782", New(5782, Elul, 4).String())
+	assert.Equal("29 Adar II 5749", New(5749, Adar2, 29).String())
 }
 
 func TestGreg(t *testing.T) {
 	assert := assert.New(t)
-	hd := NewHDate(5765, Adar2, 22)
+	hd := New(5765, Adar2, 22)
 	gy, gm, gd := hd.Greg()
 	assert.Equal(2005, gy)
 	assert.Equal(time.April, gm)
 	assert.Equal(2, gd)
 }
 
-func ExampleNewHDateFromTime() {
+func ExampleFromTime() {
 	t := time.Date(2008, time.November, 13, 0, 0, 0, 0, time.UTC)
-	hd := NewHDateFromTime(t)
+	hd := FromTime(t)
 	fmt.Println(hd)
 	// Output: 15 Cheshvan 5769
 }
 
-func ExampleNewHDateFromRD() {
-	hd := NewHDateFromRD(733359)
+func ExampleFromRD() {
+	hd := FromRD(733359)
 	fmt.Println(hd)
 	// Output: 15 Cheshvan 5769
 }
@@ -259,8 +259,8 @@ func ExampleMonthFromName() {
 	// Output: Sh'vat (11), Cheshvan (8), Tevet (10)
 }
 
-func ExampleDaysInHebYear() {
-	days := DaysInHebYear(5782)
+func ExampleDaysInYear() {
+	days := DaysInYear(5782)
 	fmt.Println(days)
 	// Output: 384
 }
@@ -278,35 +278,35 @@ func ExampleHebrewToRD() {
 }
 
 func ExampleHDate_Greg() {
-	hd := NewHDate(5765, Adar2, 22)
+	hd := New(5765, Adar2, 22)
 	year, month, day := hd.Greg()
 	fmt.Println(year, month, day)
 	// Output: 2005 April 2
 }
 
 func ExampleHDate_Abs() {
-	hd := NewHDate(5765, Adar2, 22)
+	hd := New(5765, Adar2, 22)
 	rataDie := hd.Abs()
 	fmt.Println(rataDie)
 	// Output: 732038
 }
 
 func ExampleHDate_DaysInMonth() {
-	hd := NewHDate(5765, Adar2, 22)
+	hd := New(5765, Adar2, 22)
 	days := hd.DaysInMonth()
 	fmt.Println(days)
 	// Output: 29
 }
 
 func ExampleHDate_Weekday() {
-	hd := NewHDate(5765, Adar2, 22)
+	hd := New(5765, Adar2, 22)
 	dayOfWeek := hd.Weekday()
 	fmt.Println(dayOfWeek)
 	// Output: Saturday
 }
 
 func ExampleHDate_MonthName() {
-	hd := NewHDate(5765, Adar2, 22)
+	hd := New(5765, Adar2, 22)
 	fmt.Println(hd.MonthName("en"))
 	fmt.Println(hd.MonthName("he"))
 	// Output:
@@ -315,14 +315,14 @@ func ExampleHDate_MonthName() {
 }
 
 func ExampleHDate_IsLeapYear() {
-	hd := NewHDate(5765, Adar2, 22)
+	hd := New(5765, Adar2, 22)
 	leap := hd.IsLeapYear()
 	fmt.Println(leap)
 	// Output: true
 }
 
 func ExampleHDate_Gregorian() {
-	hd := NewHDate(5765, Adar2, 22)
+	hd := New(5765, Adar2, 22)
 	t := hd.Gregorian()
 	fmt.Println(t)
 	// Output: 2005-04-02 00:00:00 +0000 UTC

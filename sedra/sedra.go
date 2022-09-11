@@ -1,4 +1,4 @@
-package hebcal
+package sedra
 
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
@@ -22,6 +22,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hebcal/hebcal-go/hdate"
 )
 
 type yearType int
@@ -296,9 +298,9 @@ type Parsha struct {
 }
 
 // Constructs a new Sedra for the entire Hebrew year.
-func NewSedra(year int, il bool) Sedra {
-	longC := LongCheshvan(year)
-	shortK := ShortKislev(year)
+func New(year int, il bool) Sedra {
+	longC := hdate.LongCheshvan(year)
+	shortK := hdate.ShortKislev(year)
 	var ytype yearType
 	if longC && !shortK {
 		ytype = complete
@@ -307,23 +309,23 @@ func NewSedra(year int, il bool) Sedra {
 	} else {
 		ytype = regular
 	}
-	rh := HebrewToRD(year, Tishrei, 1)
+	rh := hdate.HebrewToRD(year, hdate.Tishrei, 1)
 	rhDay := time.Weekday(rh % 7)
-	leap := IsHebLeapYear(year)
-	firstSaturday := dayOnOrBefore(time.Saturday, rh+6)
+	leap := hdate.IsLeapYear(year)
+	firstSaturday := hdate.DayOnOrBefore(time.Saturday, rh+6)
 	theSedraArray := getSedraArray(leap, rhDay, ytype, il)
 	return Sedra{Year: year, IL: il, firstSaturday: firstSaturday, theSedraArray: theSedraArray}
 }
 
 // Returns the Parsha that's read on the Saturday on or after R.D. date.
 func (sedra *Sedra) LookupByRD(rataDie int) Parsha {
-	abs := dayOnOrBefore(time.Saturday, rataDie+6)
+	abs := hdate.DayOnOrBefore(time.Saturday, rataDie+6)
 	if abs < sedra.firstSaturday {
 		panic("lookup date " + strconv.Itoa(abs) + " is earlier than start of year " + strconv.Itoa(sedra.firstSaturday))
 	}
 	weekNum := ((abs - sedra.firstSaturday) / 7)
 	if weekNum >= len(sedra.theSedraArray) {
-		nextYear := NewSedra(sedra.Year+1, sedra.IL)
+		nextYear := New(sedra.Year+1, sedra.IL)
 		return nextYear.LookupByRD(rataDie)
 	}
 	idx := sedra.theSedraArray[weekNum]
@@ -343,19 +345,19 @@ func (sedra *Sedra) LookupByRD(rataDie int) Parsha {
 }
 
 // Returns the Parsha that is read on the Saturday on or after hd.
-func (sedra *Sedra) Lookup(hd HDate) Parsha {
+func (sedra *Sedra) Lookup(hd hdate.HDate) Parsha {
 	return sedra.LookupByRD(hd.Abs())
 }
 
 // Finds the date on which the parsha number (Bereshit=1) is read.
-func (sedra *Sedra) FindParshaNum(num int) (HDate, error) {
+func (sedra *Sedra) FindParshaNum(num int) (hdate.HDate, error) {
 	parshaNum := num - 1
 	if parshaNum > 53 || (parshaNum < 0 && !isValidDouble(parshaNum)) {
-		return HDate{}, errors.New("invalid parsha number " + strconv.Itoa(num))
+		return hdate.HDate{}, errors.New("invalid parsha number " + strconv.Itoa(num))
 	}
 	for idx, candidate := range sedra.theSedraArray {
 		if candidate == parshaNum {
-			return NewHDateFromRD(sedra.firstSaturday + (idx * 7)), nil
+			return hdate.FromRD(sedra.firstSaturday + (idx * 7)), nil
 		}
 	}
 	panic("not found parsha num " + strconv.Itoa(num))
@@ -364,31 +366,4 @@ func (sedra *Sedra) FindParshaNum(num int) (HDate, error) {
 // Returns a string representation of the parsha
 func (parsha Parsha) String() string {
 	return "Parashat " + strings.Join(parsha.Name, "-")
-}
-
-// Represents one of 54 weekly Torah portions, always on a Saturday
-type parshaEvent struct {
-	Date   HDate
-	Parsha Parsha
-	IL     bool
-}
-
-func (ev parshaEvent) GetDate() HDate {
-	return ev.Date
-}
-
-func (ev parshaEvent) Render(locale string) string {
-	return ev.Parsha.String()
-}
-
-func (ev parshaEvent) GetFlags() HolidayFlags {
-	return PARSHA_HASHAVUA
-}
-
-func (ev parshaEvent) GetEmoji() string {
-	return ""
-}
-
-func (ev parshaEvent) Basename() string {
-	return strings.Join(ev.Parsha.Name, "-")
 }

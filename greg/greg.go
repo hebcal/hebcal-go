@@ -1,4 +1,6 @@
-package hebcal
+// Package greg provides functions for converting between Gregorian
+// dates and R.D. (Rata Die) day numbers.
+package greg
 
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
@@ -27,34 +29,34 @@ var monthLen = [13]int{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
 // DaysIn returns the number of days in the Gregorian month.
 func DaysIn(m time.Month, year int) int {
-	if m == time.February && IsGregLeapYear(year) {
+	if m == time.February && IsLeapYear(year) {
 		return 29
 	}
 	return monthLen[m]
 }
 
 // Returns true if the Gregorian year is a leap year.
-func IsGregLeapYear(year int) bool {
+func IsLeapYear(year int) bool {
 	return (year%4 == 0) && (year%100 != 0 || year%400 == 0)
 }
 
 // Converts Gregorian date to absolute R.D. (Rata Die) days.
 // Hours, minutes and seconds are ignored
-func GregorianDateToRD(t time.Time) int {
+func DateToRD(t time.Time) int {
 	year, month, day := t.Date()
-	abs, _ := GregorianToRD(year, month, day)
+	abs, _ := ToRD(year, month, day)
 	return abs
 }
 
 // Converts Gregorian date to absolute R.D. (Rata Die) days.
-func GregorianToRD(year int, month time.Month, day int) (int, error) {
+func ToRD(year int, month time.Month, day int) (int, error) {
 	if year == 0 {
 		return 0, errors.New("invalid Gregorian year")
 	}
 	var monthOffset int
 	if month <= time.February {
 		monthOffset = 0
-	} else if IsGregLeapYear(year) {
+	} else if IsLeapYear(year) {
 		monthOffset = -1
 	} else {
 		monthOffset = -2
@@ -66,7 +68,7 @@ func GregorianToRD(year int, month time.Month, day int) (int, error) {
 	} else {
 		prevYear = year + 1
 		var yearLen int
-		if IsGregLeapYear(year) {
+		if IsLeapYear(year) {
 			yearLen = 366
 		} else {
 			yearLen = 365
@@ -79,14 +81,6 @@ func GregorianToRD(year int, month time.Month, day int) (int, error) {
 		(prevYear / 400) + /* + Gregorian leap years */
 		dayOfYear /* days this year */
 	return rataDie, nil
-}
-
-/* like math.intAbs() but for ints */
-func intAbs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
 
 /*
@@ -118,7 +112,7 @@ Three Historical Calendars” by E. M. Reingold,  N. Dershowitz, and S. M.
 Clamen, Software--Practice and Experience, Volume 23, Number 4
 (April, 1993), pages 383-404 for an explanation.
 */
-func RDtoGregorian(rataDie int) (int, time.Month, int) {
+func FromRD(rataDie int) (int, time.Month, int) {
 	d0 := rataDie - 1
 	n400 := d0 / 146097
 	d1 := d0 % 146097

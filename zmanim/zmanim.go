@@ -1,4 +1,4 @@
-package hebcal
+package zmanim
 
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
@@ -23,6 +23,18 @@ import (
 	"github.com/nathan-osman/go-sunrise"
 )
 
+// Tzais (nightfall) based on the opinion of the Geonim calculated at
+// the sun's position at 8.5° below the western horizon.
+// https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/ComplexZmanimCalendar.html#getTzaisGeonim8Point5Degrees()
+const Tzeit3SmallStars = 8.5
+
+// Tzais (nightfall) based on the opinion of the
+// Geonim calculated as 30 minutes after sunset during the equinox
+// (on March 16, about 4 days before the astronomical equinox, the day that
+// a solar hour is 60 minutes) in Yerushalayim.
+// https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/ComplexZmanimCalendar.html#getTzaisGeonim7Point083Degrees()
+const Tzeit3MediumStars = 7.083
+
 // Zmanim are used to calculate halachic times
 type Zmanim struct {
 	Latitude  float64    // In the ragnge [-90,90]
@@ -33,13 +45,13 @@ type Zmanim struct {
 	loc       *time.Location
 }
 
-// NewZmanim makes an instance used for calculating various halachic times during this day
+// New makes an instance used for calculating various halachic times during this day
 //
 // tzid should be a timezone identifier such as "America/Los_Angeles" or "Asia/Jerusalem"
 //
 // This function panics if the latitude or longitude are out of range, or if
 // the timezone cannot be loaded
-func NewZmanim(latitude, longitude float64, date time.Time, tzid string) Zmanim {
+func New(latitude, longitude float64, date time.Time, tzid string) Zmanim {
 	if latitude < -90 || latitude > 90 {
 		panic("Latitude out of range [-90,90]")
 	}

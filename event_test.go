@@ -3,6 +3,7 @@ package hebcal
 import (
 	"testing"
 
+	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +17,7 @@ func TestHolidayEvent_Basename(t *testing.T) {
 }
 
 func TestHebrewDateEvent(t *testing.T) {
-	hd := NewHDate(5781, Sivan, 3)
+	hd := hdate.New(5781, hdate.Sivan, 3)
 	ev := hebrewDateEvent{Date: hd}
 	assert.Equal(t, "3 Sivan 5781", ev.Basename())
 	assert.Equal(t, "3rd of Sivan, 5781", ev.Render("en"))

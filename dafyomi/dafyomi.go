@@ -1,4 +1,4 @@
-package hebcal
+package dafyomi
 
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
@@ -21,6 +21,9 @@ import (
 	"errors"
 	"strconv"
 	"time"
+
+	"github.com/hebcal/hebcal-go/greg"
+	"github.com/hebcal/hebcal-go/hdate"
 )
 
 // DafYomi represents a page of Talmud, such as Pesachim 103
@@ -74,17 +77,17 @@ var shas0 = []DafYomi{
 
 var osday, nsday int
 
-// GetDafYomi calculates the Daf Yomi for given date.
+// New calculates the Daf Yomi for given date.
 //
 // Returns an error if the date is before Daf Yomi cycle began
 // (Hebrew year 5684, 11 September 1923).
-func GetDafYomi(date HDate) (DafYomi, error) {
+func New(hd hdate.HDate) (DafYomi, error) {
 	if osday == 0 {
-		osday, _ = GregorianToRD(1923, time.September, 11)
-		nsday, _ = GregorianToRD(1975, time.June, 24)
+		osday, _ = greg.ToRD(1923, time.September, 11)
+		nsday, _ = greg.ToRD(1975, time.June, 24)
 	}
 
-	cday := date.Abs()
+	cday := hd.Abs()
 	if cday < osday {
 		return DafYomi{}, errors.New("before Daf Yomi cycle began")
 	}
@@ -140,29 +143,4 @@ func GetDafYomi(date HDate) (DafYomi, error) {
 // Returns a string representation of the Daf Yomi
 func (daf DafYomi) String() string {
 	return daf.Name + " " + strconv.Itoa(daf.Blatt)
-}
-
-type dafYomiEvent struct {
-	Date HDate
-	Daf  DafYomi
-}
-
-func (ev dafYomiEvent) GetDate() HDate {
-	return ev.Date
-}
-
-func (ev dafYomiEvent) Render(locale string) string {
-	return ev.Daf.String()
-}
-
-func (ev dafYomiEvent) GetFlags() HolidayFlags {
-	return DAF_YOMI
-}
-
-func (ev dafYomiEvent) GetEmoji() string {
-	return ""
-}
-
-func (ev dafYomiEvent) Basename() string {
-	return ev.Daf.String()
 }

@@ -1,4 +1,6 @@
-package hebcal
+// Package hdate provides functions for converting between Hebrew
+// and Gregorian dates.
+package hdate
 
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
@@ -24,6 +26,8 @@ import (
 	"strconv"
 	s "strings"
 	"time"
+
+	"github.com/hebcal/hebcal-go/greg"
 )
 
 // An HMonth specifies a Hebrew month of the year (Nisan = 1, Tishrei = 7, ...).
@@ -119,36 +123,36 @@ const epoch = -1373428
 // Avg year length in the cycle (19 solar years with 235 lunar months)
 const avgHebrewYearDays = 365.24682220597794
 
-// IsHebLeapYear returns true if Hebrew year is a leap year.
-func IsHebLeapYear(year int) bool {
+// IsLeapYear returns true if Hebrew year is a leap year.
+func IsLeapYear(year int) bool {
 	return (1+year*7)%19 < 7
 }
 
-// MonthsInHebYear returns the number of months in this Hebrew year
+// MonthsInYear returns the number of months in this Hebrew year
 // (either 12 or 13 depending on leap year).
-func MonthsInHebYear(year int) int {
-	if IsHebLeapYear(year) {
+func MonthsInYear(year int) int {
+	if IsLeapYear(year) {
 		return 13
 	} else {
 		return 12
 	}
 }
 
-// DaysInHebYear computes the number of days in the Hebrew year.
+// DaysInYear computes the number of days in the Hebrew year.
 //
 // The year can be 353, 354, 355, 383, 384 or 385 days long.
-func DaysInHebYear(year int) int {
+func DaysInYear(year int) int {
 	return elapsedDays(year+1) - elapsedDays(year)
 }
 
 // LongCheshvan returns true if Cheshvan is long (30 days) in Hebrew year.
 func LongCheshvan(year int) bool {
-	return DaysInHebYear(year)%10 == 5
+	return DaysInYear(year)%10 == 5
 }
 
 // ShortKislev returns true if Kislev is short (29 days) in Hebrew year.
 func ShortKislev(year int) bool {
-	return DaysInHebYear(year)%10 == 3
+	return DaysInYear(year)%10 == 3
 }
 
 // DaysInMonth returns the number of days in Hebrew month in a given year (29 or 30).
@@ -157,7 +161,7 @@ func DaysInMonth(month HMonth, year int) int {
 	case Iyyar, Tamuz, Elul, Tevet, Adar2:
 		return 29
 	}
-	if (month == Adar1 && !IsHebLeapYear(year)) ||
+	if (month == Adar1 && !IsLeapYear(year)) ||
 		(month == Cheshvan && !LongCheshvan(year)) ||
 		(month == Kislev) && ShortKislev(year) {
 		return 29
@@ -200,8 +204,8 @@ func elapsedDays0(year int) int {
 	altDay := day
 
 	if (parts >= 19440) ||
-		(((day % 7) == 2) && (parts >= 9924) && !(IsHebLeapYear(year))) ||
-		(((day % 7) == 1) && (parts >= 16789) && IsHebLeapYear(prevYear)) {
+		(((day % 7) == 2) && (parts >= 9924) && !(IsLeapYear(year))) ||
+		(((day % 7) == 1) && (parts >= 16789) && IsLeapYear(prevYear)) {
 		altDay = day + 1
 	}
 
@@ -221,7 +225,7 @@ func elapsedDays0(year int) int {
 func HebrewToRD(year int, month HMonth, day int) int {
 	tempabs := day
 	if month < Tishrei {
-		monthsInYear := HMonth(MonthsInHebYear(year))
+		monthsInYear := HMonth(MonthsInYear(year))
 		for m := Tishrei; m <= monthsInYear; m++ {
 			tempabs += DaysInMonth(m, year)
 		}
@@ -237,8 +241,8 @@ func HebrewToRD(year int, month HMonth, day int) int {
 }
 
 // Creates a new HDate from year, Hebrew month, and day of month.
-func NewHDate(year int, month HMonth, day int) HDate {
-	if month == Adar2 && !IsHebLeapYear(year) {
+func New(year int, month HMonth, day int) HDate {
+	if month == Adar2 && !IsLeapYear(year) {
 		month = Adar1
 	}
 	if month == Adar2+1 {
@@ -258,7 +262,7 @@ func newYear(year int) int {
 }
 
 // Converts absolute Rata Die days to Hebrew date.
-func NewHDateFromRD(rataDie int) HDate {
+func FromRD(rataDie int) HDate {
 	approx := int(float64(rataDie-epoch) / avgHebrewYearDays)
 	year := approx
 	for newYear(year) <= rataDie {
@@ -279,16 +283,16 @@ func NewHDateFromRD(rataDie int) HDate {
 }
 
 // Creates an HDate from Gregorian year, month and day.
-func NewHDateFromGregorian(year int, month time.Month, day int) HDate {
-	rataDie, _ := GregorianToRD(year, month, day)
-	return NewHDateFromRD(rataDie)
+func FromGregorian(year int, month time.Month, day int) HDate {
+	rataDie, _ := greg.ToRD(year, month, day)
+	return FromRD(rataDie)
 }
 
 // Creates an HDate from a Time object. Hours, minutes and seconds are ignored.
-func NewHDateFromTime(d time.Time) HDate {
-	year, month, day := d.Date()
-	rataDie, _ := GregorianToRD(year, month, day)
-	return NewHDateFromRD(rataDie)
+func FromTime(t time.Time) HDate {
+	year, month, day := t.Date()
+	rataDie, _ := greg.ToRD(year, month, day)
+	return FromRD(rataDie)
 }
 
 // Converts Hebrew date to R.D. (Rata Die) fixed days.
@@ -308,7 +312,7 @@ func (hd HDate) DaysInMonth() int {
 
 // Converts this Hebrew Date to Gregorian year, month and day.
 func (hd HDate) Greg() (int, time.Month, int) {
-	return RDtoGregorian(hd.Abs())
+	return greg.FromRD(hd.Abs())
 }
 
 // Converts this Hebrew Date to a Gregorian time object.
@@ -336,17 +340,17 @@ func (hd HDate) Weekday() time.Weekday {
 
 // Prev returns the previous Hebrew date.
 func (hd HDate) Prev() HDate {
-	return NewHDateFromRD(hd.Abs() - 1)
+	return FromRD(hd.Abs() - 1)
 }
 
 // Next returns the next Hebrew date.
 func (hd HDate) Next() HDate {
-	return NewHDateFromRD(hd.Abs() + 1)
+	return FromRD(hd.Abs() + 1)
 }
 
 // IsLeapYear returns true if this HDate occurs during a Hebrew leap year.
 func (hd HDate) IsLeapYear() bool {
-	return IsHebLeapYear(hd.Year)
+	return IsLeapYear(hd.Year)
 }
 
 // MonthName returns a string representation of the month name.
@@ -477,21 +481,18 @@ func MonthFromName(monthName string) (HMonth, error) {
 	return 0, errors.New("unable to parse month name")
 }
 
-/*
- * Note: Applying this function to d+6 gives us the DAYNAME on or after an
- * absolute day d. Similarly, applying it to d+3 gives the DAYNAME nearest to
- * absolute date d, applying it to d-1 gives the DAYNAME previous to absolute
- * date d, and applying it to d+7 gives the DAYNAME following absolute date d.
- * @param {time.Weekday} dayOfWeek
- * @param {int} rataDie
- * @return {int}
- */
-func dayOnOrBefore(dayOfWeek time.Weekday, rataDie int) int {
+// Applying DayOnOrBefore to d+6 gives us the DAYNAME on or after an
+// absolute day rataDie.
+//
+// Similarly, applying it to d+3 gives the DAYNAME nearest to
+// rataDie, applying it to d-1 gives the DAYNAME previous to
+// rataDie, and applying it to d+7 gives the DAYNAME following rataDie.
+func DayOnOrBefore(dayOfWeek time.Weekday, rataDie int) int {
 	return rataDie - ((rataDie - int(dayOfWeek)) % 7)
 }
 
 func onOrBefore(dayOfWeek time.Weekday, rataDie int) HDate {
-	return NewHDateFromRD(dayOnOrBefore(dayOfWeek, rataDie))
+	return FromRD(DayOnOrBefore(dayOfWeek, rataDie))
 }
 
 /*

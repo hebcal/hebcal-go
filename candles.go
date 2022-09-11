@@ -20,11 +20,14 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/zmanim"
 )
 
 /*
 type TimedEvent2 interface {
-	GetDate() HDate         // Holiday date of occurrence
+	GetDate() hdate.HDate         // Holiday date of occurrence
 	Render() string         // Description (e.g. "Pesach III (CH''M)")
 	GetFlags() HolidayFlags // Event flag bitmask
 	GetEmoji() string       // Holiday-specific emoji
@@ -43,8 +46,8 @@ type TimedEvent struct {
 	linkedEvent  HEvent
 }
 
-func NewTimedEvent(hd HDate, desc string, flags HolidayFlags, t time.Time, sunsetOffset int, linkedEvent HEvent, loc *HLocation) TimedEvent {
-	if t == nilTime {
+func NewTimedEvent(hd hdate.HDate, desc string, flags HolidayFlags, t time.Time, sunsetOffset int, linkedEvent HEvent, loc *HLocation) TimedEvent {
+	if (t == time.Time{}) {
 		return TimedEvent{}
 	}
 	var emoji string
@@ -70,7 +73,7 @@ func NewTimedEvent(hd HDate, desc string, flags HolidayFlags, t time.Time, sunse
 	}
 }
 
-func (ev TimedEvent) GetDate() HDate {
+func (ev TimedEvent) GetDate() hdate.HDate {
 	return ev.Date
 }
 
@@ -91,7 +94,7 @@ func (ev TimedEvent) GetEmoji() string {
 	return ev.Emoji
 }
 
-func makeCandleEvent(hd HDate, opts *CalOptions, ev HEvent) TimedEvent {
+func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev HEvent) TimedEvent {
 	havdalahTitle := false
 	useHavdalahOffset := false
 	dow := hd.Weekday()
@@ -121,14 +124,14 @@ func makeCandleEvent(hd HDate, opts *CalOptions, ev HEvent) TimedEvent {
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	loc := opts.Location
-	zmanim := NewZmanim(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
 	var eventTime time.Time
 	if offset != 0 {
-		eventTime = zmanim.SunsetOffset(offset)
+		eventTime = z.SunsetOffset(offset)
 	} else {
-		eventTime = zmanim.Tzeit(opts.HavdalahDeg)
+		eventTime = z.Tzeit(opts.HavdalahDeg)
 	}
-	if eventTime == nilTime {
+	if (eventTime == time.Time{}) {
 		return TimedEvent{} // no sunset
 	}
 	desc := "Candle lighting"
@@ -150,8 +153,8 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	loc := opts.Location
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-	zmanim := NewZmanim(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
-	candleLightingTime := zmanim.Dusk()
+	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	candleLightingTime := z.Dusk()
 	return TimedEvent{
 		HolidayEvent: ev,
 		eventTime:    candleLightingTime,
@@ -160,37 +163,25 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	}
 }
 
-// Tzais (nightfall) based on the opinion of the Geonim calculated at
-// the sun's position at 8.5° below the western horizon.
-// https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/ComplexZmanimCalendar.html#getTzaisGeonim8Point5Degrees()
-const Tzeit3SmallStars = 8.5
-
-// Tzais (nightfall) based on the opinion of the
-// Geonim calculated as 30 minutes after sunset during the equinox
-// (on March 16, about 4 days before the astronomical equinox, the day that
-// a solar hour is 60 minutes) in Yerushalayim.
-// https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/ComplexZmanimCalendar.html#getTzaisGeonim7Point083Degrees()
-const Tzeit3MediumStars = 7.083
-
 func makeFastStartEnd(ev HEvent, loc *HLocation) (TimedEvent, TimedEvent) {
 	year, month, day := ev.GetDate().Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-	zmanim := NewZmanim(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
 	hd := ev.GetDate()
 	desc := ev.Render("en")
 	flags := ev.GetFlags()
 	var startEvent, endEvent TimedEvent
 	if desc == "Erev Tish'a B'Av" {
-		sunset := zmanim.Sunset()
+		sunset := z.Sunset()
 		startEvent = NewTimedEvent(hd, "Fast begins", flags, sunset, 0, ev, loc)
 	} else if strings.HasPrefix(desc, "Tish'a B'Av") {
-		tzeit := zmanim.Tzeit(Tzeit3MediumStars)
+		tzeit := z.Tzeit(zmanim.Tzeit3MediumStars)
 		endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, loc)
 	} else {
-		dawn := zmanim.AlotHaShachar()
+		dawn := z.AlotHaShachar()
 		startEvent = NewTimedEvent(hd, "Fast begins", flags, dawn, 0, ev, loc)
-		if hd.Weekday() != time.Friday && !(hd.Day == 14 && hd.Month == Nisan) {
-			tzeit := zmanim.Tzeit(Tzeit3MediumStars)
+		if hd.Weekday() != time.Friday && !(hd.Day == 14 && hd.Month == hdate.Nisan) {
+			tzeit := z.Tzeit(zmanim.Tzeit3MediumStars)
 			endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, loc)
 		}
 	}

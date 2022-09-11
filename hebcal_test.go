@@ -5,8 +5,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/stretchr/testify/assert"
 )
+
+func hd2iso(hd hdate.HDate) string {
+	year, month, day := hd.Greg()
+	d := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	return d.Format(time.RFC3339)[:10]
+}
 
 func TestHebrewCalendar(t *testing.T) {
 	assert := assert.New(t)
@@ -116,8 +123,8 @@ func TestHebrewCalendarCandles(t *testing.T) {
 	assert := assert.New(t)
 	loc := LookupCity("Chicago")
 	opts := CalOptions{
-		Start:          NewHDate(5782, Elul, 25),
-		End:            NewHDate(5783, Tishrei, 8),
+		Start:          hdate.New(5782, hdate.Elul, 25),
+		End:            hdate.New(5783, hdate.Tishrei, 8),
 		CandleLighting: true,
 		Location:       &loc,
 		HavdalahMins:   50,
@@ -155,8 +162,8 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 	assert := assert.New(t)
 	loc := LookupCity("Jerusalem")
 	opts := CalOptions{
-		Start:          NewHDate(5783, Kislev, 24),
-		End:            NewHDate(5783, Tevet, 2),
+		Start:          hdate.New(5783, hdate.Kislev, 24),
+		End:            hdate.New(5783, hdate.Tevet, 2),
 		CandleLighting: true,
 		Location:       &loc,
 	}

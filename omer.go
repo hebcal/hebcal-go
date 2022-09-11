@@ -16,16 +16,20 @@ package hebcal
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/hebcal/hebcal-go/hdate"
+)
 
 type omerEvent struct {
-	Date            HDate
+	Date            hdate.HDate
 	OmerDay         int
 	WeekNumber      int
 	DaysWithinWeeks int
 }
 
-func newOmerEvent(hd HDate, omerDay int) omerEvent {
+func newOmerEvent(hd hdate.HDate, omerDay int) omerEvent {
 	if omerDay < 1 || omerDay > 49 {
 		panic("invalid omerDay")
 	}
@@ -37,7 +41,7 @@ func newOmerEvent(hd HDate, omerDay int) omerEvent {
 	return omerEvent{Date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
 }
 
-func (ev omerEvent) GetDate() HDate {
+func (ev omerEvent) GetDate() hdate.HDate {
 	return ev.Date
 }
 

@@ -3,6 +3,11 @@ package hebcal
 import (
 	"regexp"
 	"strconv"
+	"strings"
+
+	"github.com/hebcal/hebcal-go/dafyomi"
+	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/sedra"
 )
 
 // Hebcal - A Jewish Calendar Generator
@@ -76,7 +81,7 @@ const (
 )
 
 type HEvent interface {
-	GetDate() HDate              // Holiday date of occurrence
+	GetDate() hdate.HDate        // Holiday date of occurrence
 	Render(locale string) string // Description (e.g. "Pesach III (CH''M)")
 	GetFlags() HolidayFlags      // Event flag bitmask
 	GetEmoji() string            // Holiday-specific emoji
@@ -90,7 +95,7 @@ type HEvent interface {
 
 // HolidayEvent represents a built-in holiday like Pesach, Purim or Tu BiShvat
 type HolidayEvent struct {
-	Date          HDate        // Holiday date of occurrence
+	Date          hdate.HDate  // Holiday date of occurrence
 	Desc          string       // Description (e.g. "Pesach III (CH''M)")
 	Flags         HolidayFlags // Event flag bitmask
 	Emoji         string       // Holiday-specific emoji
@@ -98,7 +103,7 @@ type HolidayEvent struct {
 	ChanukahDay   int          // used only for Chanukah
 }
 
-func (ev HolidayEvent) GetDate() HDate {
+func (ev HolidayEvent) GetDate() hdate.HDate {
 	return ev.Date
 }
 
@@ -152,10 +157,10 @@ func getEnOrdinal(n int) string {
 }
 
 type hebrewDateEvent struct {
-	Date HDate
+	Date hdate.HDate
 }
 
-func (ev hebrewDateEvent) GetDate() HDate {
+func (ev hebrewDateEvent) GetDate() hdate.HDate {
 	return ev.Date
 }
 
@@ -178,4 +183,56 @@ func (ev hebrewDateEvent) GetEmoji() string {
 
 func (ev hebrewDateEvent) Basename() string {
 	return ev.Date.String()
+}
+
+// Represents one of 54 weekly Torah portions, always on a Saturday
+type parshaEvent struct {
+	Date   hdate.HDate
+	Parsha sedra.Parsha
+	IL     bool
+}
+
+func (ev parshaEvent) GetDate() hdate.HDate {
+	return ev.Date
+}
+
+func (ev parshaEvent) Render(locale string) string {
+	return ev.Parsha.String()
+}
+
+func (ev parshaEvent) GetFlags() HolidayFlags {
+	return PARSHA_HASHAVUA
+}
+
+func (ev parshaEvent) GetEmoji() string {
+	return ""
+}
+
+func (ev parshaEvent) Basename() string {
+	return strings.Join(ev.Parsha.Name, "-")
+}
+
+type dafYomiEvent struct {
+	Date hdate.HDate
+	Daf  dafyomi.DafYomi
+}
+
+func (ev dafYomiEvent) GetDate() hdate.HDate {
+	return ev.Date
+}
+
+func (ev dafYomiEvent) Render(locale string) string {
+	return ev.Daf.String()
+}
+
+func (ev dafYomiEvent) GetFlags() HolidayFlags {
+	return DAF_YOMI
+}
+
+func (ev dafYomiEvent) GetEmoji() string {
+	return ""
+}
+
+func (ev dafYomiEvent) Basename() string {
+	return ev.Daf.String()
 }

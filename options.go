@@ -16,7 +16,11 @@ package hebcal
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import "time"
+import (
+	"time"
+
+	"github.com/hebcal/hebcal-go/hdate"
+)
 
 // CalOptions are used by HebrewCalendar() to configure which events are returned
 type CalOptions struct {
@@ -31,9 +35,9 @@ type CalOptions struct {
 	/* generate calendar for multiple years (default 1) */
 	NumYears int
 	/* use specific start date (requires end date) */
-	Start HDate
+	Start hdate.HDate
 	/* use specific end date (requires start date) */
-	End HDate
+	End hdate.HDate
 	/* calculate candle-lighting and havdalah times */
 	CandleLighting bool
 	/* minutes before sundown to light candles (default 18) */

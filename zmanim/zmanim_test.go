@@ -1,4 +1,4 @@
-package hebcal
+package zmanim
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ func TestZmanimChicago(t *testing.T) {
 	latitude := 41.85003
 	longitude := -87.65005
 	dt := time.Date(2020, time.June, 5, 12, 0, 0, 0, time.UTC)
-	zmanim := NewZmanim(latitude, longitude, dt, "America/Chicago")
+	zman := New(latitude, longitude, dt, "America/Chicago")
 	expected := []string{
 		"Thu, 04 Jun 2020 20:21:34 -0500",
 		"Fri, 05 Jun 2020 00:49:01 -0500",
@@ -35,24 +35,24 @@ func TestZmanimChicago(t *testing.T) {
 		"Fri, 05 Jun 2020 21:13:28 -0500",
 	}
 	times := []time.Time{
-		zmanim.GregEve(),
-		zmanim.ChatzotNight(),
-		zmanim.AlotHaShachar(),
-		zmanim.Misheyakir(),
-		zmanim.MisheyakirMachmir(),
-		zmanim.Dawn(),
-		zmanim.Sunrise(),
-		zmanim.SofZmanShma(),
-		zmanim.SofZmanShmaMGA(),
-		zmanim.SofZmanTfilla(),
-		zmanim.SofZmanTfillaMGA(),
-		zmanim.Chatzot(),
-		zmanim.MinchaGedola(),
-		zmanim.MinchaKetana(),
-		zmanim.PlagHaMincha(),
-		zmanim.Sunset(),
-		zmanim.Dusk(),
-		zmanim.Tzeit(8.5),
+		zman.GregEve(),
+		zman.ChatzotNight(),
+		zman.AlotHaShachar(),
+		zman.Misheyakir(),
+		zman.MisheyakirMachmir(),
+		zman.Dawn(),
+		zman.Sunrise(),
+		zman.SofZmanShma(),
+		zman.SofZmanShmaMGA(),
+		zman.SofZmanTfilla(),
+		zman.SofZmanTfillaMGA(),
+		zman.Chatzot(),
+		zman.MinchaGedola(),
+		zman.MinchaKetana(),
+		zman.PlagHaMincha(),
+		zman.Sunset(),
+		zman.Dusk(),
+		zman.Tzeit(8.5),
 	}
 	actual := make([]string, 18)
 	for idx, t := range times {
@@ -60,10 +60,10 @@ func TestZmanimChicago(t *testing.T) {
 	}
 	assert.Equal(expected, actual)
 
-	assert.Equal(4528916, zmanim.hour())
-	assert.Equal(75, zmanim.hourMins())
-	assert.Equal(2674500, zmanim.nightHour())
-	assert.Equal(44, zmanim.nightHourMins())
+	assert.Equal(4528916, zman.hour())
+	assert.Equal(75, zman.hourMins())
+	assert.Equal(2674500, zman.nightHour())
+	assert.Equal(44, zman.nightHourMins())
 }
 
 func TestZmanimTelAviv(t *testing.T) {
@@ -71,7 +71,7 @@ func TestZmanimTelAviv(t *testing.T) {
 	latitude := 32.08088
 	longitude := 34.78057
 	dt := time.Date(2021, time.March, 6, 12, 0, 0, 0, time.UTC)
-	zmanim := NewZmanim(latitude, longitude, dt, "Asia/Jerusalem")
+	zman := New(latitude, longitude, dt, "Asia/Jerusalem")
 	expected := []string{
 		"Fri, 05 Mar 2021 17:41:21 +0200",
 		"Fri, 05 Mar 2021 23:51:55 +0200",
@@ -93,24 +93,24 @@ func TestZmanimTelAviv(t *testing.T) {
 		"Sat, 06 Mar 2021 18:18:23 +0200",
 	}
 	times := []time.Time{
-		zmanim.GregEve(),
-		zmanim.ChatzotNight(),
-		zmanim.AlotHaShachar(),
-		zmanim.Misheyakir(),
-		zmanim.MisheyakirMachmir(),
-		zmanim.Dawn(),
-		zmanim.Sunrise(),
-		zmanim.SofZmanShma(),
-		zmanim.SofZmanShmaMGA(),
-		zmanim.SofZmanTfilla(),
-		zmanim.SofZmanTfillaMGA(),
-		zmanim.Chatzot(),
-		zmanim.MinchaGedola(),
-		zmanim.MinchaKetana(),
-		zmanim.PlagHaMincha(),
-		zmanim.Sunset(),
-		zmanim.Dusk(),
-		zmanim.Tzeit(8.5),
+		zman.GregEve(),
+		zman.ChatzotNight(),
+		zman.AlotHaShachar(),
+		zman.Misheyakir(),
+		zman.MisheyakirMachmir(),
+		zman.Dawn(),
+		zman.Sunrise(),
+		zman.SofZmanShma(),
+		zman.SofZmanShmaMGA(),
+		zman.SofZmanTfilla(),
+		zman.SofZmanTfillaMGA(),
+		zman.Chatzot(),
+		zman.MinchaGedola(),
+		zman.MinchaKetana(),
+		zman.PlagHaMincha(),
+		zman.Sunset(),
+		zman.Dusk(),
+		zman.Tzeit(8.5),
 	}
 	actual := make([]string, 18)
 	for idx, t := range times {
@@ -142,12 +142,12 @@ func TestZmanimHelsinki(t *testing.T) {
 	actual := make([]string, len(dates))
 	for idx, date := range dates {
 		dt := time.Date(date.yy, date.mm, date.dd, 12, 0, 0, 0, time.UTC)
-		zmanim := NewZmanim(latitude, longitude, dt, "Europe/Helsinki")
+		zman := New(latitude, longitude, dt, "Europe/Helsinki")
 		var t time.Time
 		if dt.Weekday() == time.Friday {
-			t = zmanim.SunsetOffset(-18)
+			t = zman.SunsetOffset(-18)
 		} else {
-			t = zmanim.Tzeit(8.5)
+			t = zman.Tzeit(8.5)
 		}
 		if (t == time.Time{}) {
 			actual[idx] = "undefined"
@@ -174,7 +174,7 @@ func ExampleZmanim_SunsetOffset() {
 	latitude := 41.85003
 	longitude := -87.65005
 	dt := time.Date(2020, time.June, 5, 12, 0, 0, 0, time.UTC)
-	zmanim := NewZmanim(latitude, longitude, dt, "America/Chicago")
-	fmt.Println(zmanim.SunsetOffset(-18))
+	zman := New(latitude, longitude, dt, "America/Chicago")
+	fmt.Println(zman.SunsetOffset(-18))
 	// Output: 2020-06-05 20:04:00 -0500 CDT
 }

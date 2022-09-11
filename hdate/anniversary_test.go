@@ -1,4 +1,4 @@
-package hebcal
+package hdate
 
 import (
 	"fmt"
@@ -39,7 +39,7 @@ func TestYahrzeit(t *testing.T) {
 		name := item[1]
 		expected := strings.Split(item[2], " ")
 		t, _ := time.Parse("2006-01-02", gregDate)
-		hd := NewHDateFromTime(t)
+		hd := FromTime(t)
 		for i := 0; i < 25; i++ {
 			hyear := i + 5778
 			yahrzeit, _ := GetYahrzeit(hyear, hd)
@@ -77,7 +77,7 @@ func TestBirthday(t *testing.T) {
 		name := item[1]
 		expected := strings.Split(item[2], " ")
 		t, _ := time.Parse("2006-01-02", gregDate)
-		hd := NewHDateFromTime(t)
+		hd := FromTime(t)
 		for i := 0; i < 21; i++ {
 			hyear := i + 5753
 			birthday, _ := GetBirthdayOrAnniversary(hyear, hd)
