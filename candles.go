@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/zmanim"
 )
 
@@ -78,9 +79,10 @@ func (ev TimedEvent) GetDate() hdate.HDate {
 }
 
 func (ev TimedEvent) Render(locale string) string {
-	desc := ev.Desc
-	if desc == "Havdalah" && ev.sunsetOffset != 0 {
-		desc = fmt.Sprintf("Havdalah (%d min)", ev.sunsetOffset)
+	desc, _ := locales.LookupTranslation(ev.Desc, locale)
+	if ev.Desc == "Havdalah" && ev.sunsetOffset != 0 {
+		minStr, _ := locales.LookupTranslation("min", locale)
+		desc = fmt.Sprintf("%s (%d %s)", desc, ev.sunsetOffset, minStr)
 	}
 	timeStr := ev.eventTime.Format(time.Kitchen)
 	return fmt.Sprintf("%s: %s", desc, timeStr[0:len(timeStr)-2])

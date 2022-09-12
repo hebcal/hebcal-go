@@ -78,13 +78,6 @@ type CalOptions struct {
 	Omer bool
 	/* include event announcing the molad */
 	// Molad bool
-	/*
-	 * translate event titles according to a locale
-	 * Default value is `en`, also built-in are `he` and `ashkenazi`.
-	 * Additional locales (such as `ru` or `fr`) are provided by the
-	 * {@link https://github.com/hebcal/hebcal-locales @hebcal/locales} package
-	 */
-	Locale string
 	/* print the Hebrew date for the entire date range */
 	AddHebrewDates bool
 	/* print the Hebrew date for dates with some events */

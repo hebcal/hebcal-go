@@ -7,6 +7,7 @@ import (
 
 	"github.com/hebcal/hebcal-go/dafyomi"
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/sedra"
 )
 
@@ -108,7 +109,8 @@ func (ev HolidayEvent) GetDate() hdate.HDate {
 }
 
 func (ev HolidayEvent) Render(locale string) string {
-	return ev.Desc
+	str, _ := locales.LookupTranslation(ev.Desc, locale)
+	return str
 }
 
 func (ev HolidayEvent) GetFlags() HolidayFlags {
@@ -166,11 +168,16 @@ func (ev hebrewDateEvent) GetDate() hdate.HDate {
 
 func (ev hebrewDateEvent) Render(locale string) string {
 	hd := ev.Date
-	if locale == "he" {
+	switch locale {
+	case "he":
 		return Gematriya(hd.Day) + " " + hd.MonthName("he") + " " + Gematriya(hd.Year)
+	case "", "en", "sephardic", "ashkenazi":
+		return getEnOrdinal(hd.Day) + " of " + hd.MonthName("en") +
+			", " + strconv.Itoa(hd.Year)
 	}
-	return getEnOrdinal(hd.Day) + " of " + hd.MonthName("en") +
-		", " + strconv.Itoa(hd.Year)
+	monthName := hd.MonthName("en")
+	str, _ := locales.LookupTranslation(monthName, locale)
+	return strconv.Itoa(hd.Day) + " " + str + " " + strconv.Itoa(hd.Year)
 }
 
 func (ev hebrewDateEvent) GetFlags() HolidayFlags {
@@ -197,7 +204,17 @@ func (ev parshaEvent) GetDate() hdate.HDate {
 }
 
 func (ev parshaEvent) Render(locale string) string {
-	return ev.Parsha.String()
+	prefix, _ := locales.LookupTranslation("Parashat", locale)
+	name, _ := locales.LookupTranslation(ev.Parsha.Name[0], locale)
+	if len(ev.Parsha.Name) == 2 {
+		p2, _ := locales.LookupTranslation(ev.Parsha.Name[1], locale)
+		delim := "-"
+		if locale == "he" {
+			delim = "־"
+		}
+		name = name + delim + p2
+	}
+	return prefix + " " + name
 }
 
 func (ev parshaEvent) GetFlags() HolidayFlags {
@@ -222,7 +239,8 @@ func (ev dafYomiEvent) GetDate() hdate.HDate {
 }
 
 func (ev dafYomiEvent) Render(locale string) string {
-	return ev.Daf.String()
+	name, _ := locales.LookupTranslation(ev.Daf.Name, locale)
+	return name + " " + strconv.Itoa(ev.Daf.Blatt)
 }
 
 func (ev dafYomiEvent) GetFlags() HolidayFlags {

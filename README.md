@@ -14,8 +14,20 @@ birthdays and anniversaries.
 
 Hebcal was created in 1992 by Danny Sadinoff as a Unix/Linux program
 written in C, inspired by similar functionality written in Emacs Lisp.
-
-This golang implementation was released in 2022 by Michael J. Radwin.
+This Golang implementation was released in 2022 by Michael J. Radwin.
 
 Many users of this library will utilize the HebrewCalendar and HDate
 interfaces.
+
+Hebcal incorporates and uses several related packages:
+
+  - hdate: converts between Hebrew and Gregorian dates.
+    Also includes functions for calculating personal anniversaries
+    (Yahrzeit, Birthday) according to the Hebrew calendar.
+  - dafyomi: Daf Yomi, a daily regimen of learning the Talmud.
+  - greg: converts between Gregorian dates and R.D. (Rata Die)
+    day numbers.
+  - sedra: weekly Torah reading (Parashat HaShavua).
+  - zmanim: calculates halachic times.
+  - locales: translations and transliterations of Jewish holiday
+    names into several languages.

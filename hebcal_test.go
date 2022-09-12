@@ -262,3 +262,30 @@ func ExampleHebrewCalendar() {
 	// Sat 08-Jan-2022 Parashat Bo
 	// Sat 08-Jan-2022 Havdalah (50 min): 5:22
 }
+
+func TestHebrewCalendarLocale(t *testing.T) {
+	loc := LookupCity("Providence")
+	opts := CalOptions{
+		Year:           2022,
+		Sedrot:         true,
+		CandleLighting: true,
+		Location:       &loc,
+		HavdalahMins:   50,
+	}
+	events, _ := HebrewCalendar(&opts)
+	actual := make([]string, 6)
+	for i := 0; i < 6; i++ {
+		ev := events[i]
+		dateStr := ev.GetDate().Gregorian().Format("Mon 02-Jan-2006")
+		actual[i] = fmt.Sprintf("%s %s", dateStr, ev.Render("es"))
+	}
+	expected := []string{
+		"Sat 01-Jan-2022 Parashá Vaera",
+		"Sat 01-Jan-2022 Havdalah (50 min): 5:15",
+		"Mon 03-Jan-2022 Rosh Jodesh Sh'vat",
+		"Fri 07-Jan-2022 Iluminación de velas: 4:12",
+		"Sat 08-Jan-2022 Parashá Bo",
+		"Sat 08-Jan-2022 Havdalah (50 min): 5:22",
+	}
+	assert.Equal(t, expected, actual)
+}

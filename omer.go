@@ -20,6 +20,7 @@ import (
 	"strconv"
 
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/locales"
 )
 
 type omerEvent struct {
@@ -46,7 +47,8 @@ func (ev omerEvent) GetDate() hdate.HDate {
 }
 
 func (ev omerEvent) Render(locale string) string {
-	return strconv.Itoa(ev.OmerDay) + " day of the Omer"
+	dayOfTheOmer, _ := locales.LookupTranslation("day of the Omer", locale)
+	return strconv.Itoa(ev.OmerDay) + " " + dayOfTheOmer
 }
 
 func (ev omerEvent) GetFlags() HolidayFlags {
