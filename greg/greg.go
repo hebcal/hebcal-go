@@ -1,5 +1,5 @@
-// Package greg provides functions for converting between Gregorian
-// dates and R.D. (Rata Die) day numbers.
+// Hebcal's greg package converts between Gregorian dates
+// and R.D. (Rata Die) day numbers.
 package greg
 
 // Hebcal - A Jewish Calendar Generator

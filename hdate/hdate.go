@@ -1,5 +1,7 @@
-// Package hdate provides functions for converting between Hebrew
-// and Gregorian dates.
+// Hebcal's hdate package converts between Hebrew and Gregorian dates.
+//
+// It also includes functions for calculating personal anniversaries
+// (Yahrzeit, Birthday) according to the Hebrew calendar.
 package hdate
 
 // Hebcal - A Jewish Calendar Generator

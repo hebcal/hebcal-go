@@ -1,3 +1,5 @@
+// Hebcal's dafyomi package calculates the Daf Yomi, a daily
+// regimen of learning the Talmud.
 package dafyomi
 
 // Hebcal - A Jewish Calendar Generator
