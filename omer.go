@@ -24,14 +24,14 @@ import (
 	"github.com/hebcal/hebcal-go/locales"
 )
 
-type omerEvent struct {
+type OmerEvent struct {
 	Date            hdate.HDate
 	OmerDay         int
 	WeekNumber      int
 	DaysWithinWeeks int
 }
 
-func newOmerEvent(hd hdate.HDate, omerDay int) omerEvent {
+func NewOmerEvent(hd hdate.HDate, omerDay int) OmerEvent {
 	if omerDay < 1 || omerDay > 49 {
 		panic("invalid omerDay")
 	}
@@ -40,23 +40,23 @@ func newOmerEvent(hd hdate.HDate, omerDay int) omerEvent {
 	if days == 0 {
 		days = 7
 	}
-	return omerEvent{Date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
+	return OmerEvent{Date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
 }
 
-func (ev omerEvent) GetDate() hdate.HDate {
+func (ev OmerEvent) GetDate() hdate.HDate {
 	return ev.Date
 }
 
-func (ev omerEvent) Render(locale string) string {
+func (ev OmerEvent) Render(locale string) string {
 	dayOfTheOmer, _ := locales.LookupTranslation("day of the Omer", locale)
 	return strconv.Itoa(ev.OmerDay) + " " + dayOfTheOmer
 }
 
-func (ev omerEvent) GetFlags() HolidayFlags {
+func (ev OmerEvent) GetFlags() HolidayFlags {
 	return OMER_COUNT
 }
 
-func (ev omerEvent) GetEmoji() string {
+func (ev OmerEvent) GetEmoji() string {
 	number := ev.OmerDay
 	var r rune
 	if number <= 20 {
@@ -71,11 +71,11 @@ func (ev omerEvent) GetEmoji() string {
 	return string(r)
 }
 
-func (ev omerEvent) Basename() string {
-	return ev.Render("en")
+func (ev OmerEvent) Basename() string {
+	return "Omer"
 }
 
-func (ev omerEvent) GetWeeks() int {
+func (ev OmerEvent) GetWeeks() int {
 	if ev.DaysWithinWeeks == 7 {
 		return ev.WeekNumber
 	} else {
@@ -161,7 +161,7 @@ func todayIsHe(omer int) string {
 	return str
 }
 
-func (ev omerEvent) TodayIs(locale string) string {
+func (ev OmerEvent) TodayIs(locale string) string {
 	if locale == "he" {
 		return todayIsHe(ev.OmerDay)
 	}
@@ -214,7 +214,7 @@ var sefirotTranslit = []string{
 	"Malkhut",
 }
 
-func (ev omerEvent) Sefira(locale string) string {
+func (ev OmerEvent) Sefira(locale string) string {
 	weekStr := sefirot[ev.WeekNumber]
 	dayWithinWeekStr := sefirot[ev.DaysWithinWeeks]
 	weekNum2or6 := ev.WeekNumber == 2 || ev.WeekNumber == 6

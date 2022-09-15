@@ -157,7 +157,7 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		}
 		if opts.Omer && abs >= beginOmer && abs <= endOmer {
 			omerDay := abs - beginOmer + 1
-			events = append(events, newOmerEvent(hd, omerDay))
+			events = append(events, NewOmerEvent(hd, omerDay))
 		}
 		/*
 			const hmonth = hd.getMonth();
