@@ -100,16 +100,6 @@ in the evening).
 Two options also exist for generating an Event with the Hebrew date:
   - opts.AddHebrewDates - print the Hebrew date for the entire date range
   - opts.AddHebrewDatesForEvents - print the Hebrew date for dates with some events
-
-Lastly, translation and transliteration of event titles is controlled by
-opts.Locale and the Locale API.
-This package supports three locales by default:
-  - en - default, Sephardic transliterations (e.g. "Shabbat")
-  - ashkenazi - Ashkenazi transliterations (e.g. "Shabbos")
-  - he - Hebrew (e.g. "שַׁבָּת")
-
-Additional locales (such as ru or fr) are supported by the
-https://github.com/hebcal/hebcal-locales hebcal-locales-go package
 */
 func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 	err := checkCandleOptions(opts)
