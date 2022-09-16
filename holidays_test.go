@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetAllHolidaysForYear(t *testing.T) {
-	assert.Equal(t, 120, len(getAllHolidaysForYear(5783)))
+	assert.Equal(t, 125, len(getAllHolidaysForYear(5783)))
 }
 
 func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
@@ -247,4 +247,58 @@ func TestGetHolidaysForYearArrayIL(t *testing.T) {
 	}
 
 	assert.Equal(t, expected, actual)
+}
+
+func TestModernILHolidays(t *testing.T) {
+	events0Israel := GetHolidaysForYear(5783, true)
+	eventsIsrael := make([]HolidayEvent, 0, 12)
+	for _, ev := range events0Israel {
+		if (ev.Flags & MODERN_HOLIDAY) != 0 {
+			eventsIsrael = append(eventsIsrael, ev)
+		}
+	}
+	actualIsrael := make([]string, 0, len(eventsIsrael))
+	for _, ev := range eventsIsrael {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.Date), ev.Desc)
+		// fmt.Printf("\"%s\",\n", line)
+		actualIsrael = append(actualIsrael, line)
+	}
+	expectedIsrael := []string{
+		"2022-11-01 Yom HaAliyah School Observance",
+		"2022-11-06 Yitzhak Rabin Memorial Day",
+		"2022-11-23 Sigd",
+		"2022-11-30 Ben-Gurion Day",
+		"2023-02-21 Family Day",
+		"2023-04-01 Yom HaAliyah",
+		"2023-04-18 Yom HaShoah",
+		"2023-04-25 Yom HaZikaron",
+		"2023-04-26 Yom HaAtzma'ut",
+		"2023-05-01 Herzl Day",
+		"2023-05-19 Yom Yerushalayim",
+		"2023-07-18 Jabotinsky Day",
+	}
+	assert.Equal(t, expectedIsrael, actualIsrael)
+
+	events0Diaspora := GetHolidaysForYear(5783, false)
+	eventsDiaspora := make([]HolidayEvent, 0, 12)
+	for _, ev := range events0Diaspora {
+		if (ev.Flags & MODERN_HOLIDAY) != 0 {
+			eventsDiaspora = append(eventsDiaspora, ev)
+		}
+	}
+	actualDiaspora := make([]string, 0, len(eventsDiaspora))
+	for _, ev := range eventsDiaspora {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.Date), ev.Desc)
+		// fmt.Printf("\"%s\",\n", line)
+		actualDiaspora = append(actualDiaspora, line)
+	}
+	expectedDiaspora := []string{
+		"2022-11-23 Sigd",
+		"2023-04-01 Yom HaAliyah",
+		"2023-04-18 Yom HaShoah",
+		"2023-04-25 Yom HaZikaron",
+		"2023-04-26 Yom HaAtzma'ut",
+		"2023-05-19 Yom Yerushalayim",
+	}
+	assert.Equal(t, expectedDiaspora, actualDiaspora)
 }

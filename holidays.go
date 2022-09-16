@@ -124,15 +124,30 @@ var staticHolidays = []holiday{
 }
 
 var staticModernHolidays = []struct {
-	firstYear     int
-	mm            hdate.HMonth
-	dd            int
-	desc          string
-	suppressEmoji bool
+	firstYear        int // First observed in Hebrew year
+	mm               hdate.HMonth
+	dd               int
+	desc             string
+	chul             bool // also display in Chutz L'Aretz
+	suppressEmoji    bool
+	satPostponeToSun bool
+	friPostponeToSun bool
 }{
-	{firstYear: 5727, mm: hdate.Iyyar, dd: 28, desc: "Yom Yerushalayim"},
-	{firstYear: 5769, mm: hdate.Cheshvan, dd: 29, desc: "Sigd", suppressEmoji: true},
-	{firstYear: 5777, mm: hdate.Nisan, dd: 10, desc: "Yom HaAliyah"},
+	{firstYear: 5727, mm: hdate.Iyyar, dd: 28, desc: "Yom Yerushalayim",
+		chul: true},
+	{firstYear: 5737, mm: hdate.Kislev, dd: 6, desc: "Ben-Gurion Day",
+		satPostponeToSun: true, friPostponeToSun: true},
+	{firstYear: 5750, mm: hdate.Shvat, dd: 30, desc: "Family Day",
+		suppressEmoji: true},
+	{firstYear: 5758, mm: hdate.Cheshvan, dd: 12, desc: "Yitzhak Rabin Memorial Day"},
+	{firstYear: 5764, mm: hdate.Iyyar, dd: 10, desc: "Herzl Day",
+		satPostponeToSun: true},
+	{firstYear: 5765, mm: hdate.Tamuz, dd: 29, desc: "Jabotinsky Day",
+		satPostponeToSun: true},
+	{firstYear: 5769, mm: hdate.Cheshvan, dd: 29, desc: "Sigd",
+		chul: true, suppressEmoji: true},
+	{firstYear: 5777, mm: hdate.Nisan, dd: 10, desc: "Yom HaAliyah",
+		chul: true},
 	{firstYear: 5777, mm: hdate.Cheshvan, dd: 7, desc: "Yom HaAliyah School Observance"},
 }
 
@@ -363,7 +378,7 @@ func getAllHolidaysForYear(year int) []HolidayEvent {
 		 * state of Israel observes Yom Hashoah on the preceding
 		 * Thursday. When it falls on a Sunday, Yom Hashoah is observed
 		 * on the following Monday.
-		 * http://www.ushmm.org/remembrance/dor/calendar/
+		 * https://www.ushmm.org/remember/days-of-remembrance/resources/calendar
 		 */
 		if nisan27dt.Weekday() == time.Friday {
 			nisan27dt = nisan27dt.Prev()
@@ -380,8 +395,22 @@ func getAllHolidaysForYear(year int) []HolidayEvent {
 			if h.suppressEmoji {
 				emoji = ""
 			}
-			events = append(events, HolidayEvent{Date: hdate.New(year, h.mm, h.dd),
-				Desc: h.desc, Flags: MODERN_HOLIDAY, Emoji: emoji})
+			hd := hdate.New(year, h.mm, h.dd)
+			if h.friPostponeToSun && hd.Weekday() == time.Friday {
+				hd = hd.Next().Next()
+			}
+			if h.satPostponeToSun && hd.Weekday() == time.Saturday {
+				hd = hd.Next()
+			}
+			flags := MODERN_HOLIDAY
+			if !h.chul {
+				flags |= IL_ONLY
+			}
+			events = append(events, HolidayEvent{
+				Date:  hd,
+				Desc:  h.desc,
+				Flags: flags,
+				Emoji: emoji})
 		}
 	}
 
