@@ -123,6 +123,19 @@ var staticHolidays = []holiday{
 		flags: EREV | LIGHT_CANDLES, emoji: "🍏🍯"},
 }
 
+var staticModernHolidays = []struct {
+	firstYear     int
+	mm            hdate.HMonth
+	dd            int
+	desc          string
+	suppressEmoji bool
+}{
+	{firstYear: 5727, mm: hdate.Iyyar, dd: 28, desc: "Yom Yerushalayim"},
+	{firstYear: 5769, mm: hdate.Cheshvan, dd: 29, desc: "Sigd", suppressEmoji: true},
+	{firstYear: 5777, mm: hdate.Nisan, dd: 10, desc: "Yom HaAliyah"},
+	{firstYear: 5777, mm: hdate.Cheshvan, dd: 7, desc: "Yom HaAliyah School Observance"},
+}
+
 func tzomGedaliahDate(rh hdate.HDate) hdate.HDate {
 	offset := 0
 	if rh.Weekday() == time.Thursday {
@@ -361,37 +374,15 @@ func getAllHolidaysForYear(year int) []HolidayEvent {
 			HolidayEvent{Date: nisan27dt, Desc: "Yom HaShoah", Flags: MODERN_HOLIDAY})
 	}
 
-	if year >= 5727 {
-		// Yom Yerushalayim only celebrated after 1967
-		events = append(events,
-			HolidayEvent{
-				Date:  hdate.New(year, hdate.Iyyar, 28),
-				Desc:  "Yom Yerushalayim",
-				Flags: MODERN_HOLIDAY,
-				Emoji: "🇮🇱"})
-	}
-
-	if year >= 5769 {
-		events = append(events,
-			HolidayEvent{
-				Date:  hdate.New(year, hdate.Cheshvan, 29),
-				Desc:  "Sigd",
-				Flags: MODERN_HOLIDAY})
-	}
-
-	if year >= 5777 {
-		events = append(events,
-			HolidayEvent{
-				Date:  hdate.New(year, hdate.Cheshvan, 7),
-				Desc:  "Yom HaAliyah School Observance",
-				Flags: MODERN_HOLIDAY,
-				Emoji: "🇮🇱"},
-			HolidayEvent{
-				Date:  hdate.New(year, hdate.Nisan, 10),
-				Desc:  "Yom HaAliyah",
-				Flags: MODERN_HOLIDAY,
-				Emoji: "🇮🇱"},
-		)
+	for _, h := range staticModernHolidays {
+		if year >= h.firstYear {
+			emoji := "🇮🇱"
+			if h.suppressEmoji {
+				emoji = ""
+			}
+			events = append(events, HolidayEvent{Date: hdate.New(year, h.mm, h.dd),
+				Desc: h.desc, Flags: MODERN_HOLIDAY, Emoji: emoji})
+		}
 	}
 
 	// Rosh Chodesh
