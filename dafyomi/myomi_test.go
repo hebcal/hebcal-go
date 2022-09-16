@@ -18,6 +18,12 @@ func TestMishnaYomi(t *testing.T) {
 		Mishna{Tractate: "Bava Kamma", Chap: 5, Verse: 7},
 		Mishna{Tractate: "Bava Kamma", Chap: 6, Verse: 1},
 	})
+	mishna, _ = idx.Lookup(hdate.FromGregorian(2024, time.April, 5))
+	assert.Equal(t, mishna, MishnaPair{
+		Mishna{Tractate: "Nedarim", Chap: 11, Verse: 12},
+		Mishna{Tractate: "Nazir", Chap: 1, Verse: 1},
+	})
+	assert.Equal(t, "Nedarim 11:12-Nazir 1:1", mishna.String())
 }
 
 func ExampleMishnaYomiIndex_Lookup() {
