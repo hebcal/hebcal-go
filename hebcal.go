@@ -26,6 +26,7 @@ import (
 	"github.com/hebcal/hebcal-go/dafyomi"
 	"github.com/hebcal/hebcal-go/greg"
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/mishnayomi"
 	"github.com/hebcal/hebcal-go/sedra"
 	"github.com/hebcal/hebcal-go/zmanim"
 )
@@ -121,6 +122,7 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		sedraYear    sedra.Sedra
 		beginOmer    int
 		endOmer      int
+		myIdx        mishnayomi.MishnaYomiIndex
 	)
 	events := make([]HEvent, 0, 20)
 	for abs := startAbs; abs <= endAbs; abs++ {
@@ -154,6 +156,13 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		if opts.DafYomi && hyear >= 5684 {
 			daf, _ := dafyomi.New(hd)
 			events = append(events, dafYomiEvent{Date: hd, Daf: daf})
+		}
+		if opts.MishnaYomi && abs >= mishnayomi.MishnaYomiStart {
+			if len(myIdx) == 0 {
+				myIdx = mishnayomi.MakeIndex()
+			}
+			mishna, _ := myIdx.Lookup(hd)
+			events = append(events, mishnaYomiEvent{Date: hd, Mishna: mishna})
 		}
 		if opts.Omer && abs >= beginOmer && abs <= endOmer {
 			omerDay := abs - beginOmer + 1

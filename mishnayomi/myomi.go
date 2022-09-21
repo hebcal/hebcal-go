@@ -1,11 +1,12 @@
-package dafyomi
+// Hebcal's mishnayomi package calculates the Mishna Yomi, a program
+// of daily learning in which participants study two Mishnayot each
+// day in order to finish the entire Mishnah in ~6 years.
+package mishnayomi
 
 import (
 	"errors"
 	"strconv"
-	"time"
 
-	"github.com/hebcal/hebcal-go/greg"
 	"github.com/hebcal/hebcal-go/hdate"
 )
 
@@ -110,13 +111,15 @@ var mishnayot = []struct {
 	{k: "Oktzin", v: []int{6, 10, 12}},
 }
 
-var mishnaYomiStart int
+// MishnaYomiStart is the R.D. number of the start of the Mishna Yomi cycle,
+// corresponding to 20 May 1947.
+const MishnaYomiStart = 710901
 
 const numMishnayot = 4192
 const numDays = numMishnayot / 2
 
-// MakeMishnaYomiIndex initializes the index for Mishna Yomi.
-func MakeMishnaYomiIndex() MishnaYomiIndex {
+// MakeIndex initializes the index for Mishna Yomi.
+func MakeIndex() MishnaYomiIndex {
 	tmp := make([]Mishna, numMishnayot)
 	i := 0
 	for _, tractate := range mishnayot {
@@ -141,14 +144,11 @@ func MakeMishnaYomiIndex() MishnaYomiIndex {
 // Returns an error if the date is before Mishna Yomi cycle began
 // (20 May 1947).
 func (idx MishnaYomiIndex) Lookup(hd hdate.HDate) (MishnaPair, error) {
-	if mishnaYomiStart == 0 {
-		mishnaYomiStart, _ = greg.ToRD(1947, time.May, 20)
-	}
 	abs := hd.Abs()
-	if abs < mishnaYomiStart {
+	if abs < MishnaYomiStart {
 		return []Mishna{}, errors.New("before Mishna Yomi cycle began")
 	}
-	dayNum := (abs - mishnaYomiStart) % numDays
+	dayNum := (abs - MishnaYomiStart) % numDays
 	return idx[dayNum], nil
 }
 
@@ -159,15 +159,17 @@ func (m Mishna) String() string {
 
 // Returns a string representation of the Mishna Yomi.
 func (pair MishnaPair) String() string {
-	s := pair[0].String() + "-"
-	sameTractate := pair[0].Tractate == pair[1].Tractate
+	m1 := pair[0]
+	m2 := pair[1]
+	s := m1.String() + "-"
+	sameTractate := m1.Tractate == pair[1].Tractate
 	if !sameTractate {
-		s += pair[1].Tractate + " "
+		s += m2.Tractate + " "
 	}
-	if sameTractate && pair[1].Chap == pair[0].Chap {
-		s += strconv.Itoa(pair[1].Verse)
+	if sameTractate && m2.Chap == m1.Chap {
+		s += strconv.Itoa(m2.Verse)
 	} else {
-		s += strconv.Itoa(pair[1].Chap) + ":" + strconv.Itoa(pair[1].Verse)
+		s += strconv.Itoa(m2.Chap) + ":" + strconv.Itoa(m2.Verse)
 	}
 	return s
 }

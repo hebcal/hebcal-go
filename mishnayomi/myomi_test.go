@@ -1,4 +1,4 @@
-package dafyomi
+package mishnayomi
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestMishnaYomi(t *testing.T) {
-	idx := MakeMishnaYomiIndex()
+	idx := MakeIndex()
 	hd := hdate.FromGregorian(1995, time.December, 17)
 	mishna, err := idx.Lookup(hd)
 	assert.Equal(t, nil, err)
@@ -27,7 +27,7 @@ func TestMishnaYomi(t *testing.T) {
 }
 
 func ExampleMishnaYomiIndex_Lookup() {
-	idx := MakeMishnaYomiIndex()
+	idx := MakeIndex()
 	mishna, _ := idx.Lookup(hdate.FromGregorian(1947, time.May, 20))
 	fmt.Println(mishna)
 	mishna, _ = idx.Lookup(hdate.FromGregorian(1995, time.December, 17))

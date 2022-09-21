@@ -291,3 +291,33 @@ func TestHebrewCalendarLocale(t *testing.T) {
 	}
 	assert.Equal(t, expected, actual)
 }
+
+func TestHebrewCalendarMishnaYomiOnly(t *testing.T) {
+	assert := assert.New(t)
+	opts := CalOptions{
+		Start:      hdate.New(5782, hdate.Kislev, 23),
+		End:        hdate.New(5782, hdate.Kislev, 29),
+		MishnaYomi: true,
+		NoHolidays: true,
+	}
+	events, err := HebrewCalendar(&opts)
+	assert.Equal(nil, err)
+	assert.Equal(7, len(events))
+	expected := []string{
+		"2021-11-27 Tevul Yom 4:2-3",
+		"2021-11-28 Tevul Yom 4:4-5",
+		"2021-11-29 Tevul Yom 4:6-7",
+		"2021-11-30 Yadayim 1:1-2",
+		"2021-12-01 Yadayim 1:3-4",
+		"2021-12-02 Yadayim 1:5-2:1",
+		"2021-12-03 Yadayim 2:2-3",
+	}
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		desc := ev.Render("en")
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
+		// fmt.Printf("\"%s\",\n", line)
+		actual = append(actual, line)
+	}
+	assert.Equal(expected, actual)
+}
