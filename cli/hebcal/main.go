@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"os"
@@ -39,6 +40,8 @@ var rangeType = YEAR
 
 func handleArgs() {
 	opt := getopt.New()
+	opt.SetProgram("hebcal")
+	opt.SetParameters("[[ month [ day ]] year]")
 	var (
 		help = opt.BoolLong("help", 0, "print this help text")
 		/*inFileName*/ _ = opt.StringLong("infile", 'I', "", "Get non-yahrtzeit Hebrew user events from specified file. The format is: mmm dd string, Where mmm is a Hebrew month name", "INFILE")
@@ -62,10 +65,11 @@ func handleArgs() {
 		longitudeStr        = opt.StringLong("longitude", 'L', "", "Set the longitude for solar calculations", "LONGITUDE")
 		tzid                = opt.StringLong("timezone", 'z', "", "Use specified timezone, overriding the -C (localize to city) switch", "TIMEZONE")
 		utf8_hebrew_sw      = opt.BoolLong("", '8', "Use UTF-8 Hebrew")
-		/*zemanim_sw*/ _ = opt.StringLong("zmanim", 'Z', "Print zemanim (experimental)")
+		/*zemanim_sw*/ _ = opt.BoolLong("zmanim", 'Z', "Print zemanim (experimental)")
 	)
 
-	opt.FlagLong(&lang, "lang", 0, "Use LANG titles", "LANG")
+	langList := strings.Join(locales.AllLocales, ", ")
+	opt.FlagLong(&lang, "lang", 0, "Use LANG titles ("+langList+")", "LANG")
 
 	opt.FlagLong(&calOptions.CandleLighting,
 		"candlelighting", 'c', "Print candlelighting times")
@@ -106,14 +110,14 @@ func handleArgs() {
 
 	calOptions.NumYears = 1
 	opt.FlagLong(&calOptions.NumYears,
-		"years", 0, "Generate events for N years (default 1)")
+		"years", 0, "Generate events for N years (default 1)", "N")
 
 	if err := opt.Getopt(os.Args, nil); err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 	if *help {
-		opt.PrintUsage(os.Stderr)
+		displayHelp(opt)
 		os.Exit(0)
 	}
 	if *version_sw {
@@ -246,22 +250,27 @@ func handleArgs() {
 		} else {
 			switch args[0] {
 			case "help":
-				opt.PrintUsage(os.Stderr)
+				displayHelp(opt)
 				os.Exit(0)
 			case "info":
-				fmt.Println("info - To Be Implemented")
+				fmt.Println("hebcal version x.yz")
 				os.Exit(0)
 			case "cities":
-				fmt.Println("cities - To Be Implemented")
+				for _, city := range hebcal.AllCities() {
+					fmt.Printf("%s (%.5f lat, %.5f long, %s)\n",
+						city.Name, city.Latitude, city.Longitude, city.TimeZoneId)
+				}
 				os.Exit(0)
 			case "copying":
-				fmt.Println("copying - To Be Implemented")
+				fmt.Println(gplv2txt)
+				fmt.Print(warranty)
 				os.Exit(0)
 			case "warranty":
-				fmt.Println("warranty - To Be Implemented")
+				fmt.Print(warranty)
 				os.Exit(0)
 			default:
 				fmt.Fprintf(os.Stderr, "unrecognized command '%s'\n", args[0])
+				fmt.Fprintf(os.Stderr, "Usage: hebcal %s\n", opt.UsageLine())
 				os.Exit(1)
 			}
 		}
@@ -397,3 +406,48 @@ func intAbs(x int) int {
 	}
 	return x
 }
+
+func displayHelp(opt *getopt.Set) {
+	opt.PrintUsage(os.Stdout)
+	fmt.Print(usageSummary)
+}
+
+var usageSummary = `
+
+hebcal help    -- Print this message.
+hebcal info    -- Print version and localization data.
+hebcal cities  -- Print a list of available cities.
+hebcal warranty -- Tells you how there's NO WARRANTY for hebcal.
+hebcal copying -- Prints the details of the GNU copyright.
+
+Hebcal prints out Hebrew calendars one solar year at a time.
+Given one argument, it will print out the calendar for that year.
+Given two numeric arguments mm yyyy, it prints out the calendar for
+month mm of year yyyy.
+
+For example,
+   hebcal -ho
+will just print out the days of the omer for the current year.
+Note: Use COMPLETE Years.  You probably aren't interested in
+hebcal 93, but rather hebcal 1993.
+
+
+Hebcal is copyright (c) 1994-2011 By Danny Sadinoff
+Portions Copyright (c) 2011-2022 Michael J. Radwin. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+Type "hebcal copying" for more details.
+
+Hebcal is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Type "hebcal warranty" for more details.
+
+"Free" above means freely distributed.  To donate money to support hebcal,
+ see the paypal link at http://www.sadinoff.com/hebcal/
+WWW:
+            https://github.com/hebcal/hebcal-go
+`

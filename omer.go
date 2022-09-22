@@ -49,7 +49,16 @@ func (ev OmerEvent) GetDate() hdate.HDate {
 
 func (ev OmerEvent) Render(locale string) string {
 	dayOfTheOmer, _ := locales.LookupTranslation("day of the Omer", locale)
-	return strconv.Itoa(ev.OmerDay) + " " + dayOfTheOmer
+	switch locale {
+	case "he":
+		return Gematriya(ev.OmerDay) + " " + dayOfTheOmer
+	case "", "en", "sephardic", "ashkenazi",
+		"ashkenazi_litvish", "ashkenazi_poylish", "ashkenazi_standard":
+		return getEnOrdinal(ev.OmerDay) + " " + dayOfTheOmer
+	case "es":
+		return strconv.Itoa(ev.OmerDay) + "º " + dayOfTheOmer
+	}
+	return strconv.Itoa(ev.OmerDay) + ". " + dayOfTheOmer
 }
 
 func (ev OmerEvent) GetFlags() HolidayFlags {

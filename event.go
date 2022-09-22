@@ -174,16 +174,21 @@ func (ev hebrewDateEvent) GetDate() hdate.HDate {
 
 func (ev hebrewDateEvent) Render(locale string) string {
 	hd := ev.Date
+	enMonthName := hd.MonthName("en")
 	switch locale {
 	case "he":
 		return Gematriya(hd.Day) + " " + hd.MonthName("he") + " " + Gematriya(hd.Year)
-	case "", "en", "sephardic", "ashkenazi":
-		return getEnOrdinal(hd.Day) + " of " + hd.MonthName("en") +
+	case "", "en", "sephardic", "ashkenazi",
+		"ashkenazi_litvish", "ashkenazi_poylish", "ashkenazi_standard":
+		return getEnOrdinal(hd.Day) + " of " + enMonthName +
 			", " + strconv.Itoa(hd.Year)
+	case "es":
+		monthName, _ := locales.LookupTranslation(enMonthName, locale)
+		return strconv.Itoa(hd.Day) + "º " + monthName + " " + strconv.Itoa(hd.Year)
+
 	}
-	monthName := hd.MonthName("en")
-	str, _ := locales.LookupTranslation(monthName, locale)
-	return strconv.Itoa(hd.Day) + " " + str + " " + strconv.Itoa(hd.Year)
+	monthName, _ := locales.LookupTranslation(enMonthName, locale)
+	return strconv.Itoa(hd.Day) + " " + monthName + " " + strconv.Itoa(hd.Year)
 }
 
 func (ev hebrewDateEvent) GetFlags() HolidayFlags {

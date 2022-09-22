@@ -146,3 +146,7 @@ func LookupCity(name string) HLocation {
 	}
 	return HLocation{}
 }
+
+func AllCities() []HLocation {
+	return classicCities
+}
