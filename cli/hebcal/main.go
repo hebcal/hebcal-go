@@ -25,6 +25,7 @@ const (
 
 var defaultCity = "New York"
 var defaultLocation = hebcal.HLocation{}
+var userLocation = hebcal.HLocation{}
 var calOptions hebcal.CalOptions = hebcal.CalOptions{
 	Location: &defaultLocation,
 }
@@ -57,19 +58,14 @@ func handleArgs() {
 		/*abbrev_sw*/ _ = opt.BoolLong("abbreviated", 'W', "Weekly view. Omer, dafyomi, and non-date-specific zemanim are shown once a week, on the day which corresponds to the first day in the range.")
 		/*yearDigits_sw*/ _ = opt.BoolLong("year-abbrev", 'y', "Print only last two digits of year")
 		cityNameArg         = opt.StringLong("city", 'C', "", "City for candle-lighting", "CITY")
+		latitudeStr         = opt.StringLong("latitude", 'l', "", "Set the latitude for solar calculations", "LATITUDE")
+		longitudeStr        = opt.StringLong("longitude", 'L', "", "Set the longitude for solar calculations", "LONGITUDE")
 		tzid                = opt.StringLong("timezone", 'z', "", "Use specified timezone, overriding the -C (localize to city) switch", "TIMEZONE")
 		utf8_hebrew_sw      = opt.BoolLong("", '8', "Use UTF-8 Hebrew")
-		/*latitude*/ _ = 0.0
-		/*longitude*/ _ = 0.0
 		/*zemanim_sw*/ _ = opt.StringLong("zmanim", 'Z', "Print zemanim (experimental)")
 	)
 
 	opt.FlagLong(&lang, "lang", 0, "Use LANG titles", "LANG")
-
-	var latitude float64
-	var longitude float64
-	opt.FlagLong(&latitude, "latitude", 'l', "Set the latitude for solar calculations", "LATITUDE")
-	opt.FlagLong(&longitude, "longitude", 'L', "Set the longitude for solar calculations", "LONGITUDE")
 
 	opt.FlagLong(&calOptions.CandleLighting,
 		"candlelighting", 'c', "Print candlelighting times")
@@ -103,7 +99,6 @@ func handleArgs() {
 	opt.FlagLong(&calOptions.CandleLightingMins,
 		"candle-mins", 'b', "Set candle-lighting to occur this many minutes before sundown", "MINUTES")
 
-	calOptions.HavdalahMins = 72
 	opt.FlagLong(&calOptions.HavdalahMins,
 		"havdalah-mins", 'm', "Set Havdalah to occur this many minutes after sundown", "MINUTES")
 	opt.FlagLong(&calOptions.HavdalahDeg,
@@ -150,13 +145,70 @@ func handleArgs() {
 		calOptions.CandleLighting = true
 	}
 
-	if tzid != nil && *tzid != "" {
+	hasLat := false
+	if latitudeStr != nil && *latitudeStr != "" {
+		latdeg := 0
+		latmin := 0
+		n, err := fmt.Sscanf(*latitudeStr, "%d,%d", &latdeg, &latmin)
+		if err != nil || n != 2 {
+			fmt.Fprintf(os.Stderr, "unable to read latitude argument: %s\n", *latitudeStr)
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+		if (intAbs(latdeg) > 90) || latmin > 60 || latmin < 0 {
+			fmt.Fprintf(os.Stderr, "Error, latitude argument out of range: %s\n", *latitudeStr)
+			os.Exit(1)
+		}
+		latmin = intAbs(latmin)
+		if latdeg < 0 {
+			latmin = -latmin
+		}
+		userLocation.Latitude = float64(latdeg) + (float64(latmin) / 60.0)
+		hasLat = true
+	}
+
+	hasLong := false
+	if longitudeStr != nil && *longitudeStr != "" {
+		longdeg := 0
+		longmin := 0
+		n, err := fmt.Sscanf(*longitudeStr, "%d,%d", &longdeg, &longmin)
+		if err != nil || n != 2 {
+			fmt.Fprintf(os.Stderr, "unable to read longitude argument: %s\n", *longitudeStr)
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+		if (intAbs(longdeg) > 180) || longmin > 60 || longmin < 0 {
+			fmt.Fprintf(os.Stderr, "Error, longitude argument out of range: %s\n", *longitudeStr)
+			os.Exit(1)
+		}
+		longmin = intAbs(longmin)
+		if longdeg < 0 {
+			longmin = -longmin
+		}
+		userLocation.Longitude = float64(-1*longdeg) + (float64(longmin) / -60.0)
+		hasLong = true
+	}
+
+	if hasLat && hasLong {
+		if tzid == nil || *tzid == "" {
+			fmt.Fprintf(os.Stderr, "Error, latitude and longitude requires -z/--timezone\n")
+			os.Exit(1)
+		}
 		_, err := time.LoadLocation(*tzid)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
-		calOptions.Location.TimeZoneId = *tzid
+		userLocation.TimeZoneId = *tzid
+		if calOptions.IL {
+			userLocation.CountryCode = "IL"
+		}
+		calOptions.Location = &userLocation
+		calOptions.CandleLighting = true
+	}
+
+	if calOptions.CandleLighting && calOptions.HavdalahDeg == 0.0 && calOptions.HavdalahMins == 0 {
+		calOptions.HavdalahMins = 72
 	}
 
 	if *noGreg_sw {
@@ -337,4 +389,11 @@ func hd2iso(hd hdate.HDate) string {
 	year, month, day := hd.Greg()
 	d := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	return d.Format(time.RFC3339)[:10]
+}
+
+func intAbs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
