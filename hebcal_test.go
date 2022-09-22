@@ -126,7 +126,7 @@ func TestHebrewCalendarCandles(t *testing.T) {
 		Start:          hdate.New(5782, hdate.Elul, 25),
 		End:            hdate.New(5783, hdate.Tishrei, 8),
 		CandleLighting: true,
-		Location:       &loc,
+		Location:       loc,
 		HavdalahMins:   50,
 	}
 	events, err := HebrewCalendar(&opts)
@@ -165,7 +165,7 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 		Start:          hdate.New(5783, hdate.Kislev, 24),
 		End:            hdate.New(5783, hdate.Tevet, 2),
 		CandleLighting: true,
-		Location:       &loc,
+		Location:       loc,
 	}
 	events, err := HebrewCalendar(&opts)
 	assert.Equal(nil, err)
@@ -246,7 +246,7 @@ func ExampleHebrewCalendar() {
 		Year:           2022,
 		Sedrot:         true,
 		CandleLighting: true,
-		Location:       &loc,
+		Location:       loc,
 		HavdalahMins:   50,
 	}
 	events, _ := HebrewCalendar(&opts)
@@ -271,7 +271,7 @@ func TestHebrewCalendarLocale(t *testing.T) {
 		Year:           2022,
 		Sedrot:         true,
 		CandleLighting: true,
-		Location:       &loc,
+		Location:       loc,
 		HavdalahMins:   50,
 	}
 	events, _ := HebrewCalendar(&opts)

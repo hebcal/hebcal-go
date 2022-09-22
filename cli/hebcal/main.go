@@ -25,11 +25,7 @@ const (
 )
 
 var defaultCity = "New York"
-var defaultLocation = hebcal.HLocation{}
-var userLocation = hebcal.HLocation{}
-var calOptions hebcal.CalOptions = hebcal.CalOptions{
-	Location: &defaultLocation,
-}
+var calOptions hebcal.CalOptions = hebcal.CalOptions{}
 var lang = "en"
 var theYear = 0
 var theGregMonth time.Month = 0
@@ -135,20 +131,32 @@ func handleArgs() {
 	}
 	checkLang()
 
-	if calOptions.CandleLighting && (cityNameArg == nil || *cityNameArg == "") {
-		cityNameArg = &defaultCity
-	}
-
+	validCity := false
 	if cityNameArg != nil && *cityNameArg != "" {
 		city := hebcal.LookupCity(*cityNameArg)
-		if city == defaultLocation {
+		if city == nil {
 			fmt.Fprintf(os.Stderr, "unknown city: %s. Use a nearby city or geographic coordinates.\n", *cityNameArg)
 			os.Exit(1)
 		}
-		calOptions.Location = &city
+		calOptions.Location = city
 		calOptions.CandleLighting = true
+		validCity = true
+	} else {
+		name := os.Getenv("HEBCAL_CITY")
+		if name != "" {
+			city := hebcal.LookupCity(name)
+			if city != nil {
+				calOptions.Location = city
+				validCity = true
+			}
+		}
 	}
 
+	if calOptions.CandleLighting && !validCity {
+		calOptions.Location = hebcal.LookupCity(defaultCity)
+	}
+
+	latitude := 0.0
 	hasLat := false
 	if latitudeStr != nil && *latitudeStr != "" {
 		latdeg := 0
@@ -167,10 +175,11 @@ func handleArgs() {
 		if latdeg < 0 {
 			latmin = -latmin
 		}
-		userLocation.Latitude = float64(latdeg) + (float64(latmin) / 60.0)
+		latitude = float64(latdeg) + (float64(latmin) / 60.0)
 		hasLat = true
 	}
 
+	longitude := 0.0
 	hasLong := false
 	if longitudeStr != nil && *longitudeStr != "" {
 		longdeg := 0
@@ -189,7 +198,7 @@ func handleArgs() {
 		if longdeg < 0 {
 			longmin = -longmin
 		}
-		userLocation.Longitude = float64(-1*longdeg) + (float64(longmin) / -60.0)
+		longitude = float64(-1*longdeg) + (float64(longmin) / -60.0)
 		hasLong = true
 	}
 
@@ -203,10 +212,7 @@ func handleArgs() {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
-		userLocation.TimeZoneId = *tzid
-		if calOptions.IL {
-			userLocation.CountryCode = "IL"
-		}
+		userLocation := hebcal.NewLocation("User Defined City", "", latitude, longitude, *tzid)
 		calOptions.Location = &userLocation
 		calOptions.CandleLighting = true
 	}

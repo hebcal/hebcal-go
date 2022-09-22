@@ -117,7 +117,7 @@ var classicCities = []HLocation{
 
 // LookupCity returns an HLocation object of one of 60 "classic" Hebcal city names.
 //
-// If not found, returns HLocation{}
+// If not found, returns nil.
 //
 // The following city names are supported:
 //
@@ -136,15 +136,15 @@ var classicCities = []HLocation{
 // Washington DC, Worcester
 //
 // City name lookup is case-insensitive.
-func LookupCity(name string) HLocation {
+func LookupCity(name string) *HLocation {
 	str := strings.ToLower(name)
 	for _, loc := range classicCities {
 		candidate := strings.ToLower(loc.Name)
 		if candidate == str {
-			return loc
+			return &loc
 		}
 	}
-	return HLocation{}
+	return nil
 }
 
 func AllCities() []HLocation {
