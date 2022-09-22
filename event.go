@@ -246,6 +246,9 @@ func (ev dafYomiEvent) GetDate() hdate.HDate {
 
 func (ev dafYomiEvent) Render(locale string) string {
 	name, _ := locales.LookupTranslation(ev.Daf.Name, locale)
+	if locale == "he" {
+		return name + " דף " + Gematriya(ev.Daf.Blatt)
+	}
 	return name + " " + strconv.Itoa(ev.Daf.Blatt)
 }
 

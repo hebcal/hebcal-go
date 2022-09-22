@@ -2,29 +2,52 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"os"
 
 	"github.com/hebcal/hebcal-go"
+	"github.com/hebcal/hebcal-go/greg"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/locales"
 	getopt "github.com/pborman/getopt/v2"
 )
 
-func main() {
+type RangeType int
+
+const (
+	YEAR RangeType = 0 + iota
+	MONTH
+	DAY
+	TODAY
+)
+
+var defaultCity = "New York"
+var defaultLocation = hebcal.HLocation{}
+var calOptions hebcal.CalOptions = hebcal.CalOptions{
+	Location: &defaultLocation,
+}
+var lang = "en"
+var theYear = 0
+var theGregMonth time.Month = 0
+var theHebMonth hdate.HMonth = 0
+var theDay = 0
+var yearDirty = false
+var rangeType = YEAR
+
+func handleArgs() {
 	opt := getopt.New()
 	var (
 		help = opt.BoolLong("help", 0, "print this help text")
 		/*inFileName*/ _ = opt.StringLong("infile", 'I', "", "Get non-yahrtzeit Hebrew user events from specified file. The format is: mmm dd string, Where mmm is a Hebrew month name", "INFILE")
-		/*today_sw*/ _ = opt.BoolLong("today", 't', "Only output for today's date")
-		/*noGreg_sw*/ _ = opt.BoolLong("today-brief", 'T', "Print today's pertinent information")
+		today_sw         = opt.BoolLong("today", 't', "Only output for today's date")
+		noGreg_sw        = opt.BoolLong("today-brief", 'T', "Print today's pertinent information")
 		/*yahrtzeitFileName*/ _ = opt.StringLong("yahrtzeit", 'Y', "", "Get yahrtzeit dates from specified file. The format is: mm dd yyyy string. The first three fields specify a *Gregorian* date.", "YAHRTZEIT")
-		/*ashkenazi_sw*/ _ = opt.BoolLong("ashkenazi", 'a', "Use Ashkenazi Hebrew transliterations")
+		ashkenazi_sw            = opt.BoolLong("ashkenazi", 'a', "Use Ashkenazi Hebrew transliterations")
 		/*euroDates_sw*/ _ = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
 		/*twentyFourHour_sw*/ _ = opt.BoolLong("24hour", 'E', "Output 24-hour times (e.g. 18:37 instead of 6:37)")
 		/*iso8601dates_sw */ _ = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
-		lang                   = opt.StringLong("lang", 0, "en", "Use LANG titles", "LANG")
 		/*printMolad_sw*/ _ = opt.BoolLong("molad", 'M', "Print the molad on Shabbat Mevorchim")
 		/*printSunriseSunset_sw*/ _ = opt.BoolLong("sunrise-and-sunset", 'O', "Output sunrise and sunset times every day")
 		/*tabs_sw*/ _ = opt.BoolLong("tabs", 'r', "Tab delineated format")
@@ -33,20 +56,21 @@ func main() {
 		/*weekday_sw*/ _ = opt.BoolLong("weekday", 'w', "Add day of the week")
 		/*abbrev_sw*/ _ = opt.BoolLong("abbreviated", 'W', "Weekly view. Omer, dafyomi, and non-date-specific zemanim are shown once a week, on the day which corresponds to the first day in the range.")
 		/*yearDigits_sw*/ _ = opt.BoolLong("year-abbrev", 'y', "Print only last two digits of year")
-		cityNameArg         = opt.StringLong("city", 'C', "New York", "City for candle-lighting", "CITY")
-		tzid                = opt.StringLong("timezone", 'z', "America/New_York", "Use specified timezone, overriding the -C (localize to city) switch", "TIMEZONE")
-		/*utf8_hebrew_sw*/ _ = 1
+		cityNameArg         = opt.StringLong("city", 'C', "", "City for candle-lighting", "CITY")
+		tzid                = opt.StringLong("timezone", 'z', "", "Use specified timezone, overriding the -C (localize to city) switch", "TIMEZONE")
+		utf8_hebrew_sw      = opt.BoolLong("", '8', "Use UTF-8 Hebrew")
 		/*latitude*/ _ = 0.0
 		/*longitude*/ _ = 0.0
 		/*zemanim_sw*/ _ = opt.StringLong("zmanim", 'Z', "Print zemanim (experimental)")
 	)
+
+	opt.FlagLong(&lang, "lang", 0, "Use LANG titles", "LANG")
 
 	var latitude float64
 	var longitude float64
 	opt.FlagLong(&latitude, "latitude", 'l', "Set the latitude for solar calculations", "LATITUDE")
 	opt.FlagLong(&longitude, "longitude", 'L', "Set the longitude for solar calculations", "LONGITUDE")
 
-	calOptions := hebcal.CalOptions{}
 	opt.FlagLong(&calOptions.CandleLighting,
 		"candlelighting", 'c', "Print candlelighting times")
 	opt.FlagLong(&calOptions.AddHebrewDates,
@@ -58,6 +82,9 @@ func main() {
 
 	opt.FlagLong(&calOptions.DafYomi,
 		"daf-yomi", 'F', "Output the Daf Yomi for the entire date range")
+	opt.FlagLong(&calOptions.MishnaYomi,
+		"mishna-yomi", 0, "Output the Mishna Yomi for the entire date range")
+
 	opt.FlagLong(&calOptions.NoHolidays,
 		"no-holidays", 'h', "Suppress default holidays")
 	opt.FlagLong(&calOptions.NoRoshChodesh,
@@ -76,6 +103,7 @@ func main() {
 	opt.FlagLong(&calOptions.CandleLightingMins,
 		"candle-mins", 'b', "Set candle-lighting to occur this many minutes before sundown", "MINUTES")
 
+	calOptions.HavdalahMins = 72
 	opt.FlagLong(&calOptions.HavdalahMins,
 		"havdalah-mins", 'm', "Set Havdalah to occur this many minutes after sundown", "MINUTES")
 	opt.FlagLong(&calOptions.HavdalahDeg,
@@ -98,23 +126,23 @@ func main() {
 		os.Exit(0)
 	}
 
-	if lang != nil {
-		found := false
-		for _, a := range locales.AllLocales {
-			if a == *lang {
-				found = true
-				break
-			}
-		}
-		if !found {
-			fmt.Fprintf(os.Stderr, "Unknown lang '%s'; using default\n", *lang)
-			*lang = "en"
-		}
+	if *ashkenazi_sw && *utf8_hebrew_sw {
+		fmt.Fprintf(os.Stderr, "Cannot specify both options -a and -8\n")
+		os.Exit(1)
+	} else if *ashkenazi_sw {
+		lang = "ashkenazi"
+	} else if *utf8_hebrew_sw {
+		lang = "he"
+	}
+	checkLang()
+
+	if calOptions.CandleLighting && (cityNameArg == nil || *cityNameArg == "") {
+		cityNameArg = &defaultCity
 	}
 
-	if cityNameArg != nil {
+	if cityNameArg != nil && *cityNameArg != "" {
 		city := hebcal.LookupCity(*cityNameArg)
-		if (city == hebcal.HLocation{}) {
+		if city == defaultLocation {
 			fmt.Fprintf(os.Stderr, "unknown city: %s. Use a nearby city or geographic coordinates.\n", *cityNameArg)
 			os.Exit(1)
 		}
@@ -122,7 +150,7 @@ func main() {
 		calOptions.CandleLighting = true
 	}
 
-	if tzid != nil {
+	if tzid != nil && *tzid != "" {
 		_, err := time.LoadLocation(*tzid)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -131,19 +159,178 @@ func main() {
 		calOptions.Location.TimeZoneId = *tzid
 	}
 
+	if *noGreg_sw {
+		*today_sw = true
+	}
+
+	gregTodayYY, gregTodayMM, gregTodayDD := time.Now().Date()
+
+	if *today_sw {
+		calOptions.AddHebrewDates = true
+		rangeType = TODAY
+		theGregMonth = gregTodayMM /* year and month specified */
+		theDay = gregTodayDD       /* printc theDay of theMonth */
+		yearDirty = true
+		calOptions.Omer = true
+		calOptions.IsHebrewYear = false
+	}
+
 	// Get the remaining positional parameters
 	args := opt.Args()
-	fmt.Println(args)
+
+	switch len(args) {
+	case 0:
+		if calOptions.IsHebrewYear {
+			hd := hdate.FromGregorian(gregTodayYY, gregTodayMM, gregTodayDD)
+			theYear = hd.Year
+		} else {
+			theYear = gregTodayYY
+		}
+	case 1:
+		yy, err := strconv.Atoi(args[0])
+		if err == nil {
+			theYear = yy     /* just year specified */
+			yearDirty = true /* print whole year */
+		} else {
+			switch args[0] {
+			case "help":
+				opt.PrintUsage(os.Stderr)
+				os.Exit(0)
+			case "info":
+				fmt.Println("info - To Be Implemented")
+				os.Exit(0)
+			case "cities":
+				fmt.Println("cities - To Be Implemented")
+				os.Exit(0)
+			case "copying":
+				fmt.Println("copying - To Be Implemented")
+				os.Exit(0)
+			case "warranty":
+				fmt.Println("warranty - To Be Implemented")
+				os.Exit(0)
+			default:
+				fmt.Fprintf(os.Stderr, "unrecognized command '%s'\n", args[0])
+				os.Exit(1)
+			}
+		}
+	case 2:
+		yy, err := strconv.Atoi(args[1])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+		theYear = yy
+		parseGregOrHebMonth(&calOptions, theYear, args[0], &theGregMonth, &theHebMonth)
+		yearDirty = true
+		rangeType = MONTH
+	case 3:
+		dd, err := strconv.Atoi(args[1])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+		theDay = dd
+		yy, err := strconv.Atoi(args[2])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+		theYear = yy
+		parseGregOrHebMonth(&calOptions, theYear, args[0], &theGregMonth, &theHebMonth)
+		yearDirty = true
+		rangeType = DAY
+	default:
+		opt.PrintUsage(os.Stderr)
+		os.Exit(1)
+	}
+
+	if calOptions.NumYears != 1 && rangeType != YEAR {
+		fmt.Fprintf(os.Stderr, "Sorry, --years option works only with entire-year calendars")
+		os.Exit(1)
+	}
+}
+
+func checkLang() {
+	if lang != "en" {
+		found := false
+		for _, a := range locales.AllLocales {
+			if a == lang {
+				found = true
+				break
+			}
+		}
+		if !found {
+			fmt.Fprintf(os.Stderr, "Unknown lang '%s'; using default\n", lang)
+			lang = "en"
+		}
+	}
+}
+
+func parseGregOrHebMonth(calOptions *hebcal.CalOptions, theYear int, arg string, gregMonth *time.Month, hebMonth *hdate.HMonth) {
+	mm, err := strconv.Atoi(arg)
+	if err == nil {
+		if calOptions.IsHebrewYear {
+			fmt.Fprintf(os.Stderr, "Don't use numbers to specify Hebrew months.\n")
+			os.Exit(1)
+		}
+		*gregMonth = time.Month(mm) /* gregorian month */
+	} else {
+		hm, err := hdate.MonthFromName(arg)
+		if err == nil {
+			*hebMonth = hm
+			calOptions.IsHebrewYear = true /* automagically turn it on */
+			if hm == hdate.Adar2 && !hdate.IsLeapYear(theYear) {
+				*hebMonth = hdate.Adar1 /* silently fix this mistake */
+			}
+		} else {
+			fmt.Fprintf(os.Stderr, "Unknown Hebrew month: %s.\n", arg)
+			os.Exit(1)
+		}
+	}
+}
+
+func main() {
+	handleArgs()
+	if theYear < 1 || (calOptions.IsHebrewYear && theYear < 3761) {
+		fmt.Fprintf(os.Stderr, "Sorry, hebcal can only handle dates in the common era.\n")
+		os.Exit(1)
+	}
+	switch rangeType {
+	case TODAY:
+		calOptions.AddHebrewDates = true
+		calOptions.Start = hdate.FromGregorian(theYear, theGregMonth, theDay)
+		calOptions.End = calOptions.Start
+	case DAY:
+		calOptions.AddHebrewDates = true
+		if calOptions.IsHebrewYear {
+			calOptions.Start = hdate.New(theYear, theHebMonth, theDay)
+		} else {
+			calOptions.Start = hdate.FromGregorian(theYear, theGregMonth, theDay)
+		}
+		calOptions.End = calOptions.Start
+	case MONTH:
+		if calOptions.IsHebrewYear {
+			calOptions.Start = hdate.New(theYear, theHebMonth, 1)
+			calOptions.End = hdate.New(theYear, theHebMonth, calOptions.Start.DaysInMonth())
+		} else {
+			calOptions.Start = hdate.FromGregorian(theYear, theGregMonth, 1)
+			calOptions.End = hdate.FromGregorian(theYear, theGregMonth, greg.DaysIn(theGregMonth, theYear))
+		}
+	case YEAR:
+		calOptions.Year = theYear
+	default:
+		panic("Oh, NO! internal error #17q!")
+	}
+
 	events, err := hebcal.HebrewCalendar(&calOptions)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	for _, ev := range events {
-		desc := ev.Render(*lang)
+		desc := ev.Render(lang)
 		fmt.Printf("%s %s\n", hd2iso(ev.GetDate()), desc)
 	}
-
 }
 
 func hd2iso(hd hdate.HDate) string {
