@@ -42,18 +42,14 @@ type CalOptions struct {
 	CandleLighting bool
 	/* minutes before sundown to light candles (default 18) */
 	CandleLightingMins int
-	/*
-	 * minutes after sundown for Havdalah (typical values are 42, 50, or 72).
-	 * If `undefined` (the default), calculate Havdalah according to Tzeit Hakochavim -
-	 * Nightfall (the point when 3 small stars are observable in the night time sky with
-	 * the naked eye).
-	 */
+	// minutes after sundown for Havdalah (typical values are 42, 50, or 72).
+	// If 0 (the default), calculate Havdalah according to Tzeit Hakochavim -
+	// Nightfall (the point when 3 small stars are observable in the night time sky with
+	// the naked eye).
 	HavdalahMins int
-	/*
-	 * degrees for solar depression for Havdalah.
-	 * Default is 8.5 degrees for 3 small stars.
-	 * Use 7.083 degress for 3 medium-sized stars.
-	 */
+	// degrees for solar depression for Havdalah.
+	// Default is 8.5 degrees for 3 small stars.
+	// Use 7.083 degress for 3 medium-sized stars.
 	HavdalahDeg float64
 	/* calculate parashah hashavua on Saturdays */
 	Sedrot bool
@@ -82,21 +78,20 @@ type CalOptions struct {
 	AddHebrewDates bool
 	/* print the Hebrew date for dates with some events */
 	AddHebrewDatesForEvents bool
-	/* use bitmask from `flags` to filter events */
+	/* use bitmask from flags to filter events */
 	Mask HolidayFlags
-	/*
-	 * include Yom Kippur Katan (default `false`).
-	 * יוֹם כִּפּוּר קָטָן is a minor day of atonement occurring monthly on the day preceeding each Rosh Chodesh.
-	 * Yom Kippur Katan is omitted in Elul (on the day before Rosh Hashanah),
-	 * Tishrei (Yom Kippur has just passed), Kislev (due to Chanukah)
-	 * and Nisan (fasting not permitted during Nisan).
-	 * When Rosh Chodesh occurs on Shabbat or Sunday, Yom Kippur Katan is observed on the preceding Thursday.
-	 * @see {@link https://en.wikipedia.org/wiki/Yom_Kippur_Katan#Practices Wikipedia Yom Kippur Katan practices}
-	 */
+	// include Yom Kippur Katan (default false).
+	// יוֹם כִּפּוּר קָטָן is a minor day of atonement occurring monthly on the day preceeding each Rosh Chodesh.
+	//
+	// Yom Kippur Katan is omitted in Elul (on the day before Rosh Hashanah),
+	// Tishrei (Yom Kippur has just passed), Kislev (due to Chanukah)
+	// and Nisan (fasting not permitted during Nisan).
+	//
+	// When Rosh Chodesh occurs on Shabbat or Sunday, Yom Kippur Katan is observed on the preceding Thursday.
+	//
+	// See https://en.wikipedia.org/wiki/Yom_Kippur_Katan#Practices
 	YomKippurKatan bool
-	/*
-	 * Whether to use 12-hour time (as opposed to 24-hour time).
-	 * Possible values are `true` and `false` the default is locale dependent.
-	 */
-	Hour12 bool
+	// Whether to use 24-hour time (as opposed to 12-hour time).
+	// Possible values are true and false. The default is locale dependent.
+	Hour24 bool
 }

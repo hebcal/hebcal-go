@@ -57,7 +57,6 @@ func handleArgs() {
 		/*yahrtzeitFileName*/ _ = opt.StringLong("yahrtzeit", 'Y', "", "Get yahrtzeit dates from specified file. The format is: mm dd yyyy string. The first three fields specify a *Gregorian* date.", "YAHRTZEIT")
 		ashkenazi_sw            = opt.BoolLong("ashkenazi", 'a', "Use Ashkenazi Hebrew transliterations")
 		euroDates_sw            = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
-		/*twentyFourHour_sw*/ _ = opt.BoolLong("24hour", 'E', "Output 24-hour times (e.g. 18:37 instead of 6:37)")
 		iso8601dates_sw         = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
 		/*printMolad_sw*/ _ = opt.BoolLong("molad", 'M', "Print the molad on Shabbat Mevorchim")
 		/*printSunriseSunset_sw*/ _ = opt.BoolLong("sunrise-and-sunset", 'O', "Output sunrise and sunset times every day")
@@ -79,6 +78,8 @@ func handleArgs() {
 	opt.FlagLong(&yearDigits_sw, "year-abbrev", 'y', "Print only last two digits of year")
 	opt.FlagLong(&tabs_sw, "tabs", 'r', "Tab delineated format")
 	opt.FlagLong(&weekday_sw, "weekday", 'w', "Add day of the week")
+	opt.FlagLong(&calOptions.Hour24,
+		"24hour", 'E', "Output 24-hour times (e.g. 18:37 instead of 6:37)")
 
 	langList := strings.Join(locales.AllLocales, ", ")
 	opt.FlagLong(&lang, "lang", 0, "Use LANG titles ("+langList+")", "LANG")

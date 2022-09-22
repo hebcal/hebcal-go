@@ -43,11 +43,12 @@ type TimedEvent struct {
 	HolidayEvent
 	eventTime    time.Time
 	sunsetOffset int
-	loc          *HLocation
+	opts         *CalOptions
 	linkedEvent  HEvent
 }
 
-func NewTimedEvent(hd hdate.HDate, desc string, flags HolidayFlags, t time.Time, sunsetOffset int, linkedEvent HEvent, loc *HLocation) TimedEvent {
+func NewTimedEvent(hd hdate.HDate, desc string, flags HolidayFlags, t time.Time,
+	sunsetOffset int, linkedEvent HEvent, opts *CalOptions) TimedEvent {
 	if (t == time.Time{}) {
 		return TimedEvent{}
 	}
@@ -69,7 +70,7 @@ func NewTimedEvent(hd hdate.HDate, desc string, flags HolidayFlags, t time.Time,
 		},
 		eventTime:    t,
 		linkedEvent:  linkedEvent,
-		loc:          loc,
+		opts:         opts,
 		sunsetOffset: sunsetOffset,
 	}
 }
@@ -84,8 +85,14 @@ func (ev TimedEvent) Render(locale string) string {
 		minStr, _ := locales.LookupTranslation("min", locale)
 		desc = fmt.Sprintf("%s (%d %s)", desc, ev.sunsetOffset, minStr)
 	}
-	timeStr := ev.eventTime.Format(time.Kitchen)
-	return fmt.Sprintf("%s: %s", desc, timeStr[0:len(timeStr)-2])
+	var timeStr string
+	if ev.opts.Hour24 {
+		timeStr = ev.eventTime.Format("15:04")
+	} else {
+		timeStr0 := ev.eventTime.Format(time.Kitchen)
+		timeStr = timeStr0[0 : len(timeStr0)-2]
+	}
+	return fmt.Sprintf("%s: %s", desc, timeStr)
 }
 
 func (ev TimedEvent) GetFlags() HolidayFlags {
@@ -140,7 +147,7 @@ func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev HEvent) TimedEvent {
 	if havdalahTitle {
 		desc = "Havdalah"
 	}
-	return NewTimedEvent(hd, desc, flags, eventTime, offset, ev, loc)
+	return NewTimedEvent(hd, desc, flags, eventTime, offset, ev, opts)
 }
 
 func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
@@ -167,13 +174,14 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 		HolidayEvent: ev,
 		eventTime:    candleLightingTime,
 		linkedEvent:  &ev,
-		loc:          loc,
+		opts:         opts,
 	}
 }
 
-func makeFastStartEnd(ev HEvent, loc *HLocation) (TimedEvent, TimedEvent) {
+func makeFastStartEnd(ev HEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
 	year, month, day := ev.GetDate().Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	loc := opts.Location
 	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
 	hd := ev.GetDate()
 	desc := ev.Render("en")
@@ -181,16 +189,16 @@ func makeFastStartEnd(ev HEvent, loc *HLocation) (TimedEvent, TimedEvent) {
 	var startEvent, endEvent TimedEvent
 	if desc == "Erev Tish'a B'Av" {
 		sunset := z.Sunset()
-		startEvent = NewTimedEvent(hd, "Fast begins", flags, sunset, 0, ev, loc)
+		startEvent = NewTimedEvent(hd, "Fast begins", flags, sunset, 0, ev, opts)
 	} else if strings.HasPrefix(desc, "Tish'a B'Av") {
 		tzeit := z.Tzeit(zmanim.Tzeit3MediumStars)
-		endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, loc)
+		endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, opts)
 	} else {
 		dawn := z.AlotHaShachar()
-		startEvent = NewTimedEvent(hd, "Fast begins", flags, dawn, 0, ev, loc)
+		startEvent = NewTimedEvent(hd, "Fast begins", flags, dawn, 0, ev, opts)
 		if hd.Weekday() != time.Friday && !(hd.Day == 14 && hd.Month == hdate.Nisan) {
 			tzeit := z.Tzeit(zmanim.Tzeit3MediumStars)
-			endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, loc)
+			endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, opts)
 		}
 	}
 	return startEvent, endEvent

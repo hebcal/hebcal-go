@@ -373,12 +373,11 @@ func appendHolidayAndRelated(events []HEvent, candlesEv TimedEvent, ev HEvent, o
 	if !opts.YomKippurKatan && (mask&YOM_KIPPUR_KATAN) != 0 {
 		return events, candlesEv // bail out early
 	}
-	loc := opts.Location
 	isMajorFast := (mask & MAJOR_FAST) != 0
 	isMinorFast := (mask & MINOR_FAST) != 0
 	var startEvent, endEvent TimedEvent
 	if opts.CandleLighting && (isMajorFast || isMinorFast) && ev.Render("en") != "Yom Kippur" {
-		startEvent, endEvent = makeFastStartEnd(ev, loc)
+		startEvent, endEvent = makeFastStartEnd(ev, opts)
 		if (startEvent != TimedEvent{}) && (isMajorFast || (isMinorFast && !opts.NoMinorFast)) {
 			events = append(events, startEvent)
 		}
