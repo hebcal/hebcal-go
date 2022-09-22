@@ -110,6 +110,11 @@ func (ev HolidayEvent) GetDate() hdate.HDate {
 }
 
 func (ev HolidayEvent) Render(locale string) string {
+	if (ev.Flags & ROSH_CHODESH) != 0 {
+		rchStr, _ := locales.LookupTranslation("Rosh Chodesh", locale)
+		monthStr, _ := locales.LookupTranslation(ev.Desc[13:], locale)
+		return rchStr + " " + monthStr
+	}
 	str, _ := locales.LookupTranslation(ev.Desc, locale)
 	return str
 }

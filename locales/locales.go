@@ -2,6 +2,25 @@ package locales
 
 import "strings"
 
+// AllLocales is an array of all supported locale names.
+var AllLocales = []string{
+	"en",
+	"ashkenazi",
+	"he",
+	"ashkenazi_litvish",
+	"ashkenazi_poylish",
+	"ashkenazi_romanian",
+	"ashkenazi_standard",
+	"de",
+	"es",
+	"fi",
+	"fr",
+	"hu",
+	"pl",
+	"ro",
+	"ru",
+}
+
 // LookupTranslation returns a message for the given key.
 // It returns false for ok if such a message could not be found.
 func LookupTranslation(key string, locale string) (string, bool) {
