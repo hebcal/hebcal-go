@@ -388,7 +388,10 @@ func appendHolidayAndRelated(events []HEvent, candlesEv TimedEvent, ev HEvent, o
 			if (mask&CHANUKAH_CANDLES) != 0 && !opts.NoHolidays {
 				// Replace Chanukah event with a clone that includes candle lighting time.
 				// For clarity, allow a "duplicate" candle lighting event to remain for Shabbat
-				ev = makeChanukahCandleLighting(ev.(HolidayEvent), opts)
+				tmp := makeChanukahCandleLighting(ev.(HolidayEvent), opts)
+				if (tmp != TimedEvent{}) {
+					ev = tmp
+				}
 			} else {
 				hd := ev.GetDate()
 				candlesEv = makeCandleEvent(hd, opts, ev)

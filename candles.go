@@ -148,6 +148,9 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	dow := hd.Weekday()
 	if dow == time.Friday || dow == time.Saturday {
 		timedEv := makeCandleEvent(hd, opts, ev)
+		if (timedEv == TimedEvent{}) {
+			return timedEv // no sunset
+		}
 		timedEv.Desc = ev.Desc
 		timedEv.ChanukahDay = ev.ChanukahDay
 		return timedEv
@@ -157,6 +160,9 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
 	candleLightingTime := z.Dusk()
+	if (candleLightingTime == time.Time{}) {
+		return TimedEvent{} // no sunset
+	}
 	return TimedEvent{
 		HolidayEvent: ev,
 		eventTime:    candleLightingTime,

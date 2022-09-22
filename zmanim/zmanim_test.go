@@ -181,3 +181,11 @@ func ExampleZmanim_SunsetOffset() {
 	// 2020-06-05 20:04:00 -0500 CDT
 	// 2020-06-05 21:12:00 -0500 CDT
 }
+
+func ExampleZmanim_Dusk() {
+	dt := time.Date(2022, time.December, 24, 12, 0, 0, 0, time.UTC)
+	zman := New(78.305499, -96.917471, dt, "America/Chicago")
+	dusk := zman.Dusk()
+	fmt.Println(dusk)
+	// Output: 0001-01-01 00:00:00 +0000 UTC
+}
