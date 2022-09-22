@@ -24,6 +24,14 @@ const (
 	TODAY
 )
 
+type GregDateFormat int
+
+const (
+	AMERICAN GregDateFormat = 1 + iota
+	EURO
+	ISO
+)
+
 var defaultCity = "New York"
 var calOptions hebcal.CalOptions = hebcal.CalOptions{}
 var lang = "en"
@@ -31,8 +39,13 @@ var theYear = 0
 var theGregMonth time.Month = 0
 var theHebMonth hdate.HMonth = 0
 var theDay = 0
-var yearDirty = false
 var rangeType = YEAR
+var tabs_sw = false
+var weekday_sw = false
+var gregDateOutputFormatCode_sw = AMERICAN
+var today_sw = false
+var noGreg_sw = false
+var yearDigits_sw = false
 
 func handleArgs() {
 	opt := getopt.New()
@@ -41,28 +54,31 @@ func handleArgs() {
 	var (
 		help = opt.BoolLong("help", 0, "print this help text")
 		/*inFileName*/ _ = opt.StringLong("infile", 'I', "", "Get non-yahrtzeit Hebrew user events from specified file. The format is: mmm dd string, Where mmm is a Hebrew month name", "INFILE")
-		today_sw         = opt.BoolLong("today", 't', "Only output for today's date")
-		noGreg_sw        = opt.BoolLong("today-brief", 'T', "Print today's pertinent information")
 		/*yahrtzeitFileName*/ _ = opt.StringLong("yahrtzeit", 'Y', "", "Get yahrtzeit dates from specified file. The format is: mm dd yyyy string. The first three fields specify a *Gregorian* date.", "YAHRTZEIT")
 		ashkenazi_sw            = opt.BoolLong("ashkenazi", 'a', "Use Ashkenazi Hebrew transliterations")
-		/*euroDates_sw*/ _ = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
+		euroDates_sw            = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
 		/*twentyFourHour_sw*/ _ = opt.BoolLong("24hour", 'E', "Output 24-hour times (e.g. 18:37 instead of 6:37)")
-		/*iso8601dates_sw */ _ = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
+		iso8601dates_sw         = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
 		/*printMolad_sw*/ _ = opt.BoolLong("molad", 'M', "Print the molad on Shabbat Mevorchim")
 		/*printSunriseSunset_sw*/ _ = opt.BoolLong("sunrise-and-sunset", 'O', "Output sunrise and sunset times every day")
-		/*tabs_sw*/ _ = opt.BoolLong("tabs", 'r', "Tab delineated format")
 		/*sedraAllWeek_sw*/ _ = opt.BoolLong("daily-sedra", 'S', "Print sedrah of the week on all calendar days")
 		version_sw            = opt.BoolLong("version", 0, "Show version number")
-		/*weekday_sw*/ _ = opt.BoolLong("weekday", 'w', "Add day of the week")
 		/*abbrev_sw*/ _ = opt.BoolLong("abbreviated", 'W', "Weekly view. Omer, dafyomi, and non-date-specific zemanim are shown once a week, on the day which corresponds to the first day in the range.")
-		/*yearDigits_sw*/ _ = opt.BoolLong("year-abbrev", 'y', "Print only last two digits of year")
-		cityNameArg         = opt.StringLong("city", 'C', "", "City for candle-lighting", "CITY")
-		latitudeStr         = opt.StringLong("latitude", 'l', "", "Set the latitude for solar calculations", "LATITUDE")
-		longitudeStr        = opt.StringLong("longitude", 'L', "", "Set the longitude for solar calculations", "LONGITUDE")
-		tzid                = opt.StringLong("timezone", 'z', "", "Use specified timezone, overriding the -C (localize to city) switch", "TIMEZONE")
-		utf8_hebrew_sw      = opt.BoolLong("", '8', "Use UTF-8 Hebrew")
+		cityNameArg     = opt.StringLong("city", 'C', "", "City for candle-lighting", "CITY")
+		utf8_hebrew_sw  = opt.BoolLong("", '8', "Use UTF-8 Hebrew")
 		/*zemanim_sw*/ _ = opt.BoolLong("zmanim", 'Z', "Print zemanim (experimental)")
 	)
+
+	var latitudeStr, longitudeStr, tzid string
+	opt.FlagLong(&latitudeStr, "latitude", 'l', "Set the latitude for solar calculations", "LATITUDE")
+	opt.FlagLong(&longitudeStr, "longitude", 'L', "Set the longitude for solar calculations", "LONGITUDE")
+	opt.FlagLong(&tzid, "timezone", 'z', "Use specified timezone, overriding the -C (localize to city) switch", "TIMEZONE")
+
+	opt.FlagLong(&today_sw, "today", 't', "Only output for today's date")
+	opt.FlagLong(&noGreg_sw, "today-brief", 'T', "Print today's pertinent information")
+	opt.FlagLong(&yearDigits_sw, "year-abbrev", 'y', "Print only last two digits of year")
+	opt.FlagLong(&tabs_sw, "tabs", 'r', "Tab delineated format")
+	opt.FlagLong(&weekday_sw, "weekday", 'w', "Add day of the week")
 
 	langList := strings.Join(locales.AllLocales, ", ")
 	opt.FlagLong(&lang, "lang", 0, "Use LANG titles ("+langList+")", "LANG")
@@ -121,6 +137,13 @@ func handleArgs() {
 		os.Exit(0)
 	}
 
+	if *euroDates_sw {
+		gregDateOutputFormatCode_sw = EURO
+	}
+	if *iso8601dates_sw {
+		gregDateOutputFormatCode_sw = ISO
+	}
+
 	if *ashkenazi_sw && *utf8_hebrew_sw {
 		fmt.Fprintf(os.Stderr, "Cannot specify both options -a and -8\n")
 		os.Exit(1)
@@ -158,17 +181,17 @@ func handleArgs() {
 
 	latitude := 0.0
 	hasLat := false
-	if latitudeStr != nil && *latitudeStr != "" {
+	if latitudeStr != "" {
 		latdeg := 0
 		latmin := 0
-		n, err := fmt.Sscanf(*latitudeStr, "%d,%d", &latdeg, &latmin)
+		n, err := fmt.Sscanf(latitudeStr, "%d,%d", &latdeg, &latmin)
 		if err != nil || n != 2 {
-			fmt.Fprintf(os.Stderr, "unable to read latitude argument: %s\n", *latitudeStr)
+			fmt.Fprintf(os.Stderr, "unable to read latitude argument: %s\n", latitudeStr)
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
 		if (intAbs(latdeg) > 90) || latmin > 60 || latmin < 0 {
-			fmt.Fprintf(os.Stderr, "Error, latitude argument out of range: %s\n", *latitudeStr)
+			fmt.Fprintf(os.Stderr, "Error, latitude argument out of range: %s\n", latitudeStr)
 			os.Exit(1)
 		}
 		latmin = intAbs(latmin)
@@ -181,17 +204,17 @@ func handleArgs() {
 
 	longitude := 0.0
 	hasLong := false
-	if longitudeStr != nil && *longitudeStr != "" {
+	if longitudeStr != "" {
 		longdeg := 0
 		longmin := 0
-		n, err := fmt.Sscanf(*longitudeStr, "%d,%d", &longdeg, &longmin)
+		n, err := fmt.Sscanf(longitudeStr, "%d,%d", &longdeg, &longmin)
 		if err != nil || n != 2 {
-			fmt.Fprintf(os.Stderr, "unable to read longitude argument: %s\n", *longitudeStr)
+			fmt.Fprintf(os.Stderr, "unable to read longitude argument: %s\n", longitudeStr)
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
 		if (intAbs(longdeg) > 180) || longmin > 60 || longmin < 0 {
-			fmt.Fprintf(os.Stderr, "Error, longitude argument out of range: %s\n", *longitudeStr)
+			fmt.Fprintf(os.Stderr, "Error, longitude argument out of range: %s\n", longitudeStr)
 			os.Exit(1)
 		}
 		longmin = intAbs(longmin)
@@ -203,16 +226,16 @@ func handleArgs() {
 	}
 
 	if hasLat && hasLong {
-		if tzid == nil || *tzid == "" {
+		if tzid == "" {
 			fmt.Fprintf(os.Stderr, "Error, latitude and longitude requires -z/--timezone\n")
 			os.Exit(1)
 		}
-		_, err := time.LoadLocation(*tzid)
+		_, err := time.LoadLocation(tzid)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
-		userLocation := hebcal.NewLocation("User Defined City", "", latitude, longitude, *tzid)
+		userLocation := hebcal.NewLocation("User Defined City", "", latitude, longitude, tzid)
 		calOptions.Location = &userLocation
 		calOptions.CandleLighting = true
 	}
@@ -221,18 +244,17 @@ func handleArgs() {
 		calOptions.HavdalahMins = 72
 	}
 
-	if *noGreg_sw {
-		*today_sw = true
+	if noGreg_sw {
+		today_sw = true
 	}
 
 	gregTodayYY, gregTodayMM, gregTodayDD := time.Now().Date()
 
-	if *today_sw {
+	if today_sw {
 		calOptions.AddHebrewDates = true
 		rangeType = TODAY
 		theGregMonth = gregTodayMM /* year and month specified */
 		theDay = gregTodayDD       /* printc theDay of theMonth */
-		yearDirty = true
 		calOptions.Omer = true
 		calOptions.IsHebrewYear = false
 	}
@@ -251,8 +273,7 @@ func handleArgs() {
 	case 1:
 		yy, err := strconv.Atoi(args[0])
 		if err == nil {
-			theYear = yy     /* just year specified */
-			yearDirty = true /* print whole year */
+			theYear = yy /* just year specified */
 		} else {
 			switch args[0] {
 			case "help":
@@ -288,7 +309,6 @@ func handleArgs() {
 		}
 		theYear = yy
 		parseGregOrHebMonth(&calOptions, theYear, args[0], &theGregMonth, &theHebMonth)
-		yearDirty = true
 		rangeType = MONTH
 	case 3:
 		dd, err := strconv.Atoi(args[1])
@@ -304,7 +324,6 @@ func handleArgs() {
 		}
 		theYear = yy
 		parseGregOrHebMonth(&calOptions, theYear, args[0], &theGregMonth, &theHebMonth)
-		yearDirty = true
 		rangeType = DAY
 	default:
 		opt.PrintUsage(os.Stderr)
@@ -395,15 +414,42 @@ func main() {
 		os.Exit(1)
 	}
 	for _, ev := range events {
+		gregDate := printGregDate(ev.GetDate())
 		desc := ev.Render(lang)
-		fmt.Printf("%s %s\n", hd2iso(ev.GetDate()), desc)
+		fmt.Printf("%s%s\n", gregDate, desc)
 	}
 }
 
-func hd2iso(hd hdate.HDate) string {
-	year, month, day := hd.Greg()
-	d := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-	return d.Format(time.RFC3339)[:10]
+func printGregDate(hd hdate.HDate) string {
+	str := ""
+	if !noGreg_sw {
+		year, month, day := hd.Greg()
+		d := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+		if gregDateOutputFormatCode_sw == ISO {
+			str += d.Format(time.RFC3339)[:10]
+		} else {
+			if gregDateOutputFormatCode_sw == EURO {
+				str += fmt.Sprintf("%d.%d.", day, month) /* dd/mm/yyyy */
+			} else {
+				str += fmt.Sprintf("%d/%d/", month, day) /* mm/dd/yyyy */
+			}
+			if yearDigits_sw {
+				str += strconv.Itoa(year % 100)
+			} else {
+				str += strconv.Itoa(year)
+			}
+		}
+		if tabs_sw {
+			str += "\t"
+		} else {
+			str += " "
+		}
+	}
+	if weekday_sw {
+		tmp := hd.Weekday().String()
+		str += tmp[0:3] + ", "
+	}
+	return str
 }
 
 func intAbs(x int) int {
