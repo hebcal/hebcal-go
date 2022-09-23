@@ -38,6 +38,15 @@ type TimedEvent2 interface {
 }
 */
 
+func formatTime(t *time.Time, opts *CalOptions) string {
+	if opts.Hour24 {
+		return t.Format("15:04")
+	} else {
+		timeStr0 := t.Format(time.Kitchen)
+		return timeStr0[0 : len(timeStr0)-2]
+	}
+}
+
 // TimedEvent is used for Candle-lighting, Havdalah, and fast start/end
 type TimedEvent struct {
 	HolidayEvent
@@ -85,13 +94,7 @@ func (ev TimedEvent) Render(locale string) string {
 		minStr, _ := locales.LookupTranslation("min", locale)
 		desc = fmt.Sprintf("%s (%d %s)", desc, ev.sunsetOffset, minStr)
 	}
-	var timeStr string
-	if ev.opts.Hour24 {
-		timeStr = ev.eventTime.Format("15:04")
-	} else {
-		timeStr0 := ev.eventTime.Format(time.Kitchen)
-		timeStr = timeStr0[0 : len(timeStr0)-2]
-	}
+	timeStr := formatTime(&ev.eventTime, ev.opts)
 	return fmt.Sprintf("%s: %s", desc, timeStr)
 }
 
@@ -202,4 +205,56 @@ func makeFastStartEnd(ev HEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
 		}
 	}
 	return startEvent, endEvent
+}
+
+type riseSetEvent struct {
+	date hdate.HDate
+	opts *CalOptions
+}
+
+func (ev riseSetEvent) GetDate() hdate.HDate {
+	return ev.date
+}
+
+func (ev riseSetEvent) Render(locale string) string {
+	loc := ev.opts.Location
+	year, month, day := ev.date.Greg()
+	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	rise := z.Sunrise()
+	set := z.Sunset()
+	riseStr := formatTime(&rise, ev.opts)
+	setStr := formatTime(&set, ev.opts)
+	return fmt.Sprintf("Sunrise: %s; Sunset %s", riseStr, setStr)
+}
+
+func (ev riseSetEvent) GetFlags() HolidayFlags {
+	return ZMANIM
+}
+
+func (ev riseSetEvent) GetEmoji() string {
+	return ""
+}
+
+func (ev riseSetEvent) Basename() string {
+	return ev.Render("en")
+}
+
+func dailyZemanim(date hdate.HDate, opts *CalOptions) []HEvent {
+	loc := opts.Location
+	year, month, day := date.Greg()
+	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	events := []HEvent{
+		NewTimedEvent(date, "Sunrise", ZMANIM, z.Sunrise(), 0, nil, opts),
+		NewTimedEvent(date, "Kriat Shema, sof zeman", ZMANIM, z.SofZmanShma(), 0, nil, opts),
+		NewTimedEvent(date, "Tefilah, sof zeman", ZMANIM, z.SofZmanTfilla(), 0, nil, opts),
+		NewTimedEvent(date, "Chatzot hayom", ZMANIM, z.Chatzot(), 0, nil, opts),
+		NewTimedEvent(date, "Mincha Gedolah", ZMANIM, z.MinchaGedola(), 0, nil, opts),
+		NewTimedEvent(date, "Mincha Ketanah", ZMANIM, z.MinchaKetana(), 0, nil, opts),
+		NewTimedEvent(date, "Plag HaMincha", ZMANIM, z.PlagHaMincha(), 0, nil, opts),
+		NewTimedEvent(date, "Sunset", ZMANIM, z.Sunset(), 0, nil, opts),
+		NewTimedEvent(date, "Tzait HaKochavim", ZMANIM, z.Tzeit(zmanim.Tzeit3SmallStars), 0, nil, opts),
+	}
+	return events
 }

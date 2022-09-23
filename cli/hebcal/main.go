@@ -59,13 +59,11 @@ func handleArgs() {
 		euroDates_sw            = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
 		iso8601dates_sw         = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
 		/*printMolad_sw*/ _ = opt.BoolLong("molad", 'M', "Print the molad on Shabbat Mevorchim")
-		/*printSunriseSunset_sw*/ _ = opt.BoolLong("sunrise-and-sunset", 'O', "Output sunrise and sunset times every day")
 		/*sedraAllWeek_sw*/ _ = opt.BoolLong("daily-sedra", 'S', "Print sedrah of the week on all calendar days")
 		version_sw            = opt.BoolLong("version", 0, "Show version number")
 		/*abbrev_sw*/ _ = opt.BoolLong("abbreviated", 'W', "Weekly view. Omer, dafyomi, and non-date-specific zemanim are shown once a week, on the day which corresponds to the first day in the range.")
 		cityNameArg     = opt.StringLong("city", 'C', "", "City for candle-lighting", "CITY")
 		utf8_hebrew_sw  = opt.BoolLong("", '8', "Use UTF-8 Hebrew")
-		/*zemanim_sw*/ _ = opt.BoolLong("zmanim", 'Z', "Print zemanim (experimental)")
 	)
 
 	var latitudeStr, longitudeStr, tzid string
@@ -80,6 +78,9 @@ func handleArgs() {
 	opt.FlagLong(&weekday_sw, "weekday", 'w', "Add day of the week")
 	opt.FlagLong(&calOptions.Hour24,
 		"24hour", 'E', "Output 24-hour times (e.g. 18:37 instead of 6:37)")
+	opt.FlagLong(&calOptions.SunriseSunset,
+		"sunrise-and-sunset", 'O', "Output sunrise and sunset times every day")
+	opt.FlagLong(&calOptions.DailyZmanim, "zmanim", 'Z', "Output zemanim every day")
 
 	langList := strings.Join(locales.AllLocales, ", ")
 	opt.FlagLong(&lang, "lang", 0, "Use LANG titles ("+langList+")", "LANG")
@@ -176,10 +177,6 @@ func handleArgs() {
 		}
 	}
 
-	if calOptions.CandleLighting && !validCity {
-		calOptions.Location = hebcal.LookupCity(defaultCity)
-	}
-
 	latitude := 0.0
 	hasLat := false
 	if latitudeStr != "" {
@@ -239,6 +236,11 @@ func handleArgs() {
 		userLocation := hebcal.NewLocation("User Defined City", "", latitude, longitude, tzid)
 		calOptions.Location = &userLocation
 		calOptions.CandleLighting = true
+		validCity = true
+	}
+
+	if !validCity && (calOptions.CandleLighting || calOptions.SunriseSunset || calOptions.DailyZmanim) {
+		calOptions.Location = hebcal.LookupCity(defaultCity)
 	}
 
 	if calOptions.CandleLighting && calOptions.HavdalahDeg == 0.0 && calOptions.HavdalahMins == 0 {

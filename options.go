@@ -94,4 +94,10 @@ type CalOptions struct {
 	// Whether to use 24-hour time (as opposed to 12-hour time).
 	// Possible values are true and false. The default is locale dependent.
 	Hour24 bool
+	// Output sunrise and sunset times every day
+	SunriseSunset bool
+	// Add zemanim daily (Alot HaShachar; Misheyakir; Kriat Shema, sof zeman;
+	// Tefilah, sof zeman;  Chatzot hayom; Mincha Gedolah; Mincha Ketanah;
+	// Plag HaMincha; Tzait HaKochavim)
+	DailyZmanim bool
 }

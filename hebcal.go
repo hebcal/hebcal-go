@@ -107,6 +107,12 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 	if err != nil {
 		return nil, err
 	}
+	if opts.SunriseSunset && opts.Location == nil {
+		return nil, errors.New("opts.SunriseSunset requires opts.Location")
+	}
+	if opts.DailyZmanim && opts.Location == nil {
+		return nil, errors.New("opts.DailyZmanim requires opts.Location")
+	}
 	startAbs, endAbs, err := getStartAndEnd(opts)
 	if err != nil {
 		return nil, err
@@ -183,6 +189,13 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		}
 		if opts.AddHebrewDates || (opts.AddHebrewDatesForEvents && prevEventsLength != len(events)) {
 			events = append(events, hebrewDateEvent{Date: hd})
+		}
+		if opts.SunriseSunset {
+			events = append(events, riseSetEvent{date: hd, opts: opts})
+		}
+		if opts.DailyZmanim {
+			zmanEvents := dailyZemanim(hd, opts)
+			events = append(events, zmanEvents...)
 		}
 	}
 	return events, nil

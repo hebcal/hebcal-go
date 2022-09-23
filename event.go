@@ -80,6 +80,8 @@ const (
 	MISHNA_YOMI
 	// Yom Kippur Katan, minor day of atonement on the day preceding each Rosh Chodesh
 	YOM_KIPPUR_KATAN
+	// Zemanim, halachic times of day
+	ZMANIM
 )
 
 type HEvent interface {
