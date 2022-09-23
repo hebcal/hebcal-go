@@ -58,7 +58,6 @@ func handleArgs() {
 		ashkenazi_sw            = opt.BoolLong("ashkenazi", 'a', "Use Ashkenazi Hebrew transliterations")
 		euroDates_sw            = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
 		iso8601dates_sw         = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
-		/*printMolad_sw*/ _ = opt.BoolLong("molad", 'M', "Print the molad on Shabbat Mevorchim")
 		/*sedraAllWeek_sw*/ _ = opt.BoolLong("daily-sedra", 'S', "Print sedrah of the week on all calendar days")
 		version_sw            = opt.BoolLong("version", 0, "Show version number")
 		/*abbrev_sw*/ _ = opt.BoolLong("abbreviated", 'W', "Weekly view. Omer, dafyomi, and non-date-specific zemanim are shown once a week, on the day which corresponds to the first day in the range.")
@@ -81,6 +80,7 @@ func handleArgs() {
 	opt.FlagLong(&calOptions.SunriseSunset,
 		"sunrise-and-sunset", 'O', "Output sunrise and sunset times every day")
 	opt.FlagLong(&calOptions.DailyZmanim, "zmanim", 'Z', "Output zemanim every day")
+	opt.FlagLong(&calOptions.Molad, "molad", 'M', "Print the molad on Shabbat Mevorchim")
 
 	langList := strings.Join(locales.AllLocales, ", ")
 	opt.FlagLong(&lang, "lang", 0, "Use LANG titles ("+langList+")", "LANG")

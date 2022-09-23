@@ -73,7 +73,7 @@ type CalOptions struct {
 	/* include Days of the Omer */
 	Omer bool
 	/* include event announcing the molad */
-	// Molad bool
+	Molad bool
 	/* print the Hebrew date for the entire date range */
 	AddHebrewDates bool
 	/* print the Hebrew date for dates with some events */

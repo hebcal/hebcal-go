@@ -197,6 +197,11 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 			zmanEvents := dailyZemanim(hd, opts)
 			events = append(events, zmanEvents...)
 		}
+		if opts.Molad && dow == time.Saturday && hd.Month != hdate.Elul && hd.Day >= 23 && hd.Day <= 29 {
+			nextMonthName, nextMonth := nextMonthName(hd.Year, hd.Month)
+			molad := hdate.NewMolad(hd.Year, nextMonth)
+			events = append(events, moladEvent{Date: hd, Molad: molad, MonthName: nextMonthName})
+		}
 	}
 	return events, nil
 }
