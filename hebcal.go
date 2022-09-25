@@ -34,7 +34,7 @@ import (
 /*
 Calculates holidays and other Hebrew calendar events based on CalOptions.
 
-Each holiday is represented by an HEvent object which includes a date,
+Each holiday is represented by CalEvent object which includes a date,
 a description, flags and optional attributes.
 If given no options, returns holidays for the Diaspora for the current Gregorian year.
 
@@ -102,7 +102,7 @@ Two options also exist for generating an Event with the Hebrew date:
   - opts.AddHebrewDates - print the Hebrew date for the entire date range
   - opts.AddHebrewDatesForEvents - print the Hebrew date for dates with some events
 */
-func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
+func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 	err := checkCandleOptions(opts)
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		userEvents   []HolidayEvent
 	)
 	firstWeekday := time.Weekday(startAbs % 7)
-	events := make([]HEvent, 0, 20)
+	events := make([]CalEvent, 0, 20)
 	for abs := startAbs; abs <= endAbs; abs++ {
 		hd := hdate.FromRD(abs)
 		hyear := hd.Year
@@ -416,7 +416,7 @@ func getMaskFromOptions(opts *CalOptions) HolidayFlags {
 	return mask
 }
 
-func appendHolidayAndRelated(events []HEvent, candlesEv TimedEvent, ev HEvent, opts *CalOptions) ([]HEvent, TimedEvent) {
+func appendHolidayAndRelated(events []CalEvent, candlesEv TimedEvent, ev CalEvent, opts *CalOptions) ([]CalEvent, TimedEvent) {
 	mask := ev.GetFlags()
 	if !opts.YomKippurKatan && (mask&YOM_KIPPUR_KATAN) != 0 {
 		return events, candlesEv // bail out early

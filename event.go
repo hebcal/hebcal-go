@@ -85,7 +85,7 @@ const (
 	ZMANIM
 )
 
-type HEvent interface {
+type CalEvent interface {
 	GetDate() hdate.HDate        // Holiday date of occurrence
 	Render(locale string) string // Description (e.g. "Pesach III (CH''M)")
 	GetFlags() HolidayFlags      // Event flag bitmask

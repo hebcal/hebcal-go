@@ -38,7 +38,7 @@ type UserYahrzeit struct {
 // CalOptions are used by HebrewCalendar() to configure which events are returned
 type CalOptions struct {
 	/* latitude/longitude/tzid used for candle-lighting */
-	Location *HLocation
+	Location *Location
 	/* Gregorian or Hebrew year */
 	Year int
 	/* to interpret year as Hebrew year */

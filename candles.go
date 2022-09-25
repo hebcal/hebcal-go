@@ -26,18 +26,6 @@ import (
 	"github.com/hebcal/hebcal-go/zmanim"
 )
 
-/*
-type TimedEvent2 interface {
-	GetDate() hdate.HDate         // Holiday date of occurrence
-	Render() string         // Description (e.g. "Pesach III (CH''M)")
-	GetFlags() HolidayFlags // Event flag bitmask
-	GetEmoji() string       // Holiday-specific emoji
-	GetTime() time.Time
-	GetLinkedEvent() HEvent
-	GetLocation() *HLocation
-}
-*/
-
 func formatTime(t *time.Time, opts *CalOptions) string {
 	if opts.Hour24 {
 		return t.Format("15:04")
@@ -53,11 +41,11 @@ type TimedEvent struct {
 	eventTime    time.Time
 	sunsetOffset int
 	opts         *CalOptions
-	linkedEvent  HEvent
+	linkedEvent  CalEvent
 }
 
 func NewTimedEvent(hd hdate.HDate, desc string, flags HolidayFlags, t time.Time,
-	sunsetOffset int, linkedEvent HEvent, opts *CalOptions) TimedEvent {
+	sunsetOffset int, linkedEvent CalEvent, opts *CalOptions) TimedEvent {
 	if (t == time.Time{}) {
 		return TimedEvent{}
 	}
@@ -106,7 +94,7 @@ func (ev TimedEvent) GetEmoji() string {
 	return ev.Emoji
 }
 
-func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev HEvent) TimedEvent {
+func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev CalEvent) TimedEvent {
 	havdalahTitle := false
 	useHavdalahOffset := false
 	dow := hd.Weekday()
@@ -181,7 +169,7 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	}
 }
 
-func makeFastStartEnd(ev HEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
+func makeFastStartEnd(ev CalEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
 	year, month, day := ev.GetDate().Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	loc := opts.Location
@@ -240,12 +228,12 @@ func (ev riseSetEvent) Basename() string {
 	return ev.Render("en")
 }
 
-func dailyZemanim(date hdate.HDate, opts *CalOptions) []HEvent {
+func dailyZemanim(date hdate.HDate, opts *CalOptions) []CalEvent {
 	loc := opts.Location
 	year, month, day := date.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
-	events := []HEvent{
+	events := []CalEvent{
 		NewTimedEvent(date, "Sunrise", ZMANIM, z.Sunrise(), 0, nil, opts),
 		NewTimedEvent(date, "Kriat Shema, sof zeman", ZMANIM, z.SofZmanShma(), 0, nil, opts),
 		NewTimedEvent(date, "Tefilah, sof zeman", ZMANIM, z.SofZmanTfilla(), 0, nil, opts),

@@ -19,8 +19,8 @@ package hebcal
 
 import "strings"
 
-// HLocation represents a location for Zmanim
-type HLocation struct {
+// Location represents a location for Zmanim
+type Location struct {
 	Name        string  // City name
 	CountryCode string  // ISO 3166 two-letter in caps, e.g. "US", "GB", "IL"
 	Latitude    float64 // In the range [-90,90]
@@ -31,14 +31,14 @@ type HLocation struct {
 // NewLocation creates an instance of an HLocation object.
 //
 // This function panics if the latitude or longitude are out of range.
-func NewLocation(name string, countryCode string, latitude float64, longitude float64, tzid string) HLocation {
+func NewLocation(name string, countryCode string, latitude float64, longitude float64, tzid string) Location {
 	if latitude < -90 || latitude > 90 {
 		panic("Latitude out of range [-90,90]")
 	}
 	if longitude < -180 || longitude > 180 {
 		panic("Longitude out of range [-180,180]")
 	}
-	return HLocation{
+	return Location{
 		Name:        name,
 		CountryCode: countryCode,
 		Latitude:    latitude,
@@ -47,7 +47,7 @@ func NewLocation(name string, countryCode string, latitude float64, longitude fl
 	}
 }
 
-var classicCities = []HLocation{
+var classicCities = []Location{
 	{"Ashdod", "IL", 31.79213, 34.64966, "Asia/Jerusalem"},
 	{"Atlanta", "US", 33.749, -84.38798, "America/New_York"},
 	{"Austin", "US", 30.26715, -97.74306, "America/Chicago"},
@@ -136,7 +136,7 @@ var classicCities = []HLocation{
 // Washington DC, Worcester
 //
 // City name lookup is case-insensitive.
-func LookupCity(name string) *HLocation {
+func LookupCity(name string) *Location {
 	str := strings.ToLower(name)
 	for _, loc := range classicCities {
 		candidate := strings.ToLower(loc.Name)
@@ -147,6 +147,6 @@ func LookupCity(name string) *HLocation {
 	return nil
 }
 
-func AllCities() []HLocation {
+func AllCities() []Location {
 	return classicCities
 }
