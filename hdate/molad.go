@@ -60,18 +60,18 @@ func (m *Molad) setMoladTime(chalakim int) {
 }
 
 func NewMolad(year int, month HMonth) Molad {
-	molad := getChalakimSinceMoladTohu(year, month)
-	hd := FromRD(moladToAbsDate(molad))
-	conjunctionDay := (molad / chalakimPerDay)
-	conjunctionParts := (molad - conjunctionDay*chalakimPerDay)
-	moladDate := Molad{Date: hd}
-	moladDate.setMoladTime(conjunctionParts)
-	if moladDate.Hours >= 6 {
+	chalakim := getChalakimSinceMoladTohu(year, month)
+	hd := FromRD(moladToAbsDate(chalakim))
+	conjunctionDay := chalakim / chalakimPerDay
+	conjunctionParts := chalakim - conjunctionDay*chalakimPerDay
+	molad := Molad{}
+	molad.setMoladTime(conjunctionParts)
+	if molad.Hours >= 6 {
 		hd = hd.Next()
 	}
-	moladDate.Hours = (moladDate.Hours + 18) % 24
-	moladDate.Date = hd
-	return moladDate
+	molad.Date = hd
+	molad.Hours = (molad.Hours + 18) % 24
+	return molad
 }
 
 // This is Dershowitz & Reingold's floating point version here for reference
