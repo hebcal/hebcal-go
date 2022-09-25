@@ -33,7 +33,6 @@ const (
 )
 
 var defaultCity = "New York"
-var calOptions hebcal.CalOptions = hebcal.CalOptions{}
 var lang = "en"
 var theYear = 0
 var theGregMonth time.Month = 0
@@ -47,17 +46,18 @@ var today_sw = false
 var noGreg_sw = false
 var yearDigits_sw = false
 
-func handleArgs() {
+func handleArgs() hebcal.CalOptions {
+	calOptions := hebcal.CalOptions{}
 	opt := getopt.New()
 	opt.SetProgram("hebcal")
 	opt.SetParameters("[[ month [ day ]] year]")
 	var (
-		help = opt.BoolLong("help", 0, "print this help text")
-		/*inFileName*/ _ = opt.StringLong("infile", 'I', "", "Get non-yahrtzeit Hebrew user events from specified file. The format is: mmm dd string, Where mmm is a Hebrew month name", "INFILE")
-		/*yahrtzeitFileName*/ _ = opt.StringLong("yahrtzeit", 'Y', "", "Get yahrtzeit dates from specified file. The format is: mm dd yyyy string. The first three fields specify a *Gregorian* date.", "YAHRTZEIT")
-		ashkenazi_sw            = opt.BoolLong("ashkenazi", 'a', "Use Ashkenazi Hebrew transliterations")
-		euroDates_sw            = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
-		iso8601dates_sw         = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
+		help             = opt.BoolLong("help", 0, "print this help text")
+		inFileName       = opt.StringLong("infile", 'I', "", "Get non-yahrtzeit Hebrew user events from specified file. The format is: mmm dd string, Where mmm is a Hebrew month name", "INFILE")
+		yahrzeitFileName = opt.StringLong("yahrtzeit", 'Y', "", "Get yahrtzeit dates from specified file. The format is: mm dd yyyy string. The first three fields specify a *Gregorian* date.", "YAHRTZEIT")
+		ashkenazi_sw     = opt.BoolLong("ashkenazi", 'a', "Use Ashkenazi Hebrew transliterations")
+		euroDates_sw     = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
+		iso8601dates_sw  = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
 		/*sedraAllWeek_sw*/ _ = opt.BoolLong("daily-sedra", 'S', "Print sedrah of the week on all calendar days")
 		version_sw            = opt.BoolLong("version", 0, "Show version number")
 		/*abbrev_sw*/ _ = opt.BoolLong("abbreviated", 'W', "Weekly view. Omer, dafyomi, and non-date-specific zemanim are shown once a week, on the day which corresponds to the first day in the range.")
@@ -262,6 +262,13 @@ func handleArgs() {
 		calOptions.IsHebrewYear = false
 	}
 
+	if *yahrzeitFileName != "" {
+		calOptions.Yahrzeits = readYahrzeitFile(*yahrzeitFileName)
+	}
+	if *inFileName != "" {
+		calOptions.UserEvents = readUserFile(*inFileName)
+	}
+
 	// Get the remaining positional parameters
 	args := opt.Args()
 
@@ -337,6 +344,7 @@ func handleArgs() {
 		fmt.Fprintf(os.Stderr, "Sorry, --years option works only with entire-year calendars")
 		os.Exit(1)
 	}
+	return calOptions
 }
 
 func checkLang() {
@@ -379,7 +387,7 @@ func parseGregOrHebMonth(calOptions *hebcal.CalOptions, theYear int, arg string,
 }
 
 func main() {
-	handleArgs()
+	calOptions := handleArgs()
 	if theYear < 1 || (calOptions.IsHebrewYear && theYear < 3761) {
 		fmt.Fprintf(os.Stderr, "Sorry, hebcal can only handle dates in the common era.\n")
 		os.Exit(1)

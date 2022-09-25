@@ -22,6 +22,19 @@ import (
 	"github.com/hebcal/hebcal-go/hdate"
 )
 
+// UserEvent is used for generating a non-yahrtzeit user event.
+type UserEvent struct {
+	Month hdate.HMonth // Hebrew month
+	Day   int          // Day in month (1-30)
+	Desc  string       // Description
+}
+
+// UserYahrzeit is used for generating a yahrtzeit reminder events.
+type UserYahrzeit struct {
+	Date time.Time // Gregorian Date of death
+	Name string    // Name of deceased
+}
+
 // CalOptions are used by HebrewCalendar() to configure which events are returned
 type CalOptions struct {
 	/* latitude/longitude/tzid used for candle-lighting */
@@ -100,4 +113,8 @@ type CalOptions struct {
 	// Tefilah, sof zeman;  Chatzot hayom; Mincha Gedolah; Mincha Ketanah;
 	// Plag HaMincha; Tzait HaKochavim)
 	DailyZmanim bool
+	// Add Yahrzeit reminders when the anniversary falls within the date range.
+	Yahrzeits []UserYahrzeit
+	// Add non-yahrtzeit Hebrew user event reminders when the anniversary falls within the date range.
+	UserEvents []UserEvent
 }

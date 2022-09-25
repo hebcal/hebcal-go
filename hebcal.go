@@ -129,6 +129,7 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		beginOmer    int
 		endOmer      int
 		myIdx        mishnayomi.MishnaYomiIndex
+		userEvents   []HolidayEvent
 	)
 	events := make([]HEvent, 0, 20)
 	for abs := startAbs; abs <= endAbs; abs++ {
@@ -143,6 +144,31 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 			if opts.Omer {
 				beginOmer = hdate.HebrewToRD(hyear, hdate.Nisan, 16)
 				endOmer = hdate.HebrewToRD(hyear, hdate.Sivan, 5)
+			}
+			numUserEvents := len(opts.Yahrzeits) + len(opts.UserEvents)
+			if numUserEvents != 0 {
+				userEvents = make([]HolidayEvent, 0, numUserEvents)
+				for _, yahrzeit := range opts.Yahrzeits {
+					origDate := hdate.FromTime(yahrzeit.Date)
+					observedDate, err := hdate.GetYahrzeit(currentYear, origDate)
+					if err == nil {
+						userEvents = append(userEvents, HolidayEvent{
+							Date:  observedDate,
+							Desc:  yahrzeit.Name,
+							Flags: USER_EVENT,
+						})
+					}
+				}
+				for _, event := range opts.UserEvents {
+					// Watch for ShortKislev and LongCheshvan
+					if event.Day <= hdate.DaysInMonth(event.Month, hyear) {
+						userEvents = append(userEvents, HolidayEvent{
+							Date:  hdate.New(hyear, event.Month, event.Day),
+							Desc:  event.Desc,
+							Flags: USER_EVENT,
+						})
+					}
+				}
 			}
 		}
 		dow := hd.Weekday()
@@ -187,15 +213,20 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		if (candlesEv != TimedEvent{}) {
 			events = append(events, candlesEv)
 		}
-		if opts.AddHebrewDates || (opts.AddHebrewDatesForEvents && prevEventsLength != len(events)) {
-			events = append(events, hebrewDateEvent{Date: hd})
-		}
 		if opts.SunriseSunset {
 			events = append(events, riseSetEvent{date: hd, opts: opts})
 		}
 		if opts.DailyZmanim {
 			zmanEvents := dailyZemanim(hd, opts)
 			events = append(events, zmanEvents...)
+		}
+		for _, userEv := range userEvents {
+			if abs == userEv.Date.Abs() {
+				events = append(events, userEv)
+			}
+		}
+		if opts.AddHebrewDates || (opts.AddHebrewDatesForEvents && prevEventsLength != len(events)) {
+			events = append(events, hebrewDateEvent{Date: hd})
 		}
 		if opts.Molad && dow == time.Saturday && hd.Month != hdate.Elul && hd.Day >= 23 && hd.Day <= 29 {
 			nextMonthName, nextMonth := nextMonthName(hd.Year, hd.Month)
