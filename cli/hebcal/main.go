@@ -52,16 +52,13 @@ func handleArgs() hebcal.CalOptions {
 	opt.SetProgram("hebcal")
 	opt.SetParameters("[[ month [ day ]] year]")
 	var (
-		help             = opt.BoolLong("help", 0, "print this help text")
-		inFileName       = opt.StringLong("infile", 'I', "", "Get non-yahrtzeit Hebrew user events from specified file. The format is: mmm dd string, Where mmm is a Hebrew month name", "INFILE")
-		yahrzeitFileName = opt.StringLong("yahrtzeit", 'Y', "", "Get yahrtzeit dates from specified file. The format is: mm dd yyyy string. The first three fields specify a *Gregorian* date.", "YAHRTZEIT")
-		ashkenazi_sw     = opt.BoolLong("ashkenazi", 'a', "Use Ashkenazi Hebrew transliterations")
-		euroDates_sw     = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
-		iso8601dates_sw  = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
-		/*sedraAllWeek_sw*/ _ = opt.BoolLong("daily-sedra", 'S', "Print sedrah of the week on all calendar days")
-		version_sw            = opt.BoolLong("version", 0, "Show version number")
-		cityNameArg           = opt.StringLong("city", 'C', "", "City for candle-lighting", "CITY")
-		utf8_hebrew_sw        = opt.BoolLong("", '8', "Use UTF-8 Hebrew")
+		help            = opt.BoolLong("help", 0, "print this help text")
+		ashkenazi_sw    = opt.BoolLong("ashkenazi", 'a', "Use Ashkenazi Hebrew transliterations")
+		euroDates_sw    = opt.BoolLong("euro-dates", 'e', "Output 'European' dates -- DD.MM.YYYY")
+		iso8601dates_sw = opt.BoolLong("iso-8601", 'g', "Output ISO 8601 dates -- YYYY-MM-DD")
+		version_sw      = opt.BoolLong("version", 0, "Show version number")
+		cityNameArg     = opt.StringLong("city", 'C', "", "City for candle-lighting", "CITY")
+		utf8_hebrew_sw  = opt.BoolLong("", '8', "Use UTF-8 Hebrew")
 	)
 
 	var latitudeStr, longitudeStr, tzid string
@@ -112,7 +109,9 @@ func handleArgs() hebcal.CalOptions {
 	opt.FlagLong(&calOptions.Omer,
 		"omer", 'o', "Add days of the Omer")
 	opt.FlagLong(&calOptions.Sedrot,
-		"sedrot", 's', "Add weekly sedrot on Saturday")
+		"sedrot", 's', "Add the weekly sedra to the output on Saturdays")
+	opt.FlagLong(&calOptions.DailySedra,
+		"daily-sedra", 'S', "Add the weekly sedra to the output every day")
 
 	calOptions.CandleLightingMins = 18
 	opt.FlagLong(&calOptions.CandleLightingMins,
@@ -126,6 +125,19 @@ func handleArgs() hebcal.CalOptions {
 	calOptions.NumYears = 1
 	opt.FlagLong(&calOptions.NumYears,
 		"years", 0, "Generate events for N years (default 1)", "N")
+
+	inFileName := opt.StringLong("infile", 'I', "", `Read extra events from file.
+These events are printed regardless of the -h suppress holidays switch.
+There is one holiday per line in file, each with the format
+    MMMM DD Description
+where MMMM is a string identifying the Hebrew month and DD is a number from 1 to 30.
+Description is a newline-terminated string describing the event.`, "FILENAME")
+	yahrzeitFileName := opt.StringLong("yahrtzeit", 'Y', "", `Read a table of yahrtzeit dates from file.
+These events are printed regardless of the -h suppress holidays switch.
+There is one death-date per line in file, each with the format
+    MM DD YYYY Description
+where MM, DD and YYYY are the Gregorian date of death.
+Description is a newline-terminated string to be printed on the yahrtzeit.`, "FILENAME")
 
 	if err := opt.Getopt(os.Args, nil); err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)

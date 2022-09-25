@@ -321,16 +321,27 @@ func New(year int, il bool) Sedra {
 
 // Returns the Parsha that's read on the Saturday on or after R.D. date.
 func (sedra *Sedra) LookupByRD(rataDie int) Parsha {
+	sedraNumWeeks := len(sedra.theSedraArray)
+	if sedraNumWeeks == 0 {
+		panic("invalid Sedra state, did you forget sedra.New()?")
+	}
 	abs := hdate.DayOnOrBefore(time.Saturday, rataDie+6)
 	if abs < sedra.firstSaturday {
 		panic("lookup date " + strconv.Itoa(abs) + " is earlier than start of year " + strconv.Itoa(sedra.firstSaturday))
 	}
+	var idx int
 	weekNum := ((abs - sedra.firstSaturday) / 7)
-	if weekNum >= len(sedra.theSedraArray) {
-		nextYear := New(sedra.Year+1, sedra.IL)
-		return nextYear.LookupByRD(rataDie)
+	if weekNum >= sedraNumWeeks {
+		indexLast := sedra.theSedraArray[sedraNumWeeks-1]
+		if indexLast < 0 {
+			/* advance 2 parashiyot ahead after a doubled week */
+			idx = _u(indexLast) + 2
+		} else {
+			idx = indexLast + 1
+		}
+	} else {
+		idx = sedra.theSedraArray[weekNum]
 	}
-	idx := sedra.theSedraArray[weekNum]
 	if idx >= 0 {
 		name := parshiot[idx]
 		return Parsha{Name: []string{name}, Num: []int{idx + 1}, Chag: false}

@@ -139,7 +139,7 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		if hd.Year != currentYear {
 			currentYear = hyear
 			holidaysYear = GetHolidaysForYear(hyear, il)
-			if opts.Sedrot && currentYear >= 3762 {
+			if (opts.Sedrot || opts.DailySedra) && currentYear >= 3762 {
 				sedraYear = sedra.New(hyear, il)
 			}
 			if opts.Omer {
@@ -177,7 +177,7 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		if opts.SunriseSunset && (!opts.WeeklyAbbreviated || dow == firstWeekday) {
 			events = append(events, riseSetEvent{date: hd, opts: opts})
 		}
-		if opts.Sedrot && dow == time.Saturday && hyear >= 3762 {
+		if (opts.DailySedra || (opts.Sedrot && dow == time.Saturday)) && hyear >= 3762 {
 			parsha := sedraYear.LookupByRD(abs)
 			if !parsha.Chag {
 				events = append(events, parshaEvent{Date: hd, Parsha: parsha, IL: il})

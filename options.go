@@ -124,6 +124,11 @@ type CalOptions struct {
 	// Weekly abbreviated view. Omer, dafyomi, and non-date-specific zemanim are shown once a week,
 	// on the day which corresponds to the first day in the range.
 	WeeklyAbbreviated bool
+	// Add the weekly sedra to the output every day.  When this option is
+	// invoked, every time a day is printed, the torah reading for the
+	// Saturday on or immediately following that date is printed.  If
+	// there is no reading for the next Saturday, then nothing is printed.
+	DailySedra bool
 	//
 	//	-------- End: CLI legacy compatibility options  --------
 }
