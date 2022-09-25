@@ -104,17 +104,26 @@ type CalOptions struct {
 	//
 	// See https://en.wikipedia.org/wiki/Yom_Kippur_Katan#Practices
 	YomKippurKatan bool
-	// Whether to use 24-hour time (as opposed to 12-hour time).
-	// Possible values are true and false. The default is locale dependent.
+	// Whether to use 24-hour time (as opposed to 12-hour time) for
+	// TimedEvent.Render().
 	Hour24 bool
-	// Output sunrise and sunset times every day
+
+	//	-------- Begin: CLI legacy compatibility options  --------
+	//  These options are primarily here for the command-line interface.
+	//
+	// Output sunrise and sunset times every day.
 	SunriseSunset bool
 	// Add zemanim daily (Alot HaShachar; Misheyakir; Kriat Shema, sof zeman;
 	// Tefilah, sof zeman;  Chatzot hayom; Mincha Gedolah; Mincha Ketanah;
-	// Plag HaMincha; Tzait HaKochavim)
+	// Plag HaMincha; Tzait HaKochavim).
 	DailyZmanim bool
 	// Add Yahrzeit reminders when the anniversary falls within the date range.
 	Yahrzeits []UserYahrzeit
 	// Add non-yahrtzeit Hebrew user event reminders when the anniversary falls within the date range.
 	UserEvents []UserEvent
+	// Weekly abbreviated view. Omer, dafyomi, and non-date-specific zemanim are shown once a week,
+	// on the day which corresponds to the first day in the range.
+	WeeklyAbbreviated bool
+	//
+	//	-------- End: CLI legacy compatibility options  --------
 }

@@ -131,6 +131,7 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		myIdx        mishnayomi.MishnaYomiIndex
 		userEvents   []HolidayEvent
 	)
+	firstWeekday := time.Weekday(startAbs % 7)
 	events := make([]HEvent, 0, 20)
 	for abs := startAbs; abs <= endAbs; abs++ {
 		hd := hdate.FromRD(abs)
@@ -173,11 +174,8 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 		}
 		dow := hd.Weekday()
 		prevEventsLength := len(events)
-		var candlesEv TimedEvent
-		for _, holidayEv := range holidaysYear {
-			if hd == holidayEv.Date {
-				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
-			}
+		if opts.SunriseSunset && (!opts.WeeklyAbbreviated || dow == firstWeekday) {
+			events = append(events, riseSetEvent{date: hd, opts: opts})
 		}
 		if opts.Sedrot && dow == time.Saturday && hyear >= 3762 {
 			parsha := sedraYear.LookupByRD(abs)
@@ -185,53 +183,54 @@ func HebrewCalendar(opts *CalOptions) ([]HEvent, error) {
 				events = append(events, parshaEvent{Date: hd, Parsha: parsha, IL: il})
 			}
 		}
-		if opts.DafYomi && hyear >= 5684 {
-			daf, _ := dafyomi.New(hd)
-			events = append(events, dafYomiEvent{Date: hd, Daf: daf})
-		}
-		if opts.MishnaYomi && abs >= mishnayomi.MishnaYomiStart {
-			if len(myIdx) == 0 {
-				myIdx = mishnayomi.MakeIndex()
+		var candlesEv TimedEvent
+		for _, holidayEv := range holidaysYear {
+			if hd == holidayEv.Date {
+				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
 			}
-			mishna, _ := myIdx.Lookup(hd)
-			events = append(events, mishnaYomiEvent{Date: hd, Mishna: mishna})
-		}
-		if opts.Omer && abs >= beginOmer && abs <= endOmer {
-			omerDay := abs - beginOmer + 1
-			events = append(events, NewOmerEvent(hd, omerDay))
-		}
-		/*
-			const hmonth = hd.getMonth();
-			if (options.molad && dow == SAT && hmonth != ELUL && hd.getDate() >= 23 && hd.getDate() <= 29) {
-				const monNext = (hmonth == HDate.monthsInYear(hyear) ? NISAN : hmonth + 1);
-				evts.push(new MoladEvent(hd, hyear, monNext));
-			}
-		*/
-		if (candlesEv == TimedEvent{}) && opts.CandleLighting && (dow == time.Friday || dow == time.Saturday) {
-			candlesEv = makeCandleEvent(hd, opts, nil)
-		}
-		if (candlesEv != TimedEvent{}) {
-			events = append(events, candlesEv)
-		}
-		if opts.SunriseSunset {
-			events = append(events, riseSetEvent{date: hd, opts: opts})
-		}
-		if opts.DailyZmanim {
-			zmanEvents := dailyZemanim(hd, opts)
-			events = append(events, zmanEvents...)
 		}
 		for _, userEv := range userEvents {
 			if abs == userEv.Date.Abs() {
 				events = append(events, userEv)
 			}
 		}
-		if opts.AddHebrewDates || (opts.AddHebrewDatesForEvents && prevEventsLength != len(events)) {
-			events = append(events, hebrewDateEvent{Date: hd})
+		if !opts.WeeklyAbbreviated || dow == firstWeekday {
+			if opts.Omer && abs >= beginOmer && abs <= endOmer {
+				omerDay := abs - beginOmer + 1
+				events = append(events, NewOmerEvent(hd, omerDay))
+			}
+			if opts.DafYomi && hyear >= 5684 {
+				daf, _ := dafyomi.New(hd)
+				events = append(events, dafYomiEvent{Date: hd, Daf: daf})
+			}
+			if opts.MishnaYomi && abs >= mishnayomi.MishnaYomiStart {
+				if len(myIdx) == 0 {
+					myIdx = mishnayomi.MakeIndex()
+				}
+				mishna, _ := myIdx.Lookup(hd)
+				events = append(events, mishnaYomiEvent{Date: hd, Mishna: mishna})
+			}
+			if opts.DailyZmanim {
+				zmanEvents := dailyZemanim(hd, opts)
+				events = append(events, zmanEvents...)
+			}
+		}
+		if (candlesEv == TimedEvent{}) && opts.CandleLighting && (dow == time.Friday || dow == time.Saturday) {
+			candlesEv = makeCandleEvent(hd, opts, nil)
+		}
+		if (candlesEv != TimedEvent{}) {
+			events = append(events, candlesEv)
 		}
 		if opts.Molad && dow == time.Saturday && hd.Month != hdate.Elul && hd.Day >= 23 && hd.Day <= 29 {
 			nextMonthName, nextMonth := nextMonthName(hd.Year, hd.Month)
 			molad := hdate.NewMolad(hd.Year, nextMonth)
 			events = append(events, moladEvent{Date: hd, Molad: molad, MonthName: nextMonthName})
+		}
+		if (opts.AddHebrewDates && (!opts.WeeklyAbbreviated || dow == firstWeekday)) ||
+			((opts.AddHebrewDates || opts.AddHebrewDatesForEvents) && prevEventsLength != len(events)) {
+			events = append(events, nil)
+			copy(events[prevEventsLength+1:], events[prevEventsLength:])
+			events[prevEventsLength] = hebrewDateEvent{Date: hd}
 		}
 	}
 	return events, nil
