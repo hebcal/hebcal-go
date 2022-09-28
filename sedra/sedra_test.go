@@ -45,3 +45,21 @@ func ExampleSedra_FindParshaNum() {
 	fmt.Println(hd)
 	// Output: 15 Sh'vat 5749
 }
+
+func TestSedraYearTypes(t *testing.T) {
+	years := []int{5701, 5702, 5703, 5708, 5710, 5711, 5713, 5714, 5715, 5717, 5719, 5726, 5734, 5736}
+	for _, year := range years {
+		diaspora := New(year, false)
+		hd1, _ := diaspora.FindParshaNum(1)
+		assert.Equal(t, year, hd1.Year)
+		il := New(year, true)
+		hd2, _ := il.FindParshaNum(1)
+		assert.Equal(t, year, hd2.Year)
+	}
+}
+
+func TestIsValidDouble(t *testing.T) {
+	assert.Equal(t, true, isValidDouble(-26))
+	assert.Equal(t, false, isValidDouble(-1))
+	assert.Equal(t, false, isValidDouble(26))
+}
