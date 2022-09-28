@@ -1,4 +1,4 @@
-package hebcal
+package zmanim
 
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin

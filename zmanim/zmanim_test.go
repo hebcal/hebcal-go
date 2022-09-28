@@ -13,7 +13,8 @@ func TestZmanimChicago(t *testing.T) {
 	latitude := 41.85003
 	longitude := -87.65005
 	dt := time.Date(2020, time.June, 5, 12, 0, 0, 0, time.UTC)
-	zman := New(latitude, longitude, dt, "America/Chicago")
+	location := NewLocation("<city>", "XX", latitude, longitude, "America/Chicago")
+	zman := New(&location, dt)
 	expected := []string{
 		"Thu, 04 Jun 2020 20:21:34 -0500",
 		"Fri, 05 Jun 2020 00:49:01 -0500",
@@ -68,10 +69,9 @@ func TestZmanimChicago(t *testing.T) {
 
 func TestZmanimTelAviv(t *testing.T) {
 	assert := assert.New(t)
-	latitude := 32.08088
-	longitude := 34.78057
 	dt := time.Date(2021, time.March, 6, 12, 0, 0, 0, time.UTC)
-	zman := New(latitude, longitude, dt, "Asia/Jerusalem")
+	location := NewLocation("Tel Aviv", "IL", 32.08088, 34.78057, "Asia/Jerusalem")
+	zman := New(&location, dt)
 	expected := []string{
 		"Fri, 05 Mar 2021 17:41:21 +0200",
 		"Fri, 05 Mar 2021 23:51:55 +0200",
@@ -121,8 +121,7 @@ func TestZmanimTelAviv(t *testing.T) {
 
 func TestZmanimHelsinki(t *testing.T) {
 	assert := assert.New(t)
-	latitude := 60.16952
-	longitude := 24.93545
+	location := NewLocation("Helsinki", "FI", 60.16952, 24.93545, "Europe/Helsinki")
 	dates := []struct {
 		yy int
 		mm time.Month
@@ -142,7 +141,7 @@ func TestZmanimHelsinki(t *testing.T) {
 	actual := make([]string, len(dates))
 	for idx, date := range dates {
 		dt := time.Date(date.yy, date.mm, date.dd, 12, 0, 0, 0, time.UTC)
-		zman := New(latitude, longitude, dt, "Europe/Helsinki")
+		zman := New(&location, dt)
 		var t time.Time
 		if dt.Weekday() == time.Friday {
 			t = zman.SunsetOffset(-18, true)
@@ -171,10 +170,9 @@ func TestZmanimHelsinki(t *testing.T) {
 }
 
 func ExampleZmanim_SunsetOffset() {
-	latitude := 41.85003
-	longitude := -87.65005
 	dt := time.Date(2020, time.June, 5, 12, 0, 0, 0, time.UTC)
-	zman := New(latitude, longitude, dt, "America/Chicago")
+	location := NewLocation("Chicago", "US", 41.85003, -87.65005, "America/Chicago")
+	zman := New(&location, dt)
 	fmt.Println(zman.SunsetOffset(-18, true))
 	fmt.Println(zman.SunsetOffset(50, true))
 	// Output:
@@ -184,7 +182,8 @@ func ExampleZmanim_SunsetOffset() {
 
 func ExampleZmanim_Dusk() {
 	dt := time.Date(2022, time.December, 24, 12, 0, 0, 0, time.UTC)
-	zman := New(78.305499, -96.917471, dt, "America/Chicago")
+	location := NewLocation("Amund Ringnes Island", "CA", 78.305499, -96.917471, "America/Chicago")
+	zman := New(&location, dt)
 	dusk := zman.Dusk()
 	fmt.Println(dusk)
 	// Output: 0001-01-01 00:00:00 +0000 UTC

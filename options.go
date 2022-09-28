@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/zmanim"
 )
 
 // UserEvent is used for generating a non-yahrtzeit user event.
@@ -38,7 +39,7 @@ type UserYahrzeit struct {
 // CalOptions are used by HebrewCalendar() to configure which events are returned
 type CalOptions struct {
 	/* latitude/longitude/tzid used for candle-lighting */
-	Location *Location
+	Location *zmanim.Location
 	/* Gregorian or Hebrew year */
 	Year int
 	/* to interpret year as Hebrew year */

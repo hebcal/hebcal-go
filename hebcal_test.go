@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/zmanim"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -121,7 +122,7 @@ func TestHebrewCalendarSedrotOnly(t *testing.T) {
 
 func TestHebrewCalendarCandles(t *testing.T) {
 	assert := assert.New(t)
-	loc := LookupCity("Chicago")
+	loc := zmanim.LookupCity("Chicago")
 	opts := CalOptions{
 		Start:          hdate.New(5782, hdate.Elul, 25),
 		End:            hdate.New(5783, hdate.Tishrei, 8),
@@ -160,7 +161,7 @@ func TestHebrewCalendarCandles(t *testing.T) {
 
 func TestHebrewCalendarChanukahCandles(t *testing.T) {
 	assert := assert.New(t)
-	loc := LookupCity("Jerusalem")
+	loc := zmanim.LookupCity("Jerusalem")
 	opts := CalOptions{
 		Start:          hdate.New(5783, hdate.Kislev, 24),
 		End:            hdate.New(5783, hdate.Tevet, 2),
@@ -241,7 +242,7 @@ func TestHebrewCalendarMask(t *testing.T) {
 }
 
 func ExampleHebrewCalendar() {
-	loc := LookupCity("Providence")
+	loc := zmanim.LookupCity("Providence")
 	opts := CalOptions{
 		Year:           2022,
 		Sedrot:         true,
@@ -266,7 +267,7 @@ func ExampleHebrewCalendar() {
 }
 
 func TestHebrewCalendarLocale(t *testing.T) {
-	loc := LookupCity("Providence")
+	loc := zmanim.LookupCity("Providence")
 	opts := CalOptions{
 		Year:           2022,
 		Sedrot:         true,

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hebcal-go/dafyomi"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/locales"
@@ -180,7 +181,7 @@ func (ev hebrewDateEvent) Render(locale string) string {
 	enMonthName := hd.MonthName("en")
 	switch locale {
 	case "he":
-		return Gematriya(hd.Day) + " " + hd.MonthName("he") + " " + Gematriya(hd.Year)
+		return gematriya.Gematriya(hd.Day) + " " + hd.MonthName("he") + " " + gematriya.Gematriya(hd.Year)
 	case "", "en", "sephardic", "ashkenazi",
 		"ashkenazi_litvish", "ashkenazi_poylish", "ashkenazi_standard":
 		return getEnOrdinal(hd.Day) + " of " + enMonthName +
@@ -255,7 +256,7 @@ func (ev dafYomiEvent) GetDate() hdate.HDate {
 func (ev dafYomiEvent) Render(locale string) string {
 	name, _ := locales.LookupTranslation(ev.Daf.Name, locale)
 	if locale == "he" {
-		return name + " דף " + Gematriya(ev.Daf.Blatt)
+		return name + " דף " + gematriya.Gematriya(ev.Daf.Blatt)
 	}
 	return name + " " + strconv.Itoa(ev.Daf.Blatt)
 }

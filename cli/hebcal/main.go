@@ -12,6 +12,7 @@ import (
 	"github.com/hebcal/hebcal-go/greg"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/locales"
+	"github.com/hebcal/hebcal-go/zmanim"
 	getopt "github.com/pborman/getopt/v2"
 )
 
@@ -171,7 +172,7 @@ Description is a newline-terminated string to be printed on the yahrtzeit.`, "FI
 
 	validCity := false
 	if cityNameArg != nil && *cityNameArg != "" {
-		city := hebcal.LookupCity(*cityNameArg)
+		city := zmanim.LookupCity(*cityNameArg)
 		if city == nil {
 			fmt.Fprintf(os.Stderr, "unknown city: %s. Use a nearby city or geographic coordinates.\n", *cityNameArg)
 			os.Exit(1)
@@ -182,7 +183,7 @@ Description is a newline-terminated string to be printed on the yahrtzeit.`, "FI
 	} else {
 		name := os.Getenv("HEBCAL_CITY")
 		if name != "" {
-			city := hebcal.LookupCity(name)
+			city := zmanim.LookupCity(name)
 			if city != nil {
 				calOptions.Location = city
 				validCity = true
@@ -246,14 +247,14 @@ Description is a newline-terminated string to be printed on the yahrtzeit.`, "FI
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
-		userLocation := hebcal.NewLocation("User Defined City", "", latitude, longitude, tzid)
+		userLocation := zmanim.NewLocation("User Defined City", "", latitude, longitude, tzid)
 		calOptions.Location = &userLocation
 		calOptions.CandleLighting = true
 		validCity = true
 	}
 
 	if !validCity && (calOptions.CandleLighting || calOptions.SunriseSunset || calOptions.DailyZmanim) {
-		calOptions.Location = hebcal.LookupCity(defaultCity)
+		calOptions.Location = zmanim.LookupCity(defaultCity)
 	}
 
 	if calOptions.CandleLighting && calOptions.HavdalahDeg == 0.0 && calOptions.HavdalahMins == 0 {
@@ -306,7 +307,7 @@ Description is a newline-terminated string to be printed on the yahrtzeit.`, "FI
 				fmt.Println("hebcal version x.yz")
 				os.Exit(0)
 			case "cities":
-				for _, city := range hebcal.AllCities() {
+				for _, city := range zmanim.AllCities() {
 					fmt.Printf("%s (%.5f lat, %.5f long, %s)\n",
 						city.Name, city.Latitude, city.Longitude, city.TimeZoneId)
 				}

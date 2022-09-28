@@ -124,7 +124,7 @@ func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev CalEvent) TimedEvent {
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	loc := opts.Location
-	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	z := zmanim.New(loc, gregDate)
 	var eventTime time.Time
 	if offset != 0 {
 		eventTime = z.SunsetOffset(offset, true)
@@ -156,7 +156,7 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	loc := opts.Location
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	z := zmanim.New(loc, gregDate)
 	candleLightingTime := z.Dusk()
 	if (candleLightingTime == time.Time{}) {
 		return TimedEvent{} // no sunset
@@ -173,7 +173,7 @@ func makeFastStartEnd(ev CalEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
 	year, month, day := ev.GetDate().Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	loc := opts.Location
-	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	z := zmanim.New(loc, gregDate)
 	hd := ev.GetDate()
 	desc := ev.Render("en")
 	flags := ev.GetFlags()
@@ -208,7 +208,7 @@ func (ev riseSetEvent) Render(locale string) string {
 	loc := ev.opts.Location
 	year, month, day := ev.date.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	z := zmanim.New(loc, gregDate)
 	rise := z.Sunrise()
 	set := z.Sunset()
 	riseStr := formatTime(&rise, ev.opts)
@@ -232,7 +232,7 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []CalEvent {
 	loc := opts.Location
 	year, month, day := date.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-	z := zmanim.New(loc.Latitude, loc.Longitude, gregDate, loc.TimeZoneId)
+	z := zmanim.New(loc, gregDate)
 	events := []CalEvent{
 		NewTimedEvent(date, "Sunrise", ZMANIM, z.Sunrise(), 0, nil, opts),
 		NewTimedEvent(date, "Kriat Shema, sof zeman", ZMANIM, z.SofZmanShma(), 0, nil, opts),

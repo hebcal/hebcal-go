@@ -20,6 +20,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/locales"
 )
@@ -51,7 +52,7 @@ func (ev OmerEvent) Render(locale string) string {
 	dayOfTheOmer, _ := locales.LookupTranslation("day of the Omer", locale)
 	switch locale {
 	case "he":
-		return Gematriya(ev.OmerDay) + " " + dayOfTheOmer
+		return gematriya.Gematriya(ev.OmerDay) + " " + dayOfTheOmer
 	case "", "en", "sephardic", "ashkenazi",
 		"ashkenazi_litvish", "ashkenazi_poylish", "ashkenazi_standard":
 		return getEnOrdinal(ev.OmerDay) + " " + dayOfTheOmer

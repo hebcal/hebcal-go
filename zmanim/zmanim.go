@@ -37,12 +37,11 @@ const Tzeit3MediumStars = 7.083
 
 // Zmanim are used to calculate halachic times
 type Zmanim struct {
-	Latitude  float64    // In the ragnge [-90,90]
-	Longitude float64    // In the range [-180,180]
-	Year      int        // Gregorian year
-	Month     time.Month // Gregorian month
-	Day       int        // Gregorian day
-	loc       *time.Location
+	Location *Location
+	Year     int        // Gregorian year
+	Month    time.Month // Gregorian month
+	Day      int        // Gregorian day
+	loc      *time.Location
 }
 
 // New makes an instance used for calculating various halachic times during this day.
@@ -51,19 +50,13 @@ type Zmanim struct {
 //
 // This function panics if the latitude or longitude are out of range, or if
 // the timezone cannot be loaded.
-func New(latitude, longitude float64, date time.Time, tzid string) Zmanim {
-	if latitude < -90 || latitude > 90 {
-		panic("Latitude out of range [-90,90]")
-	}
-	if longitude < -180 || longitude > 180 {
-		panic("Longitude out of range [-180,180]")
-	}
+func New(location *Location, date time.Time) Zmanim {
 	year, month, day := date.Date()
-	loc, err := time.LoadLocation(tzid)
+	loc, err := time.LoadLocation(location.TimeZoneId)
 	if err != nil {
 		panic(err)
 	}
-	return Zmanim{Latitude: latitude, Longitude: longitude, Year: year, Month: month, Day: day, loc: loc}
+	return Zmanim{Location: location, Year: year, Month: month, Day: day, loc: loc}
 }
 
 var nilTime = time.Time{}
@@ -83,7 +76,7 @@ func (z *Zmanim) inLoc(dt time.Time) time.Time {
 //
 // Returns time.Time{} if there sun does not rise or set
 func (z *Zmanim) Sunset() time.Time {
-	_, set := sunrise.SunriseSunset(z.Latitude, z.Longitude, z.Year, z.Month, z.Day)
+	_, set := sunrise.SunriseSunset(z.Location.Latitude, z.Location.Longitude, z.Year, z.Month, z.Day)
 	return z.inLoc(set)
 }
 
@@ -91,12 +84,12 @@ func (z *Zmanim) Sunset() time.Time {
 // Sun appears over the eastern horizon in the morning
 // (0.833° above horizon).
 func (z *Zmanim) Sunrise() time.Time {
-	rise, _ := sunrise.SunriseSunset(z.Latitude, z.Longitude, z.Year, z.Month, z.Day)
+	rise, _ := sunrise.SunriseSunset(z.Location.Latitude, z.Location.Longitude, z.Year, z.Month, z.Day)
 	return z.inLoc(rise)
 }
 
 func (z *Zmanim) timeAtAngle(angle float64, rising bool) time.Time {
-	morning, evening := sunrise.TimeOfElevation(z.Latitude, z.Longitude, -angle, z.Year, z.Month, z.Day)
+	morning, evening := sunrise.TimeOfElevation(z.Location.Latitude, z.Location.Longitude, -angle, z.Year, z.Month, z.Day)
 	if rising {
 		return z.inLoc(morning)
 	} else {
@@ -116,7 +109,7 @@ func (z *Zmanim) Dusk() time.Time {
 
 // ms in hour
 func (z *Zmanim) hour() int {
-	rise, set := sunrise.SunriseSunset(z.Latitude, z.Longitude, z.Year, z.Month, z.Day)
+	rise, set := sunrise.SunriseSunset(z.Location.Latitude, z.Location.Longitude, z.Year, z.Month, z.Day)
 	millis := set.UnixMilli() - rise.UnixMilli()
 	return int(millis / 12)
 }
@@ -130,12 +123,11 @@ func (z *Zmanim) GregEve() time.Time {
 	prev := time.Date(z.Year, z.Month, z.Day-1, 0, 0, 0, 0, z.loc)
 	year, month, day := prev.Date()
 	zman := Zmanim{
-		Latitude:  z.Latitude,
-		Longitude: z.Longitude,
-		Year:      year,
-		Month:     month,
-		Day:       day,
-		loc:       z.loc,
+		Location: z.Location,
+		Year:     year,
+		Month:    month,
+		Day:      day,
+		loc:      z.loc,
 	}
 	return zman.Sunset()
 }
