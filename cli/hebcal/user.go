@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hebcal/hebcal-go"
 	"github.com/hebcal/hebcal-go/greg"
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/hebcal"
 )
 
 func readUserFile(filename string) []hebcal.UserEvent {
