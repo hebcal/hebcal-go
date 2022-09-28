@@ -10,10 +10,8 @@ import (
 
 func TestZmanimChicago(t *testing.T) {
 	assert := assert.New(t)
-	latitude := 41.85003
-	longitude := -87.65005
 	dt := time.Date(2020, time.June, 5, 12, 0, 0, 0, time.UTC)
-	location := NewLocation("<city>", "XX", latitude, longitude, "America/Chicago")
+	location := NewLocation("Chicago", "US", 41.85003, -87.65005, "America/Chicago")
 	zman := New(&location, dt)
 	expected := []string{
 		"Thu, 04 Jun 2020 20:21:34 -0500",
@@ -182,7 +180,7 @@ func ExampleZmanim_SunsetOffset() {
 
 func ExampleZmanim_Dusk() {
 	dt := time.Date(2022, time.December, 24, 12, 0, 0, 0, time.UTC)
-	location := NewLocation("Amund Ringnes Island", "CA", 78.305499, -96.917471, "America/Chicago")
+	location := NewLocation("Amund Ringnes Island", "CA", 78.305499, -96.917471, "America/Regina")
 	zman := New(&location, dt)
 	dusk := zman.Dusk()
 	fmt.Println(dusk)
