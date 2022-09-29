@@ -418,7 +418,8 @@ func getMaskFromOptions(opts *CalOptions) HolidayFlags {
 
 func appendHolidayAndRelated(events []CalEvent, candlesEv TimedEvent, ev CalEvent, opts *CalOptions) ([]CalEvent, TimedEvent) {
 	mask := ev.GetFlags()
-	if !opts.YomKippurKatan && (mask&YOM_KIPPUR_KATAN) != 0 {
+	if (!opts.YomKippurKatan && (mask&YOM_KIPPUR_KATAN) != 0) ||
+		(opts.NoModern && (mask&MODERN_HOLIDAY) != 0) {
 		return events, candlesEv // bail out early
 	}
 	isMajorFast := (mask & MAJOR_FAST) != 0

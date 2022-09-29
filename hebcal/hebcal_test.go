@@ -322,3 +322,70 @@ func TestHebrewCalendarMishnaYomiOnly(t *testing.T) {
 	}
 	assert.Equal(expected, actual)
 }
+
+func TestNoModern(t *testing.T) {
+	opts := CalOptions{
+		Year:             2022,
+		IL:               true,
+		NoMinorFast:      true,
+		NoModern:         true,
+		NoRoshChodesh:    true,
+		NoSpecialShabbat: true,
+	}
+	events, _ := HebrewCalendar(&opts)
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		desc := ev.Render("en")
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
+		// fmt.Printf("\"%s\",\n", line)
+		actual = append(actual, line)
+	}
+	expected := []string{
+		"2022-01-17 Tu BiShvat",
+		"2022-02-15 Purim Katan",
+		"2022-03-16 Erev Purim",
+		"2022-03-17 Purim",
+		"2022-03-18 Shushan Purim",
+		"2022-04-15 Erev Pesach",
+		"2022-04-16 Pesach I",
+		"2022-04-17 Pesach II (CH''M)",
+		"2022-04-18 Pesach III (CH''M)",
+		"2022-04-19 Pesach IV (CH''M)",
+		"2022-04-20 Pesach V (CH''M)",
+		"2022-04-21 Pesach VI (CH''M)",
+		"2022-04-22 Pesach VII",
+		"2022-05-15 Pesach Sheni",
+		"2022-05-19 Lag BaOmer",
+		"2022-06-04 Erev Shavuot",
+		"2022-06-05 Shavuot",
+		"2022-08-06 Erev Tish'a B'Av",
+		"2022-08-07 Tish'a B'Av (observed)",
+		"2022-08-12 Tu B'Av",
+		"2022-08-28 Rosh Hashana LaBehemot",
+		"2022-09-17 Leil Selichot",
+		"2022-09-25 Erev Rosh Hashana",
+		"2022-09-26 Rosh Hashana 5783",
+		"2022-09-27 Rosh Hashana II",
+		"2022-10-04 Erev Yom Kippur",
+		"2022-10-05 Yom Kippur",
+		"2022-10-09 Erev Sukkot",
+		"2022-10-10 Sukkot I",
+		"2022-10-11 Sukkot II (CH''M)",
+		"2022-10-12 Sukkot III (CH''M)",
+		"2022-10-13 Sukkot IV (CH''M)",
+		"2022-10-14 Sukkot V (CH''M)",
+		"2022-10-15 Sukkot VI (CH''M)",
+		"2022-10-16 Sukkot VII (Hoshana Raba)",
+		"2022-10-17 Shmini Atzeret",
+		"2022-12-18 Chanukah: 1 Candle",
+		"2022-12-19 Chanukah: 2 Candles",
+		"2022-12-20 Chanukah: 3 Candles",
+		"2022-12-21 Chanukah: 4 Candles",
+		"2022-12-22 Chanukah: 5 Candles",
+		"2022-12-23 Chanukah: 6 Candles",
+		"2022-12-24 Chanukah: 7 Candles",
+		"2022-12-25 Chanukah: 8 Candles",
+		"2022-12-26 Chanukah: 8th Day",
+	}
+	assert.Equal(t, expected, actual)
+}
