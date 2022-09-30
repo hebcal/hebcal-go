@@ -233,16 +233,30 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []CalEvent {
 	year, month, day := date.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	z := zmanim.New(loc, gregDate)
-	events := []CalEvent{
-		NewTimedEvent(date, "Sunrise", ZMANIM, z.Sunrise(), 0, nil, opts),
-		NewTimedEvent(date, "Kriat Shema, sof zeman", ZMANIM, z.SofZmanShma(), 0, nil, opts),
-		NewTimedEvent(date, "Tefilah, sof zeman", ZMANIM, z.SofZmanTfilla(), 0, nil, opts),
-		NewTimedEvent(date, "Chatzot hayom", ZMANIM, z.Chatzot(), 0, nil, opts),
-		NewTimedEvent(date, "Mincha Gedolah", ZMANIM, z.MinchaGedola(), 0, nil, opts),
-		NewTimedEvent(date, "Mincha Ketanah", ZMANIM, z.MinchaKetana(), 0, nil, opts),
-		NewTimedEvent(date, "Plag HaMincha", ZMANIM, z.PlagHaMincha(), 0, nil, opts),
-		NewTimedEvent(date, "Sunset", ZMANIM, z.Sunset(), 0, nil, opts),
-		NewTimedEvent(date, "Tzait HaKochavim", ZMANIM, z.Tzeit(zmanim.Tzeit3SmallStars), 0, nil, opts),
+	times := []struct {
+		desc string
+		t    time.Time
+	}{
+		{"Alot haShachar", z.AlotHaShachar()},
+		{"Misheyakir", z.Misheyakir()},
+		{"Misheyakir Machmir", z.MisheyakirMachmir()},
+		{"Dawn", z.Dawn()},
+		{"Sunrise", z.Sunrise()},
+		{"Kriat Shema, sof zeman", z.SofZmanShma()},
+		{"Kriat Shema, sof zeman (MGA)", z.SofZmanShmaMGA()},
+		{"Tefilah, sof zeman", z.SofZmanTfilla()},
+		{"Tefilah, sof zeman (MGA)", z.SofZmanTfillaMGA()},
+		{"Chatzot hayom", z.Chatzot()},
+		{"Mincha Gedolah", z.MinchaGedola()},
+		{"Mincha Ketanah", z.MinchaKetana()},
+		{"Plag HaMincha", z.PlagHaMincha()},
+		{"Sunset", z.Sunset()},
+		{"Dusk", z.Dusk()},
+		{"Tzait HaKochavim", z.Tzeit(zmanim.Tzeit3SmallStars)},
+	}
+	events := make([]CalEvent, len(times))
+	for i, ev := range times {
+		events[i] = NewTimedEvent(date, ev.desc, ZMANIM, ev.t, 0, nil, opts)
 	}
 	return events
 }

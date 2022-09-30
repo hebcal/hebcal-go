@@ -389,3 +389,42 @@ func TestNoModern(t *testing.T) {
 	}
 	assert.Equal(t, expected, actual)
 }
+
+func TestDailyZemanim(t *testing.T) {
+	hd := hdate.New(5782, hdate.Kislev, 23)
+	loc := zmanim.LookupCity("Providence")
+	opts := CalOptions{
+		Start:       hd,
+		End:         hd,
+		NoHolidays:  true,
+		DailyZmanim: true,
+		Location:    loc,
+		Hour24:      true,
+	}
+	events, _ := HebrewCalendar(&opts)
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		desc := ev.Render("en")
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
+		actual = append(actual, line)
+	}
+	expected := []string{
+		"2021-11-27 Alot haShachar: 05:21",
+		"2021-11-27 Misheyakir: 05:47",
+		"2021-11-27 Misheyakir Machmir: 05:54",
+		"2021-11-27 Dawn: 06:18",
+		"2021-11-27 Sunrise: 06:49",
+		"2021-11-27 Kriat Shema, sof zeman: 09:11",
+		"2021-11-27 Kriat Shema, sof zeman (MGA): 08:35",
+		"2021-11-27 Tefilah, sof zeman: 09:58",
+		"2021-11-27 Tefilah, sof zeman (MGA): 09:34",
+		"2021-11-27 Chatzot hayom: 11:33",
+		"2021-11-27 Mincha Gedolah: 11:57",
+		"2021-11-27 Mincha Ketanah: 14:19",
+		"2021-11-27 Plag HaMincha: 15:18",
+		"2021-11-27 Sunset: 16:17",
+		"2021-11-27 Dusk: 16:48",
+		"2021-11-27 Tzait HaKochavim: 17:02",
+	}
+	assert.Equal(t, expected, actual)
+}
