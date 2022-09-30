@@ -501,22 +501,44 @@ func getAllHolidaysForYear(year int) []HolidayEvent {
 			Flags: SPECIAL_SHABBAT,
 			Emoji: "🕍"})
 
-	// Birkat Hachamah appears only once every 28 years
-	for day := 1; day <= 30; day++ {
-		rataDie := hdate.HebrewToRD(year, hdate.Nisan, day)
-		elapsed := rataDie + 1373429
-		if elapsed%10227 == 172 {
-			events = append(events,
-				HolidayEvent{
-					Date:  hdate.FromRD(rataDie),
-					Desc:  "Birkat Hachamah",
-					Flags: MINOR_HOLIDAY,
-					Emoji: "☀️"})
-		}
+	// Birkat Hachamah appears only once every 28 years.
+	birkatHaChamaRD := getBirkatHaChama(year)
+	if birkatHaChamaRD != 0 {
+		events = append(events,
+			HolidayEvent{
+				Date:  hdate.FromRD(birkatHaChamaRD),
+				Desc:  "Birkat Hachamah",
+				Flags: MINOR_HOLIDAY,
+				Emoji: "☀️"})
 	}
 
 	sort.Sort(byDate(events))
 	return events
+}
+
+// Birkat Hachamah appears only once every 28 years.
+// Although almost always in Nisan, it can occur in Adar II.
+//   - 27 Adar II 5461 (Gregorian year 1701)
+//   - 29 Adar II 5993 (Gregorian year 2233)
+//
+// Due to drift, this will eventually slip into Iyyar
+//   - 2 Iyyar 7141 (Gregorian year 3381)
+func getBirkatHaChama(year int) int {
+	startMonth := hdate.Nisan
+	startDay := 1
+	if hdate.IsLeapYear(year) {
+		startMonth = hdate.Adar2
+		startDay = 20
+	}
+	baseRD := hdate.HebrewToRD(year, startMonth, startDay)
+	for day := 0; day <= 40; day++ {
+		rataDie := baseRD + day
+		elapsed := rataDie + 1373429
+		if elapsed%10227 == 172 {
+			return rataDie
+		}
+	}
+	return 0
 }
 
 // Returns a slice of holidays for the year.

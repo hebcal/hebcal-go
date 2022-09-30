@@ -326,4 +326,13 @@ func TestBirkatHachamah(t *testing.T) {
 		}
 	}
 	assert.Equal(t, "19 Nisan 5965", hd.String())
+
+	hd = hdate.HDate{}
+	events = GetHolidaysForYear(5993, false)
+	for _, ev := range events {
+		if ev.Desc == "Birkat Hachamah" {
+			hd = ev.Date
+		}
+	}
+	assert.Equal(t, "29 Adar II 5993", hd.String())
 }
