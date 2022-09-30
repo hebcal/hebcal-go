@@ -496,6 +496,20 @@ func getAllHolidaysForYear(year int) []HolidayEvent {
 			Flags: SPECIAL_SHABBAT,
 			Emoji: "🕍"})
 
+	// Birkat Hachamah appears only once every 28 years
+	for day := 1; day <= 30; day++ {
+		rataDie := hdate.HebrewToRD(year, hdate.Nisan, day)
+		elapsed := rataDie + 1373429
+		if elapsed%10227 == 172 {
+			events = append(events,
+				HolidayEvent{
+					Date:  hdate.FromRD(rataDie),
+					Desc:  "Birkat Hachamah",
+					Flags: MINOR_HOLIDAY,
+					Emoji: "☀️"})
+		}
+	}
+
 	sort.Sort(byDate(events))
 	return events
 }

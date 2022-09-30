@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -301,4 +302,27 @@ func TestModernILHolidays(t *testing.T) {
 		"2023-05-19 Yom Yerushalayim",
 	}
 	assert.Equal(t, expectedDiaspora, actualDiaspora)
+}
+
+func TestBirkatHachamah(t *testing.T) {
+	actual := make([]int, 0, 10)
+	for year := 5650; year < 5920; year++ {
+		events := GetHolidaysForYear(year, false)
+		for _, ev := range events {
+			if ev.Desc == "Birkat Hachamah" {
+				actual = append(actual, year)
+			}
+		}
+	}
+	expected := []int{5657, 5685, 5713, 5741, 5769, 5797, 5825, 5853, 5881, 5909}
+	assert.Equal(t, expected, actual)
+
+	events := GetHolidaysForYear(5965, false)
+	var hd hdate.HDate
+	for _, ev := range events {
+		if ev.Desc == "Birkat Hachamah" {
+			hd = ev.Date
+		}
+	}
+	assert.Equal(t, "19 Nisan 5965", hd.String())
 }
