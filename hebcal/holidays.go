@@ -284,6 +284,11 @@ func getAllHolidaysForYear(year int) []HolidayEvent {
 			Desc:  "Purim Katan",
 			Flags: MINOR_HOLIDAY,
 			Emoji: "🎭️"})
+		events = append(events, HolidayEvent{
+			Date:  hdate.New(year, hdate.Adar1, 15),
+			Desc:  "Shushan Purim Katan",
+			Flags: MINOR_HOLIDAY,
+			Emoji: "🎭️"})
 	}
 	for candles := 2; candles <= 6; candles++ {
 		events = append(events, HolidayEvent{

@@ -343,6 +343,7 @@ func TestNoModern(t *testing.T) {
 	expected := []string{
 		"2022-01-17 Tu BiShvat",
 		"2022-02-15 Purim Katan",
+		"2022-02-16 Shushan Purim Katan",
 		"2022-03-16 Erev Purim",
 		"2022-03-17 Purim",
 		"2022-03-18 Shushan Purim",

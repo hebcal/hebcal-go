@@ -14,7 +14,7 @@ func TestGetAllHolidaysForYear(t *testing.T) {
 
 func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 	events := GetHolidaysForYear(5771, false)
-	assert.Equal(t, 108, len(events))
+	assert.Equal(t, 109, len(events))
 
 	expected := []string{
 		"2010-09-09 Rosh Hashana 5771",
@@ -64,6 +64,7 @@ func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 		"2011-02-04 Rosh Chodesh Adar I",
 		"2011-02-05 Rosh Chodesh Adar I",
 		"2011-02-18 Purim Katan",
+		"2011-02-19 Shushan Purim Katan",
 		"2011-03-03 Yom Kippur Katan Adar II",
 		"2011-03-05 Shabbat Mevarchim Chodesh Adar II",
 		"2011-03-05 Shabbat Shekalim",
