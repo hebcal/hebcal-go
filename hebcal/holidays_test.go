@@ -336,3 +336,102 @@ func TestBirkatHachamah(t *testing.T) {
 	}
 	assert.Equal(t, "29 Adar II 5993", hd.String())
 }
+
+func TestPurimMeshulash(t *testing.T) {
+	actual := make([]string, 0, 10)
+	events := GetHolidaysForYear(5781, true)
+	for _, ev := range events {
+		if ev.Date.Month == hdate.Adar1 && ev.Date.Day >= 13 && ev.Date.Day <= 17 {
+			line := fmt.Sprintf("%s / %s / %s", hd2iso(ev.Date), ev.Date.String(), ev.Desc)
+			actual = append(actual, line)
+		}
+	}
+	expected := []string{
+		"2021-02-25 / 13 Adar 5781 / Erev Purim",
+		"2021-02-25 / 13 Adar 5781 / Ta'anit Esther",
+		"2021-02-26 / 14 Adar 5781 / Purim",
+		"2021-02-27 / 15 Adar 5781 / Shushan Purim",
+		"2021-02-28 / 16 Adar 5781 / Purim Meshulash",
+	}
+	assert.Equal(t, expected, actual)
+}
+
+func TestHolidayEmoji(t *testing.T) {
+	var expectedEmoji = map[string]string{
+		"Asara B'Tevet":                   "✡️",
+		"Chanukah: 1 Candle":              "🕎",
+		"Chanukah: 3 Candles":             "🕎",
+		"Chanukah: 8 Candles":             "🕎",
+		"Chanukah: 8th Day":               "🕎",
+		"Lag BaOmer":                      "🔥",
+		"Leil Selichot":                   "🕍",
+		"Pesach Sheni":                    "✡️",
+		"Erev Pesach":                     "🫓🍷",
+		"Pesach I":                        "🫓🍷",
+		"Pesach":                          "🫓",
+		"Purim Katan":                     "🎭️",
+		"Purim":                           "🎭️📜",
+		"Rosh Chodesh Nisan":              "🌒",
+		"Rosh Chodesh Iyyar":              "🌒",
+		"Rosh Chodesh Sivan":              "🌒",
+		"Rosh Chodesh Tamuz":              "🌒",
+		"Rosh Chodesh Av":                 "🌒",
+		"Rosh Chodesh Elul":               "🌒",
+		"Rosh Chodesh Cheshvan":           "🌒",
+		"Rosh Chodesh Kislev":             "🌒",
+		"Rosh Chodesh Tevet":              "🌒",
+		"Rosh Chodesh Sh'vat":             "🌒",
+		"Rosh Chodesh Adar":               "🌒",
+		"Rosh Chodesh Adar I":             "🌒",
+		"Rosh Chodesh Adar II":            "🌒",
+		"Rosh Hashana":                    "🍏🍯",
+		"Rosh Hashana LaBehemot":          "🐑",
+		"Shabbat Chazon":                  "🕍",
+		"Shabbat HaChodesh":               "🕍",
+		"Shabbat HaGadol":                 "🕍",
+		"Shabbat Machar Chodesh":          "🕍",
+		"Shabbat Nachamu":                 "🕍",
+		"Shabbat Parah":                   "🕍",
+		"Shabbat Rosh Chodesh":            "🕍",
+		"Shabbat Shekalim":                "🕍",
+		"Shabbat Shirah":                  "🕍",
+		"Shabbat Shuva":                   "🕍",
+		"Shabbat Zachor":                  "🕍",
+		"Shavuot":                         "⛰️🌸",
+		"Shmini Atzeret":                  "✡️",
+		"Shushan Purim":                   "🎭️📜",
+		"Purim Meshulash":                 "✡️",
+		"Sigd":                            "✡️",
+		"Simchat Torah":                   "✡️",
+		"Sukkot":                          "🌿🍋",
+		"Ta'anit Bechorot":                "✡️",
+		"Ta'anit Esther":                  "✡️",
+		"Tish'a B'Av":                     "✡️",
+		"Tu B'Av":                         "❤️",
+		"Tu BiShvat":                      "🌳",
+		"Tzom Gedaliah":                   "✡️",
+		"Tzom Tammuz":                     "✡️",
+		"Yom HaAliyah":                    "🇮🇱",
+		"Yom HaAtzma'ut":                  "🇮🇱",
+		"Yom HaShoah":                     "✡️",
+		"Yom HaZikaron":                   "🇮🇱",
+		"Yom Kippur":                      "✡️",
+		"Yom Yerushalayim":                "🇮🇱",
+		"Yom Kippur Katan Sh'vat":         "",
+		"Yom Kippur Katan Kislev":         "",
+		"Shabbat Mevarchim Chodesh Iyyar": "",
+	}
+	events := GetHolidaysForYear(5765, false)
+	for _, ev := range events {
+		actual := ev.GetEmoji()
+		expected, ok := expectedEmoji[ev.Desc]
+		if ok {
+			assert.Equal(t, expected, actual, ev.Desc)
+		} else {
+			expected, ok := expectedEmoji[ev.Basename()]
+			if ok {
+				assert.Equal(t, expected, actual, ev.Desc)
+			}
+		}
+	}
+}

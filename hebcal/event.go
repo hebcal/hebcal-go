@@ -128,7 +128,19 @@ func (ev HolidayEvent) GetFlags() HolidayFlags {
 }
 
 func (ev HolidayEvent) GetEmoji() string {
-	return ev.Emoji
+	if ev.Emoji != "" {
+		return ev.Emoji
+	}
+	switch ev.Flags {
+	case SPECIAL_SHABBAT:
+		return "🕍"
+	case ROSH_CHODESH:
+		return "🌒"
+	case SHABBAT_MEVARCHIM, YOM_KIPPUR_KATAN | MINOR_FAST:
+		return ""
+	default:
+		return "✡️"
+	}
 }
 
 var regexes = []*regexp.Regexp{
