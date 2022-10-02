@@ -313,6 +313,9 @@ var dict_he = map[string]string{
 	"Jabotinsky Day": "יוֹם ז׳בוטינסקי",
 	"Herzl Day": "יוֹם הרצל",
 	"Ben-Gurion Day": "יוֹם בן-גוריון",
+	"Birkat Hachamah": "בִרְכַּת הַחַמָּה",
+	"Shushan Purim Katan": "שׁוּשָׁן פּוּרִים קָטָן",
+	"Purim Meshulash": "פּוּרִים מְשׁוּלָּשׁ",
 }
 
 func Lookup_he(s string) (string, bool) {

@@ -74,10 +74,13 @@ var dict_ashkenazi = map[string]string{
 	"Tahorot": "Tahoros",
 	"Mikvaot": "Mikvaos",
 	"Alot HaShachar": "Alos HaShachar",
+	"Misheyakir": "Misheyakir",
 	"Kriat Shema, sof zeman": "Krias Shema, sof zman",
 	"Tefilah, sof zeman": "Tefilah, sof zman",
 	"Chatzot hayom": "Chatzos",
 	"Tzait HaKochavim": "Tzeis HaKochavim",
+	"Birkat Hachamah": "Birkas Hachamah",
+	"Shushan Purim Katan": "Shushan Purim Koton",
 }
 
 func Lookup_ashkenazi(s string) (string, bool) {
