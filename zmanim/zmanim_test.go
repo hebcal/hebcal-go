@@ -59,10 +59,8 @@ func TestZmanimChicago(t *testing.T) {
 	}
 	assert.Equal(expected, actual)
 
-	assert.Equal(4528916, zman.hour())
-	assert.Equal(75, zman.hourMins())
-	assert.Equal(2674500, zman.nightHour())
-	assert.Equal(44, zman.nightHourMins())
+	assert.Equal(4528.916666666667, zman.Hour())
+	assert.Equal(2674.500, zman.nightHour())
 }
 
 func TestZmanimTelAviv(t *testing.T) {
@@ -72,7 +70,7 @@ func TestZmanimTelAviv(t *testing.T) {
 	zman := New(&location, dt)
 	expected := []string{
 		"Fri, 05 Mar 2021 17:41:21 +0200",
-		"Fri, 05 Mar 2021 23:51:55 +0200",
+		"Fri, 05 Mar 2021 23:51:56 +0200",
 		"Sat, 06 Mar 2021 04:50:19 +0200",
 		"Sat, 06 Mar 2021 05:12:02 +0200",
 		"Sat, 06 Mar 2021 05:18:11 +0200",

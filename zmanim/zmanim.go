@@ -107,16 +107,15 @@ func (z *Zmanim) Dusk() time.Time {
 	return z.timeAtAngle(6.0, false)
 }
 
-// ms in hour
-func (z *Zmanim) hour() int {
+// Hour returns the number seconds in a halachic Hour.
+// Calculated by taking the total time of daylight of a particular day,
+// from sunrise until sunset and dividing it into twelve equal parts.
+// A halachic Hour is thus known as a sha'ah zemanit,
+// or proportional Hour, and varies by the season and even by the day.
+func (z *Zmanim) Hour() float64 {
 	rise, set := sunrise.SunriseSunset(z.Location.Latitude, z.Location.Longitude, z.Year, z.Month, z.Day)
-	millis := set.UnixMilli() - rise.UnixMilli()
-	return int(millis / 12)
-}
-
-// hour in ms / (1000 ms in s * 60 s in m) = mins in halachic hour
-func (z *Zmanim) hourMins() int {
-	return z.hour() / (1000 * 60)
+	seconds := set.Unix() - rise.Unix()
+	return float64(seconds) / 12.0
 }
 
 func (z *Zmanim) GregEve() time.Time {
@@ -132,24 +131,19 @@ func (z *Zmanim) GregEve() time.Time {
 	return zman.Sunset()
 }
 
-// ms in hour
-func (z *Zmanim) nightHour() int {
+// seconds in hour
+func (z *Zmanim) nightHour() float64 {
 	set := z.GregEve()
 	rise := z.Sunrise()
-	millis := rise.UnixMilli() - set.UnixMilli()
-	return int(millis / 12)
-}
-
-// hour in ms / (1000 ms in s * 60 s in m) = mins in halachic hour
-func (z *Zmanim) nightHourMins() int {
-	return z.nightHour() / (1000 * 60)
+	seconds := rise.Unix() - set.Unix()
+	return float64(seconds) / 12.0
 }
 
 // sunrise plus N halachic hours
 func (z *Zmanim) hourOffset(hours float64) time.Time {
 	rise := z.Sunrise()
-	millis := rise.UnixMilli() + int64(float64(z.hour())*hours)
-	return time.UnixMilli(millis).In(z.loc)
+	seconds := rise.Unix() + int64(z.Hour()*hours)
+	return time.Unix(seconds, 0).In(z.loc)
 }
 
 // Midday – Chatzot; Sunrise plus 6 halachic hours
@@ -160,8 +154,8 @@ func (z *Zmanim) Chatzot() time.Time {
 // Midnight – Chatzot; Sunset plus 6 halachic hours
 func (z *Zmanim) ChatzotNight() time.Time {
 	rise := z.Sunrise()
-	millis := rise.UnixMilli() - int64(z.nightHour()*6)
-	return time.UnixMilli(millis).In(z.loc)
+	seconds := rise.Unix() - int64(z.nightHour()*6.0)
+	return time.Unix(seconds, 0).In(z.loc)
 }
 
 // Dawn – Alot haShachar; Sun is 16.1° below the horizon in the morning
@@ -189,13 +183,13 @@ func (z *Zmanim) SofZmanTfilla() time.Time {
 	return z.hourOffset(4)
 }
 
-func (z *Zmanim) sofZmanMGA(hours int) time.Time {
+func (z *Zmanim) sofZmanMGA(hours float64) time.Time {
 	alot72 := z.SunriseOffset(-72, false)
 	tzeit72 := z.SunsetOffset(72, false)
-	alot72ms := alot72.UnixMilli()
-	temporalHour := (tzeit72.UnixMilli() - alot72ms) / 12 // ms in hour
-	millis := alot72ms + (int64(hours) * temporalHour)
-	return time.UnixMilli(millis).In(z.loc)
+	alot72sec := alot72.Unix()
+	temporalHour := float64(tzeit72.Unix()-alot72sec) / 12.0 // sec in hour
+	seconds := alot72sec + int64(hours*temporalHour)
+	return time.Unix(seconds, 0).In(z.loc)
 }
 
 // Latest Shema (MGA); Sunrise plus 3 halachic hours, according to Magen Avraham
