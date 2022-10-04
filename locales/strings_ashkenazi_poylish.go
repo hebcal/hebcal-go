@@ -40,7 +40,6 @@ var dict_ashkenazi_poylish = map[string]string{
 	"Tamid": "Tumid",
 	"Midot": "Midos",
 	"Niddah": "Niddu",
-	"Daf Yomi: %s %d": "Daf Yoymi: %s %d",
 	"Daf Yomi": "Daf Yoymi",
 	"Parashat": "Parshas",
 	"Achrei Mot": "Achrai",

@@ -40,7 +40,6 @@ var dict_de = map[string]string{
 	"Tamid": "Tamid",
 	"Midot": "Midot",
 	"Niddah": "Niddah",
-	"Daf Yomi: %s %d": "Daf Jomi: %s %d",
 	"Daf Yomi": "Daf Jomi",
 	"Unable to allocate memory for holiday.": "Dem Feiertag kann kein Speicher zugewiesen werden.",
 	"input file read error. Skipping line %s": "Fehler beim Einlesen der Datei. Zeile %s übersprungen",

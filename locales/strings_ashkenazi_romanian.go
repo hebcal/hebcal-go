@@ -40,7 +40,6 @@ var dict_ashkenazi_romanian = map[string]string{
 	"Tamid": "Tomid",
 	"Midot": "Midos",
 	"Niddah": "Nido",
-	"Daf Yomi: %s %d": "Daf Ioimi: %s %d",
 	"Daf Yomi": "Daf Ioimi",
 	"Unable to allocate memory for holiday.": "Imposibil de alocat memorie pemtru sărbătorea.",
 	"input file read error. Skipping line %s": "eroare citire fişier de intrare. Trecere peste linia %s",

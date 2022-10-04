@@ -8,7 +8,6 @@ var dict_pl = map[string]string{
 	"Megillah": "Megilla",
 	"Kiddushin": "Kidduszin",
 	"Shevuot": "Szewuot",
-	"Daf Yomi: %s %d": "Daf Yomi: %s %d",
 	"Parashat": "Parsza",
 	"Achrei Mot": "Achare Mot",
 	"Bechukotai": "Bechukotai",

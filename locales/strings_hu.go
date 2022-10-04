@@ -40,7 +40,6 @@ var dict_hu = map[string]string{
 	"Tamid": "Támid",
 	"Midot": "Midot",
 	"Niddah": "Nidá",
-	"Daf Yomi: %s %d": "Daf Jomi: %s %d",
 	"Daf Yomi": "Daf Jomi",
 	"input file read error. Skipping line %s": "Olvasási hiba a beviteli fájlban. Sor kihagyása %s",
 	"Error in input file.  Skipping line %s": "Hiba a beviteli fájlban. Sor kihagyása %s",

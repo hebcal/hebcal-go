@@ -40,7 +40,6 @@ var dict_uk = map[string]string{
 	"Tamid": "Тамід",
 	"Midot": "Мідот",
 	"Niddah": "Ніда",
-	"Daf Yomi: %s %d": "Сторінка Дня: %s %d",
 	"Daf Yomi": "Сторінка Дня",
 	"Parashat": "Розділ",
 	"Achrei Mot": "Ахарей Мот",

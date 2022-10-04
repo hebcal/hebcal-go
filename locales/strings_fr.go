@@ -40,7 +40,6 @@ var dict_fr = map[string]string{
 	"Tamid": "Tamid",
 	"Midot": "Midot",
 	"Niddah": "Niddah",
-	"Daf Yomi: %s %d": "Daf Yomi: %s %d",
 	"Unable to allocate memory for holiday.": "Impossible d'allouer de la mémoire pour la fête.",
 	"input file read error. Skipping line %s": "erreur de lecture du fichier d'entrée. Ignore la ligne %s",
 	"Error in input file.  Skipping line %s": "Erreur dans le fichier d'entrée. Ignore la ligne %s",

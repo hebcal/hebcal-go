@@ -40,7 +40,6 @@ var dict_fi = map[string]string{
 	"Tamid": "Tamid",
 	"Midot": "Midot",
 	"Niddah": "Nida",
-	"Daf Yomi: %s %d": "Daf jomi: %s %d",
 	"Daf Yomi": "Daf jomi",
 	"Parashat": "Parshat",
 	"Achrei Mot": "Achrei mot",

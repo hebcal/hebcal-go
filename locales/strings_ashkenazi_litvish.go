@@ -40,7 +40,6 @@ var dict_ashkenazi_litvish = map[string]string{
 	"Tamid": "Tomid",
 	"Midot": "Midos",
 	"Niddah": "Niddo",
-	"Daf Yomi: %s %d": "Daf Yeimi: %s %d",
 	"Daf Yomi": "Daf Yeimi",
 	"Parashat": "Parshas",
 	"Achrei Mot": "Achrei",

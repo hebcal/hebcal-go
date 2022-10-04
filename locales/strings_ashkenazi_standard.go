@@ -40,7 +40,6 @@ var dict_ashkenazi_standard = map[string]string{
 	"Tamid": "Tomid",
 	"Midot": "Midos",
 	"Niddah": "Niddo",
-	"Daf Yomi: %s %d": "Daf Yoymi: %s %d",
 	"Daf Yomi": "Daf Yoymi",
 	"Parashat": "Parshas",
 	"Achrei Mot": "Achrei",
