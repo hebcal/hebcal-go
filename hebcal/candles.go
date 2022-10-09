@@ -94,6 +94,10 @@ func (ev TimedEvent) GetEmoji() string {
 	return ev.Emoji
 }
 
+func (ev TimedEvent) Basename() string {
+	return ev.Desc
+}
+
 func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev CalEvent) TimedEvent {
 	havdalahTitle := false
 	useHavdalahOffset := false
