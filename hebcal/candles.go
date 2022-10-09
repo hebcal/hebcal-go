@@ -38,10 +38,10 @@ func formatTime(t *time.Time, opts *CalOptions) string {
 // TimedEvent is used for Candle-lighting, Havdalah, and fast start/end
 type TimedEvent struct {
 	HolidayEvent
-	eventTime    time.Time
+	EventTime    time.Time
+	LinkedEvent  CalEvent
 	sunsetOffset int
 	opts         *CalOptions
-	linkedEvent  CalEvent
 }
 
 func NewTimedEvent(hd hdate.HDate, desc string, flags HolidayFlags, t time.Time,
@@ -65,8 +65,8 @@ func NewTimedEvent(hd hdate.HDate, desc string, flags HolidayFlags, t time.Time,
 			Flags: flags,
 			Emoji: emoji,
 		},
-		eventTime:    t,
-		linkedEvent:  linkedEvent,
+		EventTime:    t,
+		LinkedEvent:  linkedEvent,
 		opts:         opts,
 		sunsetOffset: sunsetOffset,
 	}
@@ -82,7 +82,7 @@ func (ev TimedEvent) Render(locale string) string {
 		minStr, _ := locales.LookupTranslation("min", locale)
 		desc = fmt.Sprintf("%s (%d %s)", desc, ev.sunsetOffset, minStr)
 	}
-	timeStr := formatTime(&ev.eventTime, ev.opts)
+	timeStr := formatTime(&ev.EventTime, ev.opts)
 	return fmt.Sprintf("%s: %s", desc, timeStr)
 }
 
@@ -163,8 +163,8 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	}
 	return TimedEvent{
 		HolidayEvent: ev,
-		eventTime:    candleLightingTime,
-		linkedEvent:  &ev,
+		EventTime:    candleLightingTime,
+		LinkedEvent:  ev,
 		opts:         opts,
 	}
 }
