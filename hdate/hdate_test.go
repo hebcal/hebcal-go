@@ -238,6 +238,12 @@ func TestGreg(t *testing.T) {
 	assert.Equal(2, gd)
 }
 
+func ExampleFromGregorian() {
+	hd := FromGregorian(2008, time.November, 13)
+	fmt.Println(hd)
+	// Output: 15 Cheshvan 5769
+}
+
 func ExampleFromTime() {
 	t := time.Date(2008, time.November, 13, 0, 0, 0, 0, time.UTC)
 	hd := FromTime(t)
@@ -326,4 +332,71 @@ func ExampleHDate_Gregorian() {
 	t := hd.Gregorian()
 	fmt.Println(t)
 	// Output: 2005-04-02 00:00:00 +0000 UTC
+}
+
+func ExampleHDate_Before() {
+	orig := FromGregorian(2014, time.February, 19)
+	hd := orig.Before(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	// Output: Sat, 15 Feb 2014 00:00:00 UTC
+}
+
+func ExampleHDate_OnOrBefore() {
+	orig := FromGregorian(2014, time.February, 19)
+	hd := orig.OnOrBefore(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	orig = FromGregorian(2014, time.February, 22)
+	hd = orig.OnOrBefore(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	orig = FromGregorian(2014, time.February, 23)
+	hd = orig.OnOrBefore(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	// Output:
+	// Sat, 15 Feb 2014 00:00:00 UTC
+	// Sat, 22 Feb 2014 00:00:00 UTC
+	// Sat, 22 Feb 2014 00:00:00 UTC
+}
+
+func ExampleHDate_Nearest() {
+	orig := FromGregorian(2014, time.February, 19)
+	hd := orig.Nearest(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	orig = FromGregorian(2014, time.February, 18)
+	hd = orig.Nearest(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	// Output:
+	// Sat, 22 Feb 2014 00:00:00 UTC
+	// Sat, 15 Feb 2014 00:00:00 UTC
+}
+
+func ExampleHDate_OnOrAfter() {
+	orig := FromGregorian(2014, time.February, 19)
+	hd := orig.OnOrAfter(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	orig = FromGregorian(2014, time.February, 22)
+	hd = orig.OnOrAfter(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	orig = FromGregorian(2014, time.February, 23)
+	hd = orig.OnOrAfter(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	// Output:
+	// Sat, 22 Feb 2014 00:00:00 UTC
+	// Sat, 22 Feb 2014 00:00:00 UTC
+	// Sat, 01 Mar 2014 00:00:00 UTC
+}
+
+func ExampleHDate_After() {
+	orig := FromGregorian(2014, time.February, 19)
+	hd := orig.After(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	orig = FromGregorian(2014, time.February, 22)
+	hd = orig.After(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	orig = FromGregorian(2014, time.February, 23)
+	hd = orig.After(time.Saturday)
+	fmt.Println(hd.Gregorian().Format(time.RFC1123))
+	// Output:
+	// Sat, 22 Feb 2014 00:00:00 UTC
+	// Sat, 01 Mar 2014 00:00:00 UTC
+	// Sat, 01 Mar 2014 00:00:00 UTC
 }

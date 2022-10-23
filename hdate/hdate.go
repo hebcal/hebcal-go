@@ -483,12 +483,12 @@ func MonthFromName(monthName string) (HMonth, error) {
 	return 0, errors.New("unable to parse month name")
 }
 
-// Applying DayOnOrBefore to d+6 gives us the DAYNAME on or after an
+// Applying DayOnOrBefore to d+6 gives us the dayOfWeek on or after an
 // absolute day rataDie.
 //
-// Similarly, applying it to d+3 gives the DAYNAME nearest to
-// rataDie, applying it to d-1 gives the DAYNAME previous to
-// rataDie, and applying it to d+7 gives the DAYNAME following rataDie.
+// Similarly, applying it to d+3 gives the dayOfWeek nearest to
+// rataDie, applying it to d-1 gives the dayOfWeek previous to
+// rataDie, and applying it to d+7 gives the dayOfWeek following rataDie.
 func DayOnOrBefore(dayOfWeek time.Weekday, rataDie int) int {
 	return rataDie - ((rataDie - int(dayOfWeek)) % 7)
 }
@@ -497,56 +497,32 @@ func onOrBefore(dayOfWeek time.Weekday, rataDie int) HDate {
 	return FromRD(DayOnOrBefore(dayOfWeek, rataDie))
 }
 
-/*
-Before returns an HDate representing the a dayNumber before the current date.
-
-For example
-
-	NewHDate(new Date('Wednesday February 19, 2014')).Before(6).Greg() // Sat Feb 15 2014
-*/
+// Before returns an HDate representing the dayOfWeek before
+// the Hebrew date specified by hd.
 func (hd HDate) Before(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs()-1)
 }
 
-/*
-OnOrBefore returns an HDate representing the a dayNumber on or before the current date.
-
-	NewHDate(new Date('Wednesday February 19, 2014')).OnOrBefore(6).Greg() // Sat Feb 15 2014
-	NewHDate(new Date('Saturday February 22, 2014')).OnOrBefore(6).Greg() // Sat Feb 22 2014
-	NewHDate(new Date('Sunday February 23, 2014')).OnOrBefore(6).Greg() // Sat Feb 22 2014
-*/
+// OnOrBefore returns an HDate corresponding to the dayOfWeek on or before
+// the Hebrew date specified by hd.
 func (hd HDate) OnOrBefore(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs())
 }
 
-/*
-Nearest returns an HDate representing the nearest dayNumber to the current date
-
-	NewHDate(new Date('Wednesday February 19, 2014')).Nearest(6).Greg() // Sat Feb 22 2014
-	NewHDate(new Date('Tuesday February 18, 2014')).Nearest(6).Greg() // Sat Feb 15 2014
-*/
+// Nearest returns an HDate representing the nearest dayOfWeek to
+// the Hebrew date specified by hd.
 func (hd HDate) Nearest(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs()+3)
 }
 
-/*
-OnOrAfter returns an HDate representing the a dayNumber on or after the current date.
-
-	NewHDate(new Date('Wednesday February 19, 2014')).OnOrAfter(6).Greg() // Sat Feb 22 2014
-	NewHDate(new Date('Saturday February 22, 2014')).OnOrAfter(6).Greg() // Sat Feb 22 2014
-	NewHDate(new Date('Sunday February 23, 2014')).OnOrAfter(6).Greg() // Sat Mar 01 2014
-*/
+// OnOrAfter returns an HDate corresponding to the dayOfWeek on or after
+// the Hebrew date specified by hd.
 func (hd HDate) OnOrAfter(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs()+6)
 }
 
-/*
-After returns an HDate representing the a dayNumber after the current date.
-
-		NewHDate(new Date('Wednesday February 19, 2014')).After(6).Greg() // Sat Feb 22 2014
-		NewHDate(new Date('Saturday February 22, 2014')).After(6).Greg() // Sat Mar 01 2014
-	  NewHDate(new Date('Sunday February 23, 2014')).After(6).Greg() // Sat Mar 01 2014
-*/
+// After returns an HDate corresponding to the dayOfWeek after
+// the Hebrew date specified by hd.
 func (hd HDate) After(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs()+7)
 }
