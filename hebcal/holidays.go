@@ -147,6 +147,7 @@ var staticModernHolidays = []struct {
 	suppressEmoji    bool
 	satPostponeToSun bool
 	friPostponeToSun bool
+	friSatMovetoThu  bool
 }{
 	{firstYear: 5727, mm: hdate.Iyyar, dd: 28, desc: "Yom Yerushalayim",
 		chul: true},
@@ -154,7 +155,8 @@ var staticModernHolidays = []struct {
 		satPostponeToSun: true, friPostponeToSun: true},
 	{firstYear: 5750, mm: hdate.Shvat, dd: 30, desc: "Family Day",
 		suppressEmoji: true},
-	{firstYear: 5758, mm: hdate.Cheshvan, dd: 12, desc: "Yitzhak Rabin Memorial Day"},
+	{firstYear: 5758, mm: hdate.Cheshvan, dd: 12, desc: "Yitzhak Rabin Memorial Day",
+		friSatMovetoThu: true},
 	{firstYear: 5764, mm: hdate.Iyyar, dd: 10, desc: "Herzl Day",
 		satPostponeToSun: true},
 	{firstYear: 5765, mm: hdate.Tamuz, dd: 29, desc: "Jabotinsky Day",
@@ -403,10 +405,12 @@ func getAllHolidaysForYear(year int) []HolidayEvent {
 				emoji = ""
 			}
 			hd := hdate.New(year, h.mm, h.dd)
-			if h.friPostponeToSun && hd.Weekday() == time.Friday {
+			dow := hd.Weekday()
+			if h.friSatMovetoThu && (dow == time.Friday || dow == time.Saturday) {
+				hd = hd.OnOrBefore(time.Thursday)
+			} else if h.friPostponeToSun && dow == time.Friday {
 				hd = hd.Next().Next()
-			}
-			if h.satPostponeToSun && hd.Weekday() == time.Saturday {
+			} else if h.satPostponeToSun && dow == time.Saturday {
 				hd = hd.Next()
 			}
 			flags := MODERN_HOLIDAY

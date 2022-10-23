@@ -305,6 +305,17 @@ func TestModernILHolidays(t *testing.T) {
 	assert.Equal(t, expectedDiaspora, actualDiaspora)
 }
 
+func TestModernFriSatMovetoThu(t *testing.T) {
+	events := GetHolidaysForYear(5781, true)
+	var rabinDay HolidayEvent
+	for _, ev := range events {
+		if ev.Desc == "Yitzhak Rabin Memorial Day" {
+			rabinDay = ev
+		}
+	}
+	assert.Equal(t, "2020-10-29", hd2iso(rabinDay.Date))
+}
+
 func TestBirkatHachamah(t *testing.T) {
 	actual := make([]int, 0, 10)
 	for year := 5650; year < 5920; year++ {
