@@ -243,7 +243,14 @@ func HebrewToRD(year int, month HMonth, day int) int {
 }
 
 // Creates a new HDate from year, Hebrew month, and day of month.
+//
+// Panics if Hebrew year is less than 1, if Hebrew month
+// is not in the range [Tishrei..Adar2], or if Hebrew day
+// is not in the range [1..30]
 func New(year int, month HMonth, day int) HDate {
+	if year < 1 {
+		panic("invalid Hebrew year " + strconv.Itoa(year))
+	}
 	if month == Adar2 && !IsLeapYear(year) {
 		month = Adar1
 	}
@@ -253,7 +260,8 @@ func New(year int, month HMonth, day int) HDate {
 	if month < Nisan || month > Adar2 {
 		panic("invalid Hebrew Month " + month.String())
 	}
-	if day < 1 || day > 30 {
+	daysInMonth := DaysInMonth(month, year)
+	if day < 1 || day > daysInMonth {
 		panic("invalid Hebrew day " + strconv.Itoa(day))
 	}
 	return HDate{Year: year, Month: month, Day: day}
@@ -264,9 +272,14 @@ func newYear(year int) int {
 }
 
 // Converts absolute Rata Die days to Hebrew date.
+//
+// Panics if rataDie is before the Hebrew epoch.
 func FromRD(rataDie int) HDate {
-	approx := int(float64(rataDie-epoch) / avgHebrewYearDays)
-	year := approx
+	if rataDie <= epoch {
+		panic("invalid R.D. date " + strconv.Itoa(rataDie))
+	}
+	approx := float64(rataDie-epoch) / avgHebrewYearDays
+	year := int(approx)
 	for newYear(year) <= rataDie {
 		year++
 	}
