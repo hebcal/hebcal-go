@@ -20,7 +20,6 @@ package hebcal
 import (
 	"errors"
 	"math"
-	"strings"
 	"time"
 
 	"github.com/hebcal/hebcal-go/dafyomi"
@@ -295,6 +294,22 @@ func intAbs(x int) int {
 	return x
 }
 
+var israelCityOffset = map[string]int{
+	"Jerusalem":       40,
+	"Haifa":           30,
+	"Zichron Ya'akov": 30,
+	"Zichron Ya‘akov": 30,
+	"Zichron Ya’akov": 30,
+	"Zichron Yaakov":  30,
+	"Zikhron Ya'akov": 30,
+	"Zikhron Ya'aqov": 30,
+	"Zikhron Ya‘akov": 30,
+	"Zikhron Ya‘aqov": 30,
+	"Zikhron Ya’akov": 30,
+	"Zikhron Ya’aqov": 30,
+	"Zikhron Yaakov":  30,
+}
+
 func checkCandleOptions(opts *CalOptions) error {
 	if !opts.CandleLighting {
 		return nil
@@ -310,8 +325,11 @@ func checkCandleOptions(opts *CalOptions) error {
 		min = opts.CandleLightingMins
 	}
 	loc := opts.Location
-	if loc.CountryCode == "IL" && strings.HasPrefix(loc.Name, "Jerusalem") && min == 18 {
-		min = 40
+	if loc.CountryCode == "IL" {
+		offset := israelCityOffset[loc.Name]
+		if offset != 0 && min == 18 {
+			min = offset
+		}
 	}
 	opts.CandleLightingMins = -1 * intAbs(min)
 	if opts.HavdalahMins != 0 {
