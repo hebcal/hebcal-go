@@ -87,3 +87,23 @@ func TestBirthday(t *testing.T) {
 		}
 	}
 }
+
+func ExampleGetYahrzeit() {
+	hd := FromGregorian(2014, time.March, 2)
+	fmt.Println(hd)
+	yahrzeit, _ := GetYahrzeit(5783, hd)
+	fmt.Println(yahrzeit)
+	// Output:
+	// 30 Adar I 5774
+	// 30 Sh'vat 5783
+}
+
+func ExampleGetBirthdayOrAnniversary() {
+	hd := FromGregorian(2014, time.March, 2)
+	fmt.Println(hd)
+	yahrzeit, _ := GetBirthdayOrAnniversary(5783, hd)
+	fmt.Println(yahrzeit)
+	// Output:
+	// 30 Adar I 5774
+	// 1 Nisan 5783
+}

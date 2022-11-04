@@ -400,3 +400,36 @@ func ExampleHDate_After() {
 	// Sat, 01 Mar 2014 00:00:00 UTC
 	// Sat, 01 Mar 2014 00:00:00 UTC
 }
+
+func ExampleNew() {
+	hd := New(5782, Nisan, 30)
+	fmt.Println(hd)
+	// Output: 30 Nisan 5782
+}
+
+func ExampleHDate_Next() {
+	orig := New(5782, Nisan, 30)
+	hd := orig.Next()
+	fmt.Println(hd)
+	// Output: 1 Iyyar 5782
+}
+
+func ExampleHDate_Prev() {
+	orig := New(5782, Tishrei, 1)
+	hd := orig.Prev()
+	fmt.Println(hd)
+	// Output: 29 Elul 5781
+}
+
+func ExampleHDate_String() {
+	hd := New(5783, Elul, 29)
+	str := hd.String()
+	fmt.Println(str)
+	// Output: 29 Elul 5783
+}
+
+func ExampleHMonth_String() {
+	month := Adar2
+	fmt.Println(month.String())
+	// Output: Adar II
+}
