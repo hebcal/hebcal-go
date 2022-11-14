@@ -352,7 +352,7 @@ func TestPurimMeshulash(t *testing.T) {
 	actual := make([]string, 0, 10)
 	events := GetHolidaysForYear(5781, true)
 	for _, ev := range events {
-		if ev.Date.Month == hdate.Adar1 && ev.Date.Day >= 13 && ev.Date.Day <= 17 {
+		if ev.Date.Month() == hdate.Adar1 && ev.Date.Day() >= 13 && ev.Date.Day() <= 17 {
 			line := fmt.Sprintf("%s / %s / %s", hd2iso(ev.Date), ev.Date.String(), ev.Desc)
 			actual = append(actual, line)
 		}

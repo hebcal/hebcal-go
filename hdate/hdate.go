@@ -2,6 +2,8 @@
 //
 // It also includes functions for calculating personal anniversaries
 // (Yahrzeit, Birthday) according to the Hebrew calendar.
+//
+// See also https://en.wikipedia.org/wiki/Rata_Die
 package hdate
 
 // Hebcal - A Jewish Calendar Generator
@@ -114,9 +116,9 @@ func (m HMonth) String() string {
 // to represent any concept of the time of day. For halachic times,
 // see the Zmanim interface.
 type HDate struct {
-	Year  int    // Hebrew year
-	Month HMonth // Hebrew month (1-13)
-	Day   int    // Hebrew day of month (1-30)
+	year  int    // Hebrew year
+	month HMonth // Hebrew month (1-13)
+	day   int    // Hebrew day of month (1-30)
 	abs   int    // R.D. absolute date
 }
 
@@ -223,7 +225,7 @@ func elapsedDays0(year int) int {
 //
 // Note also that R.D. = Julian Date − 1,721,424.5
 //
-// https://en.wikipedia.org/wiki/Rata_Die#Dershowitz_and_Reingold
+// https://en.wikipedia.org/wiki/Rata_Die
 func HebrewToRD(year int, month HMonth, day int) int {
 	tempabs := day
 	if month < Tishrei {
@@ -264,7 +266,7 @@ func New(year int, month HMonth, day int) HDate {
 	if day < 1 || day > daysInMonth {
 		panic("invalid Hebrew day " + strconv.Itoa(day))
 	}
-	return HDate{Year: year, Month: month, Day: day}
+	return HDate{year: year, month: month, day: day}
 }
 
 func newYear(year int) int {
@@ -294,7 +296,7 @@ func FromRD(rataDie int) HDate {
 		month++
 	}
 	day := 1 + rataDie - HebrewToRD(year, month, 1)
-	return HDate{Year: year, Month: month, Day: day, abs: rataDie}
+	return HDate{year: year, month: month, day: day, abs: rataDie}
 }
 
 // Creates an HDate from Gregorian year, month and day.
@@ -315,14 +317,29 @@ func FromTime(t time.Time) HDate {
 // R.D. 1 is the imaginary date Monday, January 1, 1 on the Gregorian Calendar.
 func (hd *HDate) Abs() int {
 	if hd.abs == 0 {
-		hd.abs = HebrewToRD(hd.Year, hd.Month, hd.Day)
+		hd.abs = HebrewToRD(hd.Year(), hd.Month(), hd.Day())
 	}
 	return hd.abs
 }
 
+// Day returns the day of month (1-30) of hd.
+func (hd HDate) Day() int {
+	return hd.day
+}
+
+// Month returns the Hebrew month of hd.
+func (hd HDate) Month() HMonth {
+	return hd.month
+}
+
+// Year returns the Hebrew year of hd.
+func (hd HDate) Year() int {
+	return hd.year
+}
+
 // Returns the number of days in this date's month (29 or 30).
 func (hd HDate) DaysInMonth() int {
-	return DaysInMonth(hd.Month, hd.Year)
+	return DaysInMonth(hd.Month(), hd.Year())
 }
 
 // Converts this Hebrew Date to Gregorian year, month and day.
@@ -365,7 +382,7 @@ func (hd HDate) Next() HDate {
 
 // IsLeapYear returns true if this HDate occurs during a Hebrew leap year.
 func (hd HDate) IsLeapYear() bool {
-	return IsLeapYear(hd.Year)
+	return IsLeapYear(hd.Year())
 }
 
 // MonthName returns a string representation of the month name.
@@ -375,22 +392,23 @@ func (hd HDate) IsLeapYear() bool {
 // Otherwise returns an English transliteration
 // (e.g. "Tishrei", "Sh'vat", "Adar II").
 func (hd HDate) MonthName(locale string) string {
+	month := hd.Month()
 	if locale == "he" {
-		if hd.Month == Adar1 && !hd.IsLeapYear() {
+		if month == Adar1 && !hd.IsLeapYear() {
 			return "אַדָר"
 		}
-		return heMonthNames[hd.Month]
+		return heMonthNames[month]
 	}
-	if hd.Month == Adar1 && !hd.IsLeapYear() {
+	if month == Adar1 && !hd.IsLeapYear() {
 		return "Adar"
 	}
-	return hd.Month.String()
+	return month.String()
 }
 
 // String returns a string representation of the Hebrew date
 // in English transliteration (e.g. "15 Cheshvan 5769").
 func (hd HDate) String() string {
-	return strconv.Itoa(hd.Day) + " " + hd.MonthName("en") + " " + strconv.Itoa(hd.Year)
+	return strconv.Itoa(hd.Day()) + " " + hd.MonthName("en") + " " + strconv.Itoa(hd.Year())
 }
 
 /*

@@ -51,10 +51,10 @@ func TestSedraYearTypes(t *testing.T) {
 	for _, year := range years {
 		diaspora := New(year, false)
 		hd1, _ := diaspora.FindParshaNum(1)
-		assert.Equal(t, year, hd1.Year)
+		assert.Equal(t, year, hd1.Year())
 		il := New(year, true)
 		hd2, _ := il.FindParshaNum(1)
-		assert.Equal(t, year, hd2.Year)
+		assert.Equal(t, year, hd2.Year())
 	}
 }
 

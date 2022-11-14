@@ -46,18 +46,18 @@ func TestHebrew2RD(t *testing.T) {
 
 func TestRD2Hebrew(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal(HDate{Year: 5769, Month: Cheshvan, Day: 15, abs: 733359}, FromRD(733359))
-	assert.Equal(HDate{Year: 5708, Month: Iyyar, Day: 6, abs: 711262}, FromRD(711262))
-	assert.Equal(HDate{Year: 3762, Month: Tishrei, Day: 1, abs: 249}, FromRD(249))
-	assert.Equal(HDate{Year: 3761, Month: Nisan, Day: 1, abs: 72}, FromRD(72))
-	assert.Equal(HDate{Year: 3761, Month: Nisan, Day: 8, abs: 79}, FromRD(79))
-	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 18, abs: 1}, FromRD(1))
-	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 17, abs: 0}, FromRD(0))
-	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 16, abs: -1}, FromRD(-1))
-	assert.Equal(HDate{Year: 3761, Month: Tevet, Day: 1, abs: -16}, FromRD(-16))
-	assert.Equal(HDate{Year: 3761, Month: Kislev, Day: 30, abs: -17}, FromRD(-17))
-	assert.Equal(HDate{Year: 9999, Month: Elul, Day: 29, abs: 2278650}, FromRD(2278650))
-	assert.Equal(HDate{Year: 5765, Month: Adar2, Day: 22, abs: 732038}, FromRD(732038))
+	assert.Equal(HDate{year: 5769, month: Cheshvan, day: 15, abs: 733359}, FromRD(733359))
+	assert.Equal(HDate{year: 5708, month: Iyyar, day: 6, abs: 711262}, FromRD(711262))
+	assert.Equal(HDate{year: 3762, month: Tishrei, day: 1, abs: 249}, FromRD(249))
+	assert.Equal(HDate{year: 3761, month: Nisan, day: 1, abs: 72}, FromRD(72))
+	assert.Equal(HDate{year: 3761, month: Nisan, day: 8, abs: 79}, FromRD(79))
+	assert.Equal(HDate{year: 3761, month: Tevet, day: 18, abs: 1}, FromRD(1))
+	assert.Equal(HDate{year: 3761, month: Tevet, day: 17, abs: 0}, FromRD(0))
+	assert.Equal(HDate{year: 3761, month: Tevet, day: 16, abs: -1}, FromRD(-1))
+	assert.Equal(HDate{year: 3761, month: Tevet, day: 1, abs: -16}, FromRD(-16))
+	assert.Equal(HDate{year: 3761, month: Kislev, day: 30, abs: -17}, FromRD(-17))
+	assert.Equal(HDate{year: 9999, month: Elul, day: 29, abs: 2278650}, FromRD(2278650))
+	assert.Equal(HDate{year: 5765, month: Adar2, day: 22, abs: 732038}, FromRD(732038))
 }
 
 func TestMonthNames(t *testing.T) {
@@ -80,13 +80,13 @@ func TestMonthNames2(t *testing.T) {
 func TestAdar2ResetToAdar1(t *testing.T) {
 	assert := assert.New(t)
 	hd := New(5782, Adar1, 15)
-	assert.Equal(Adar1, hd.Month)
+	assert.Equal(Adar1, hd.Month())
 	hd = New(5782, Adar2, 15)
-	assert.Equal(Adar2, hd.Month)
+	assert.Equal(Adar2, hd.Month())
 	hd = New(5783, Adar1, 15)
-	assert.Equal(Adar1, hd.Month)
+	assert.Equal(Adar1, hd.Month())
 	hd = New(5783, Adar2, 15)
-	assert.Equal(Adar1, hd.Month)
+	assert.Equal(Adar1, hd.Month())
 }
 
 func TestMonthFromName(t *testing.T) {
@@ -432,4 +432,22 @@ func ExampleHMonth_String() {
 	month := Adar2
 	fmt.Println(month.String())
 	// Output: Adar II
+}
+
+func ExampleHDate_Month() {
+	hd := New(5769, Cheshvan, 15)
+	fmt.Println(hd.Month())
+	// Output: Cheshvan
+}
+
+func ExampleHDate_Year() {
+	hd := New(5769, Cheshvan, 15)
+	fmt.Println(hd.Year())
+	// Output: 5769
+}
+
+func ExampleHDate_Day() {
+	hd := New(5769, Cheshvan, 15)
+	fmt.Println(hd.Day())
+	// Output: 15
 }

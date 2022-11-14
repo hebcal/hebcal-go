@@ -173,7 +173,7 @@ func tzomGedaliahDate(rh hdate.HDate) hdate.HDate {
 	if rh.Weekday() == time.Thursday {
 		offset = 1
 	}
-	return hdate.New(rh.Year, hdate.Tishrei, 3+offset)
+	return hdate.New(rh.Year(), hdate.Tishrei, 3+offset)
 }
 
 func taanitEstherDate(pesach hdate.HDate) hdate.HDate {
@@ -188,7 +188,7 @@ func taanitBechorotDate(pesach hdate.HDate) hdate.HDate {
 	if pesach.Prev().Weekday() == time.Saturday {
 		return hdate.FromRD(hdate.DayOnOrBefore(time.Thursday, pesach.Abs()))
 	} else {
-		return hdate.New(pesach.Year, hdate.Nisan, 14)
+		return hdate.New(pesach.Year(), hdate.Nisan, 14)
 	}
 }
 

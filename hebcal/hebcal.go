@@ -134,8 +134,8 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 	events := make([]CalEvent, 0, 20)
 	for abs := startAbs; abs <= endAbs; abs++ {
 		hd := hdate.FromRD(abs)
-		hyear := hd.Year
-		if hd.Year != currentYear {
+		hyear := hd.Year()
+		if hyear != currentYear {
 			currentYear = hyear
 			holidaysYear = GetHolidaysForYear(hyear, il)
 			if (opts.Sedrot || opts.DailySedra) && currentYear >= 3762 {
@@ -220,9 +220,9 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 		if (candlesEv != TimedEvent{}) {
 			events = append(events, candlesEv)
 		}
-		if opts.Molad && dow == time.Saturday && hd.Month != hdate.Elul && hd.Day >= 23 && hd.Day <= 29 {
-			nextMonthName, nextMonth := nextMonthName(hd.Year, hd.Month)
-			molad := hdate.NewMolad(hd.Year, nextMonth)
+		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
+			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
+			molad := hdate.NewMolad(hd.Year(), nextMonth)
 			events = append(events, moladEvent{Date: hd, Molad: molad, MonthName: nextMonthName})
 		}
 		if (opts.AddHebrewDates && (!opts.WeeklyAbbreviated || dow == firstWeekday)) ||
@@ -248,7 +248,7 @@ func getStartAndEnd(opts *CalOptions) (int, int, error) {
 		gy, gm, gd := t.Date()
 		if opts.IsHebrewYear {
 			today := hdate.FromGregorian(gy, gm, gd)
-			year = today.Year
+			year = today.Year()
 		} else {
 			year = gy
 		}

@@ -191,7 +191,7 @@ func makeFastStartEnd(ev CalEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
 	} else {
 		dawn := z.AlotHaShachar()
 		startEvent = NewTimedEvent(hd, "Fast begins", flags, dawn, 0, ev, opts)
-		if hd.Weekday() != time.Friday && !(hd.Day == 14 && hd.Month == hdate.Nisan) {
+		if hd.Weekday() != time.Friday && !(hd.Day() == 14 && hd.Month() == hdate.Nisan) {
 			tzeit := z.Tzeit(zmanim.Tzeit3MediumStars)
 			endEvent = NewTimedEvent(hd, "Fast ends", flags, tzeit, 0, ev, opts)
 		}
