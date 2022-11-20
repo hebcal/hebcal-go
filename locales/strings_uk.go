@@ -195,7 +195,7 @@ var dict_uk = map[string]string{
 	"Tishrei": "Тішрей",
 	"Fast begins": "Піст розпочинається",
 	"Fast ends": "Піст завершується",
-	"Shabbat Mevarchim Chodesh": "Шаббат Mevarchim Новим місяцем",
+	"Shabbat Mevarchim Chodesh": "Шаббат мевархім Новим місяцем",
 	"day": "день",
 }
 

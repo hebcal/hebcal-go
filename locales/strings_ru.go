@@ -195,7 +195,7 @@ var dict_ru = map[string]string{
 	"Tishrei": "Тишрей",
 	"Fast begins": "Пост начинается",
 	"Fast ends": "Пост завершается",
-	"Shabbat Mevarchim Chodesh": "Шаббат Mevarchim Новомесячьем",
+	"Shabbat Mevarchim Chodesh": "Шаббат мевархим Новомесячьем",
 	"day": "день",
 }
 
