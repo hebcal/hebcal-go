@@ -20,7 +20,7 @@ package greg
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import (
-	"errors"
+	"strconv"
 	"time"
 )
 
@@ -44,14 +44,16 @@ func IsLeapYear(year int) bool {
 // Hours, minutes and seconds are ignored
 func DateToRD(t time.Time) int {
 	year, month, day := t.Date()
-	abs, _ := ToRD(year, month, day)
+	abs := ToRD(year, month, day)
 	return abs
 }
 
 // Converts Gregorian date to absolute R.D. (Rata Die) days.
-func ToRD(year int, month time.Month, day int) (int, error) {
+//
+// Panics if Gregorian year is 0.
+func ToRD(year int, month time.Month, day int) int {
 	if year == 0 {
-		return 0, errors.New("invalid Gregorian year")
+		panic("invalid Gregorian year " + strconv.Itoa(year))
 	}
 	var monthOffset int
 	if month <= time.February {
@@ -80,7 +82,7 @@ func ToRD(year int, month time.Month, day int) (int, error) {
 		(prevYear / 100) + /* - century years */
 		(prevYear / 400) + /* + Gregorian leap years */
 		dayOfYear /* days this year */
-	return rataDie, nil
+	return rataDie
 }
 
 /*

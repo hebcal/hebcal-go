@@ -10,67 +10,67 @@ import (
 
 func TestGreg2RD(t *testing.T) {
 	assert := assert.New(t)
-	rataDie, _ := ToRD(1995, time.December, 17)
+	rataDie := ToRD(1995, time.December, 17)
 	assert.Equal(728644, rataDie)
-	rataDie, _ = ToRD(1888, time.December, 31)
+	rataDie = ToRD(1888, time.December, 31)
 	assert.Equal(689578, rataDie)
-	rataDie, _ = ToRD(2005, time.April, 2)
+	rataDie = ToRD(2005, time.April, 2)
 	assert.Equal(732038, rataDie)
 }
 
 func TestGreg2RDEarlyCE(t *testing.T) {
 	assert := assert.New(t)
-	rataDie, _ := ToRD(88, time.December, 30)
+	rataDie := ToRD(88, time.December, 30)
 	assert.Equal(32141, rataDie)
-	rataDie, _ = ToRD(1, time.January, 1)
+	rataDie = ToRD(1, time.January, 1)
 	assert.Equal(1, rataDie)
 }
 
 func TestGreg2RDNegative(t *testing.T) {
 	assert := assert.New(t)
-	rataDie, _ := ToRD(-1, time.December, 31)
+	rataDie := ToRD(-1, time.December, 31)
 	assert.Equal(0, rataDie)
-	rataDie, _ = ToRD(-1, time.December, 30)
+	rataDie = ToRD(-1, time.December, 30)
 	assert.Equal(-1, rataDie)
-	rataDie, _ = ToRD(-1, time.December, 29)
+	rataDie = ToRD(-1, time.December, 29)
 	assert.Equal(-2, rataDie)
-	rataDie, _ = ToRD(-1, time.November, 13)
+	rataDie = ToRD(-1, time.November, 13)
 	assert.Equal(-48, rataDie)
-	rataDie, _ = ToRD(-1, time.October, 31)
+	rataDie = ToRD(-1, time.October, 31)
 	assert.Equal(-61, rataDie)
-	rataDie, _ = ToRD(-1, time.October, 1)
+	rataDie = ToRD(-1, time.October, 1)
 	assert.Equal(-91, rataDie)
-	rataDie, _ = ToRD(-1, time.March, 1)
+	rataDie = ToRD(-1, time.March, 1)
 	assert.Equal(-305, rataDie)
-	rataDie, _ = ToRD(-1, time.February, 28)
+	rataDie = ToRD(-1, time.February, 28)
 	assert.Equal(-306, rataDie)
-	rataDie, _ = ToRD(-1, time.February, 27)
+	rataDie = ToRD(-1, time.February, 27)
 	assert.Equal(-307, rataDie)
-	rataDie, _ = ToRD(-1, time.February, 1)
+	rataDie = ToRD(-1, time.February, 1)
 	assert.Equal(-333, rataDie)
-	rataDie, _ = ToRD(-1, time.January, 31)
+	rataDie = ToRD(-1, time.January, 31)
 	assert.Equal(-334, rataDie)
-	rataDie, _ = ToRD(-1, time.January, 16)
+	rataDie = ToRD(-1, time.January, 16)
 	assert.Equal(-349, rataDie)
-	rataDie, _ = ToRD(-1, time.January, 1)
+	rataDie = ToRD(-1, time.January, 1)
 	assert.Equal(-364, rataDie)
 }
 
 func TestGreg2RDNegative2(t *testing.T) {
 	assert := assert.New(t)
-	rataDie, _ := ToRD(-2, time.December, 31)
+	rataDie := ToRD(-2, time.December, 31)
 	assert.Equal(-365, rataDie)
-	rataDie, _ = ToRD(-2, time.December, 1)
+	rataDie = ToRD(-2, time.December, 1)
 	assert.Equal(-395, rataDie)
-	rataDie, _ = ToRD(-2, time.January, 1)
+	rataDie = ToRD(-2, time.January, 1)
 	assert.Equal(-729, rataDie)
-	rataDie, _ = ToRD(-3, time.January, 1)
+	rataDie = ToRD(-3, time.January, 1)
 	assert.Equal(-1094, rataDie)
-	rataDie, _ = ToRD(-4, time.January, 1)
+	rataDie = ToRD(-4, time.January, 1)
 	assert.Equal(-1460, rataDie)
-	rataDie, _ = ToRD(-100, time.December, 20)
+	rataDie = ToRD(-100, time.December, 20)
 	assert.Equal(-36170, rataDie)
-	rataDie, _ = ToRD(-1000, time.June, 15)
+	rataDie = ToRD(-1000, time.June, 15)
 	assert.Equal(-365076, rataDie)
 }
 
@@ -186,7 +186,7 @@ func ExampleDateToRD() {
 }
 
 func ExampleToRD() {
-	rataDie, _ := ToRD(1995, time.December, 17)
+	rataDie := ToRD(1995, time.December, 17)
 	fmt.Println(rataDie)
 	// Output: 728644
 }
