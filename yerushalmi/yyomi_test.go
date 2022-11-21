@@ -13,21 +13,21 @@ import (
 func TestYerushalmiYomi(t *testing.T) {
 	assert := assert.New(t)
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 1},
-		New(hdate.FromGregorian(1997, time.March, 14), VILNA))
+		New(hdate.FromGregorian(1997, time.March, 14), Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 2},
-		New(hdate.FromGregorian(1997, time.March, 15), VILNA))
+		New(hdate.FromGregorian(1997, time.March, 15), Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 3},
-		New(hdate.FromGregorian(1997, time.March, 16), VILNA))
+		New(hdate.FromGregorian(1997, time.March, 16), Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Yevamot", Blatt: 49},
-		New(hdate.FromGregorian(1999, time.September, 21), VILNA))
+		New(hdate.FromGregorian(1999, time.September, 21), Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Niddah", Blatt: 13},
-		New(hdate.FromGregorian(2001, time.June, 22), VILNA))
+		New(hdate.FromGregorian(2001, time.June, 22), Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 1},
-		New(hdate.FromGregorian(2022, time.November, 14), VILNA))
+		New(hdate.FromGregorian(2022, time.November, 14), Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Peah", Blatt: 1},
-		New(hdate.FromGregorian(2023, time.January, 21), VILNA))
+		New(hdate.FromGregorian(2023, time.January, 21), Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 1},
-		New(hdate.FromGregorian(1980, time.February, 2), VILNA))
+		New(hdate.FromGregorian(1980, time.February, 2), Vilna))
 }
 
 func TestYerushalmiYomi2(t *testing.T) {
@@ -37,7 +37,7 @@ func TestYerushalmiYomi2(t *testing.T) {
 	endAbs := end.Abs()
 	for abs := start.Abs(); abs <= endAbs; abs++ {
 		hd := hdate.FromRD(abs)
-		daf := New(hd, VILNA)
+		daf := New(hd, Vilna)
 		actual = append(actual, hd.String()+","+daf.String())
 	}
 	expected := []string{
@@ -1609,7 +1609,7 @@ func TestYerushalmiYomi2(t *testing.T) {
 
 func ExampleNew() {
 	hd := hdate.FromGregorian(1995, time.December, 17)
-	daf := New(hd, VILNA)
+	daf := New(hd, Vilna)
 	fmt.Println(daf)
 	// Output: Nedarim 33
 }

@@ -1,11 +1,6 @@
 // Hebcal's yerushalmi package calculates the Yerushalmi Yomi, a
 // daily regimen of learning the Jerusalem Talmud.
 //
-// The Yerushalmi Daf Yomi program takes approx. 4.25 years or 51 months.
-// Unlike the Daf Yomi Bavli cycle, the Yerushalmi cycle skips both
-// Yom Kippur and Tisha B'Av. The page numbers are according to the Vilna
-// Edition which is used since 1900.
-//
 // https://en.wikipedia.org/wiki/Jerusalem_Talmud
 package yerushalmi
 
@@ -17,11 +12,19 @@ import (
 	"github.com/hebcal/hebcal-go/hdate"
 )
 
+// Using the Vilna edition, the Yerushalmi Daf Yomi program takes
+// ~4.25 years or 51 months.
+// Unlike the Daf Yomi Bavli cycle, this Yerushalmi cycle skips both
+// Yom Kippur and Tisha B'Av. The page numbers are according to the Vilna
+// Edition which is used since 1900.
+//
+// The Schottenstein edition uses different page numbers and takes
+// ~6 years to complete.
 type Edition int
 
 const (
-	VILNA Edition = 1 + iota
-	SCHOTTENSTEIN
+	Vilna Edition = 1 + iota
+	Schottenstein
 )
 
 // Vilna Edition
@@ -110,9 +113,9 @@ var schottensteinShas = []dafyomi.Daf{
 	{Name: "Niddah", Blatt: 11},
 }
 
-// YerushalmiYomiStartRD is the R.D. date of the first cycle of
+// VilnaStartRD is the R.D. date of the first cycle of
 // Yerushalmi Yomi, using the Vilna Edition page numbering.
-var YerushalmiYomiStartRD = greg.ToRD(1980, time.February, 2)
+var VilnaStartRD = greg.ToRD(1980, time.February, 2)
 
 // SchottensteinStartRD is the R.D. date of the first cycle of
 // Yerushalmi Yomi using the Schottenstein Edition page numbering.
@@ -126,18 +129,18 @@ var SchottensteinStartRD = greg.ToRD(2022, time.November, 14)
 // (2 February 1980).
 func New(hd hdate.HDate, edition Edition) dafyomi.Daf {
 	cday := hd.Abs()
-	if cday < YerushalmiYomiStartRD {
+	if cday < VilnaStartRD {
 		panic(hd.String() + " is before Daf Yomi Yerushalmi cycle began")
 	}
 
-	if edition == VILNA && skipDay(hd) {
+	if edition == Vilna && skipDay(hd) {
 		return dafyomi.Daf{}
 	}
 
 	shas := vilnaShas
-	prevCycle := YerushalmiYomiStartRD
-	nextCycle := YerushalmiYomiStartRD
-	if edition == SCHOTTENSTEIN {
+	prevCycle := VilnaStartRD
+	nextCycle := VilnaStartRD
+	if edition == Schottenstein {
 		if cday < SchottensteinStartRD {
 			panic(hd.String() + " is before Schottenstein Edition Yomi Yerushalmi cycle began")
 		}
@@ -189,8 +192,10 @@ func skipDay(hd hdate.HDate) bool {
 	return false
 }
 
+// Calculates the number of YK and 9Av that occur during between
+// startAbs and endAbs.
 func numSpecialDays(edition Edition, startAbs, endAbs int) int {
-	if edition == SCHOTTENSTEIN {
+	if edition == Schottenstein {
 		return 0
 	}
 	startYear := hdate.FromRD(startAbs).Year()
