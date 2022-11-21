@@ -24,10 +24,13 @@ Hebcal incorporates and uses several related packages:
   - hdate: converts between Hebrew and Gregorian dates.
     Also includes functions for calculating personal anniversaries
     (Yahrzeit, Birthday) according to the Hebrew calendar.
-  - dafyomi: Daf Yomi, a daily regimen of learning the Talmud.
+  - dafyomi: Daf Yomi, a daily regimen of learning the Babylonian
+    Talmud (Bavli).
   - greg: converts between Gregorian dates and R.D. (Rata Die)
     day numbers.
   - sedra: weekly Torah reading (Parashat HaShavua).
   - zmanim: calculates halachic times.
   - locales: translations and transliterations of Jewish holiday
     names into several languages.
+  - yrushalmi: Yerushalmi Yomi, a daily regimen of learning the
+    Jerusalem Talmud.

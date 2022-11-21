@@ -56,7 +56,7 @@ const (
 	SPECIAL_SHABBAT
 	// Weekly sedrot on Saturdays
 	PARSHA_HASHAVUA
-	// Daily page of Talmud
+	// Daily page of Talmud (Bavli)
 	DAF_YOMI
 	// Days of the Omer
 	OMER_COUNT
@@ -84,6 +84,8 @@ const (
 	YOM_KIPPUR_KATAN
 	// Zemanim, halachic times of day
 	ZMANIM
+	// Daily page of Jerusalem Talmud (Yerushalmi)
+	YERUSHALMI_YOMI
 )
 
 type CalEvent interface {
@@ -258,7 +260,7 @@ func (ev parshaEvent) Basename() string {
 
 type dafYomiEvent struct {
 	Date hdate.HDate
-	Daf  dafyomi.DafYomi
+	Daf  dafyomi.Daf
 }
 
 func (ev dafYomiEvent) GetDate() hdate.HDate {
@@ -350,4 +352,33 @@ func (ev moladEvent) GetEmoji() string {
 
 func (ev moladEvent) Basename() string {
 	return "Molad " + ev.MonthName
+}
+
+type yyomiEvent struct {
+	Date hdate.HDate
+	Daf  dafyomi.Daf
+}
+
+func (ev yyomiEvent) GetDate() hdate.HDate {
+	return ev.Date
+}
+
+func (ev yyomiEvent) Render(locale string) string {
+	name, _ := locales.LookupTranslation(ev.Daf.Name, locale)
+	if locale == "he" {
+		return name + " דף " + gematriya.Gematriya(ev.Daf.Blatt)
+	}
+	return name + " " + strconv.Itoa(ev.Daf.Blatt)
+}
+
+func (ev yyomiEvent) GetFlags() HolidayFlags {
+	return YERUSHALMI_YOMI
+}
+
+func (ev yyomiEvent) GetEmoji() string {
+	return ""
+}
+
+func (ev yyomiEvent) Basename() string {
+	return ev.Daf.String()
 }

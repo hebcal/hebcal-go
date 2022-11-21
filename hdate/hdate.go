@@ -301,14 +301,14 @@ func FromRD(rataDie int) HDate {
 
 // Creates an HDate from Gregorian year, month and day.
 func FromGregorian(year int, month time.Month, day int) HDate {
-	rataDie, _ := greg.ToRD(year, month, day)
+	rataDie := greg.ToRD(year, month, day)
 	return FromRD(rataDie)
 }
 
 // Creates an HDate from a Time object. Hours, minutes and seconds are ignored.
 func FromTime(t time.Time) HDate {
 	year, month, day := t.Date()
-	rataDie, _ := greg.ToRD(year, month, day)
+	rataDie := greg.ToRD(year, month, day)
 	return FromRD(rataDie)
 }
 

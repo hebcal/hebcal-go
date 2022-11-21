@@ -1,5 +1,5 @@
 // Hebcal's dafyomi package calculates the Daf Yomi, a daily
-// regimen of learning the Talmud.
+// regimen of learning the Babylonian Talmud.
 package dafyomi
 
 // Hebcal - A Jewish Calendar Generator
@@ -28,13 +28,13 @@ import (
 	"github.com/hebcal/hebcal-go/hdate"
 )
 
-// DafYomi represents a page of Talmud, such as Pesachim 103
-type DafYomi struct {
-	Name  string // Tractate name (e..g Berachot)
+// Daf represents a page of Talmud, such as Pesachim 103
+type Daf struct {
+	Name  string // Tractate name (e.g. Berachot)
 	Blatt int    // Page number
 }
 
-var shas0 = []DafYomi{
+var shas0 = []Daf{
 	{Name: "Berachot", Blatt: 64},
 	{Name: "Shabbat", Blatt: 157},
 	{Name: "Eruvin", Blatt: 105},
@@ -77,21 +77,17 @@ var shas0 = []DafYomi{
 	{Name: "Niddah", Blatt: 73},
 }
 
-var osday, nsday int
+var osday = greg.ToRD(1923, time.September, 11)
+var nsday = greg.ToRD(1975, time.June, 24)
 
 // New calculates the Daf Yomi for given date.
 //
 // Returns an error if the date is before Daf Yomi cycle began
 // (Hebrew year 5684, 11 September 1923).
-func New(hd hdate.HDate) (DafYomi, error) {
-	if osday == 0 {
-		osday, _ = greg.ToRD(1923, time.September, 11)
-		nsday, _ = greg.ToRD(1975, time.June, 24)
-	}
-
+func New(hd hdate.HDate) (Daf, error) {
 	cday := hd.Abs()
 	if cday < osday {
-		return DafYomi{}, errors.New("before Daf Yomi cycle began")
+		return Daf{}, errors.New("before Daf Yomi cycle began")
 	}
 
 	var cno, dno int
@@ -112,9 +108,9 @@ func New(hd hdate.HDate) (DafYomi, error) {
 	var shas = shas0
 	// Fix Shekalim for old cycles
 	if cno <= 7 {
-		shas = make([]DafYomi, len(shas0))
+		shas = make([]Daf, len(shas0))
 		copy(shas, shas0)
-		shas[4] = DafYomi{Name: "Shekalim", Blatt: 13}
+		shas[4] = Daf{Name: "Shekalim", Blatt: 13}
 	}
 
 	// Find the daf
@@ -139,10 +135,13 @@ func New(hd hdate.HDate) (DafYomi, error) {
 			j = 1 + dafcnt
 		}
 	}
-	return DafYomi{Name: shas[count].Name, Blatt: blatt}, nil
+	return Daf{Name: shas[count].Name, Blatt: blatt}, nil
 }
 
 // Returns a string representation of the Daf Yomi.
-func (daf DafYomi) String() string {
+func (daf Daf) String() string {
+	if daf.Blatt == 0 {
+		return "%!Daf(" + daf.Name + ",0)"
+	}
 	return daf.Name + " " + strconv.Itoa(daf.Blatt)
 }

@@ -80,10 +80,12 @@ type CalOptions struct {
 	NoSpecialShabbat bool
 	/* suppress regular holidays */
 	NoHolidays bool
-	/* include Daf Yomi */
+	/* include Babylonian Talmud Daf Yomi */
 	DafYomi bool
 	/* include Mishna Yomi */
 	MishnaYomi bool
+	/* include Jerusalem Talmud Daf Yomi */
+	YerushalmiYomi bool
 	/* include Days of the Omer */
 	Omer bool
 	/* include event announcing the molad */

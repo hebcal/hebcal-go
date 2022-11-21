@@ -27,6 +27,7 @@ import (
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/mishnayomi"
 	"github.com/hebcal/hebcal-go/sedra"
+	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
 )
 
@@ -60,7 +61,8 @@ Set opts.IL=true to use the Israeli schedule.
 Additional non-default event types can be specified:
   - Parashat HaShavua - weekly Torah Reading on Saturdays (opts.Sedrot)
   - Counting of the Omer (opts.Omer)
-  - Daf Yomi (opts.DafYomi)
+  - Babylonian Talmud Daf Yomi (opts.DafYomi)
+  - Jerusalem Talmud (Yerushalmi) Yomi (opts.YerushalmiYomi)
   - Mishna Yomi (opts.MishnaYomi)
   - Shabbat Mevarchim HaChodesh on Saturday before Rosh Chodesh (opts.ShabbatMevarchim)
   - Molad announcement on Saturday before Rosh Chodesh (opts.Molad)
@@ -202,6 +204,13 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 				daf, _ := dafyomi.New(hd)
 				events = append(events, dafYomiEvent{Date: hd, Daf: daf})
 			}
+			if opts.YerushalmiYomi && abs >= yerushalmi.YerushalmiYomiStartRD {
+				daf := yerushalmi.New(hd)
+				// No Yerushalmi Yomi on YK and 9Av
+				if daf.Blatt != 0 {
+					events = append(events, yyomiEvent{Date: hd, Daf: daf})
+				}
+			}
 			if opts.MishnaYomi && abs >= mishnayomi.MishnaYomiStart {
 				if len(myIdx) == 0 {
 					myIdx = mishnayomi.MakeIndex()
@@ -277,12 +286,12 @@ func getStartAndEnd(opts *CalOptions) (int, int, error) {
 		if opts.Month != 0 {
 			month = opts.Month
 		}
-		startAbs, _ := greg.ToRD(year, month, 1)
+		startAbs := greg.ToRD(year, month, 1)
 		if opts.Month != 0 {
 			endAbs := startAbs + greg.DaysIn(opts.Month, year)
 			return startAbs, endAbs - 1, nil
 		}
-		endAbs, _ := greg.ToRD(year+numYears, time.January, 1)
+		endAbs := greg.ToRD(year+numYears, time.January, 1)
 		return startAbs, endAbs - 1, nil
 	}
 }
@@ -380,6 +389,9 @@ func getMaskFromOptions(opts *CalOptions) HolidayFlags {
 		if (m & YOM_KIPPUR_KATAN) != 0 {
 			opts.YomKippurKatan = true
 		}
+		if (m & YERUSHALMI_YOMI) != 0 {
+			opts.YerushalmiYomi = true
+		}
 		return m
 	}
 	var mask HolidayFlags
@@ -421,6 +433,9 @@ func getMaskFromOptions(opts *CalOptions) HolidayFlags {
 	}
 	if opts.MishnaYomi {
 		mask |= MISHNA_YOMI
+	}
+	if opts.YerushalmiYomi {
+		mask |= YERUSHALMI_YOMI
 	}
 	if opts.Omer {
 		mask |= OMER_COUNT
