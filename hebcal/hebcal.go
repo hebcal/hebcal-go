@@ -122,6 +122,13 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 		opts.IL = true
 	}
 	opts.Mask = getMaskFromOptions(opts)
+	if opts.YerushalmiYomi && opts.YerushalmiEdition == 0 {
+		opts.YerushalmiEdition = yerushalmi.Vilna
+	}
+	beginYerushalmi := yerushalmi.VilnaStartRD
+	if opts.YerushalmiEdition == yerushalmi.Schottenstein {
+		beginYerushalmi = yerushalmi.SchottensteinStartRD
+	}
 	var (
 		il           bool = opts.IL
 		currentYear  int  = -1
@@ -204,9 +211,9 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 				daf, _ := dafyomi.New(hd)
 				events = append(events, dafYomiEvent{Date: hd, Daf: daf})
 			}
-			if opts.YerushalmiYomi && abs >= yerushalmi.VilnaStartRD {
-				daf := yerushalmi.New(hd, yerushalmi.Vilna)
-				// No Yerushalmi Yomi on YK and 9Av
+			if opts.YerushalmiYomi && abs >= beginYerushalmi {
+				daf := yerushalmi.New(hd, opts.YerushalmiEdition)
+				// daf.Blatt will be 0 to signal no Yerushalmi Yomi on YK and 9Av
 				if daf.Blatt != 0 {
 					events = append(events, yyomiEvent{Date: hd, Daf: daf})
 				}

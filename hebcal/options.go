@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
 )
 
@@ -86,6 +87,8 @@ type CalOptions struct {
 	MishnaYomi bool
 	/* include Jerusalem Talmud Daf Yomi */
 	YerushalmiYomi bool
+	/* Either the Vilna or Schottenstein edition of Yerushalmi Yomi */
+	YerushalmiEdition yerushalmi.Edition
 	/* include Days of the Omer */
 	Omer bool
 	/* include event announcing the molad */

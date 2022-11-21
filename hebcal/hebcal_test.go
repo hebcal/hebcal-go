@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
 	"github.com/stretchr/testify/assert"
 )
@@ -453,6 +454,69 @@ func TestHebrewCalendarYYomi(t *testing.T) {
 		desc := ev.Render("en")
 		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
 		actual = append(actual, line)
+	}
+	assert.Equal(t, expected, actual)
+}
+
+func TestHebrewCalendarSchottenstein(t *testing.T) {
+	opts := CalOptions{
+		NoHolidays:        true,
+		YerushalmiYomi:    true,
+		YerushalmiEdition: yerushalmi.Schottenstein,
+		Start:             hdate.FromGregorian(2022, time.November, 14),
+		End:               hdate.FromGregorian(2028, time.August, 7),
+	}
+	events, err := HebrewCalendar(&opts)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 2094, len(events))
+	actual := make([]string, 0, 40)
+	for _, ev := range events {
+		yyomi, ok := ev.(yyomiEvent)
+		if ok && yyomi.Daf.Blatt == 1 {
+			line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
+			actual = append(actual, line)
+		}
+	}
+	expected := []string{
+		"2022-11-14 Yerushalmi Berakhot 1",
+		"2023-02-16 Yerushalmi Peah 1",
+		"2023-04-30 Yerushalmi Demai 1",
+		"2023-07-16 Yerushalmi Kilayim 1",
+		"2023-10-08 Yerushalmi Sheviit 1",
+		"2024-01-03 Yerushalmi Terumot 1",
+		"2024-04-19 Yerushalmi Maasrot 1",
+		"2024-06-04 Yerushalmi Maaser Sheni 1",
+		"2024-08-02 Yerushalmi Challah 1",
+		"2024-09-20 Yerushalmi Orlah 1",
+		"2024-11-01 Yerushalmi Bikkurim 1",
+		"2024-11-27 Yerushalmi Shabbat 1",
+		"2025-03-20 Yerushalmi Eruvin 1",
+		"2025-05-30 Yerushalmi Pesachim 1",
+		"2025-08-24 Yerushalmi Shekalim 1",
+		"2025-10-24 Yerushalmi Yoma 1",
+		"2025-12-20 Yerushalmi Sukkah 1",
+		"2026-01-22 Yerushalmi Beitzah 1",
+		"2026-03-12 Yerushalmi Rosh Hashanah 1",
+		"2026-04-08 Yerushalmi Taanit 1",
+		"2026-05-09 Yerushalmi Megillah 1",
+		"2026-06-19 Yerushalmi Chagigah 1",
+		"2026-07-17 Yerushalmi Moed Katan 1",
+		"2026-08-09 Yerushalmi Yevamot 1",
+		"2026-11-05 Yerushalmi Ketubot 1",
+		"2027-01-21 Yerushalmi Nedarim 1",
+		"2027-03-04 Yerushalmi Nazir 1",
+		"2027-04-26 Yerushalmi Sotah 1",
+		"2027-06-17 Yerushalmi Gittin 1",
+		"2027-08-09 Yerushalmi Kiddushin 1",
+		"2027-10-01 Yerushalmi Bava Kamma 1",
+		"2027-11-10 Yerushalmi Bava Metzia 1",
+		"2027-12-15 Yerushalmi Bava Batra 1",
+		"2028-01-23 Yerushalmi Sanhedrin 1",
+		"2028-04-07 Yerushalmi Shevuot 1",
+		"2028-05-26 Yerushalmi Avodah Zarah 1",
+		"2028-06-29 Yerushalmi Makkot 1",
+		"2028-07-10 Yerushalmi Horayot 1",
+		"2028-07-28 Yerushalmi Niddah 1",
 	}
 	assert.Equal(t, expected, actual)
 }
