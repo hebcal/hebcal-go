@@ -205,7 +205,7 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 				events = append(events, dafYomiEvent{Date: hd, Daf: daf})
 			}
 			if opts.YerushalmiYomi && abs >= yerushalmi.YerushalmiYomiStartRD {
-				daf := yerushalmi.New(hd)
+				daf := yerushalmi.New(hd, yerushalmi.VILNA)
 				// No Yerushalmi Yomi on YK and 9Av
 				if daf.Blatt != 0 {
 					events = append(events, yyomiEvent{Date: hd, Daf: daf})

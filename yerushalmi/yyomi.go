@@ -17,7 +17,15 @@ import (
 	"github.com/hebcal/hebcal-go/hdate"
 )
 
-var shas = []dafyomi.Daf{
+type Edition int
+
+const (
+	VILNA Edition = 1 + iota
+	SCHOTTENSTEIN
+)
+
+// Vilna Edition
+var vilnaShas = []dafyomi.Daf{
 	{Name: "Berakhot", Blatt: 68},
 	{Name: "Peah", Blatt: 37},
 	{Name: "Demai", Blatt: 34},
@@ -59,12 +67,56 @@ var shas = []dafyomi.Daf{
 	{Name: "Niddah", Blatt: 13},
 }
 
-// The number of pages in the Talmud Yerushalmi
-const numDapim = 1554
+// Schottenstein Edition
+var schottensteinShas = []dafyomi.Daf{
+	{Name: "Berakhot", Blatt: 94},
+	{Name: "Peah", Blatt: 73},
+	{Name: "Demai", Blatt: 77},
+	{Name: "Kilayim", Blatt: 84},
+	{Name: "Sheviit", Blatt: 87},
+	{Name: "Terumot", Blatt: 107},
+	{Name: "Maasrot", Blatt: 46},
+	{Name: "Maaser Sheni", Blatt: 59},
+	{Name: "Challah", Blatt: 49},
+	{Name: "Orlah", Blatt: 42},
+	{Name: "Bikkurim", Blatt: 26},
+	{Name: "Shabbat", Blatt: 113},
+	{Name: "Eruvin", Blatt: 71},
+	{Name: "Pesachim", Blatt: 86},
+	{Name: "Shekalim", Blatt: 61},
+	{Name: "Yoma", Blatt: 57},
+	{Name: "Sukkah", Blatt: 33},
+	{Name: "Beitzah", Blatt: 49},
+	{Name: "Rosh Hashanah", Blatt: 27},
+	{Name: "Taanit", Blatt: 31},
+	{Name: "Megillah", Blatt: 41},
+	{Name: "Chagigah", Blatt: 28},
+	{Name: "Moed Katan", Blatt: 23},
+	{Name: "Yevamot", Blatt: 88},
+	{Name: "Ketubot", Blatt: 77},
+	{Name: "Nedarim", Blatt: 42},
+	{Name: "Nazir", Blatt: 53},
+	{Name: "Sotah", Blatt: 52},
+	{Name: "Gittin", Blatt: 53},
+	{Name: "Kiddushin", Blatt: 53},
+	{Name: "Bava Kamma", Blatt: 40},
+	{Name: "Bava Metzia", Blatt: 35},
+	{Name: "Bava Batra", Blatt: 39},
+	{Name: "Sanhedrin", Blatt: 75},
+	{Name: "Shevuot", Blatt: 49},
+	{Name: "Avodah Zarah", Blatt: 34},
+	{Name: "Makkot", Blatt: 11},
+	{Name: "Horayot", Blatt: 18},
+	{Name: "Niddah", Blatt: 11},
+}
 
 // YerushalmiYomiStartRD is the R.D. date of the first cycle of
-// Yerushalmi Yomi.
+// Yerushalmi Yomi, using the Vilna Edition page numbering.
 var YerushalmiYomiStartRD = greg.ToRD(1980, time.February, 2)
+
+// SchottensteinStartRD is the R.D. date of the first cycle of
+// Yerushalmi Yomi using the Schottenstein Edition page numbering.
+var SchottensteinStartRD = greg.ToRD(2022, time.November, 14)
 
 // New calculates the Daf Yomi Yerushalmi for given date.
 //
@@ -72,29 +124,40 @@ var YerushalmiYomiStartRD = greg.ToRD(1980, time.February, 2)
 //
 // Panics if the date is before Daf Yomi Yerushalmi cycle began
 // (2 February 1980).
-func New(hd hdate.HDate) dafyomi.Daf {
+func New(hd hdate.HDate, edition Edition) dafyomi.Daf {
 	cday := hd.Abs()
 	if cday < YerushalmiYomiStartRD {
 		panic(hd.String() + " is before Daf Yomi Yerushalmi cycle began")
 	}
 
-	// No Daf for Yom Kippur and Tisha B'Av
-	if (hd.Month() == hdate.Tishrei && hd.Day() == 10) ||
-		(hd.Month() == hdate.Av &&
-			((hd.Day() == 9 && hd.Weekday() != time.Saturday) ||
-				(hd.Day() == 10 && hd.Weekday() == time.Sunday))) {
+	if edition == VILNA && skipDay(hd) {
 		return dafyomi.Daf{}
 	}
 
-	nextCycle := YerushalmiYomiStartRD
+	shas := vilnaShas
 	prevCycle := YerushalmiYomiStartRD
+	nextCycle := YerushalmiYomiStartRD
+	if edition == SCHOTTENSTEIN {
+		if cday < SchottensteinStartRD {
+			panic(hd.String() + " is before Schottenstein Edition Yomi Yerushalmi cycle began")
+		}
+		shas = schottensteinShas
+		prevCycle = SchottensteinStartRD
+		nextCycle = SchottensteinStartRD
+	}
+
+	numDapim := 0
+	for _, masechet := range shas {
+		numDapim += masechet.Blatt
+	}
+
 	for cday >= nextCycle {
 		prevCycle = nextCycle
 		nextCycle += numDapim
-		nextCycle += numSpecialDays(prevCycle, nextCycle)
+		nextCycle += numSpecialDays(edition, prevCycle, nextCycle)
 	}
 
-	total := cday - prevCycle - numSpecialDays(prevCycle, cday)
+	total := cday - prevCycle - numSpecialDays(edition, prevCycle, cday)
 
 	for j := 0; j < len(shas); j++ {
 		masechet := shas[j]
@@ -107,7 +170,29 @@ func New(hd hdate.HDate) dafyomi.Daf {
 	panic("Interal error, this code should be unreachable")
 }
 
-func numSpecialDays(startAbs, endAbs int) int {
+// No Daf for Yom Kippur and Tisha B'Av when following
+// the classic Vilna Edition
+func skipDay(hd hdate.HDate) bool {
+	day := hd.Day()
+	switch hd.Month() {
+	case hdate.Tishrei:
+		if day == 10 {
+			return true
+		}
+	case hdate.Av:
+		dow := hd.Weekday()
+		if (day == 9 && dow != time.Saturday) ||
+			(day == 10 && dow == time.Sunday) {
+			return true
+		}
+	}
+	return false
+}
+
+func numSpecialDays(edition Edition, startAbs, endAbs int) int {
+	if edition == SCHOTTENSTEIN {
+		return 0
+	}
 	startYear := hdate.FromRD(startAbs).Year()
 	endYear := hdate.FromRD(endAbs).Year()
 
