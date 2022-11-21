@@ -441,12 +441,12 @@ func TestHebrewCalendarYYomi(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 6, len(events))
 	expected := []string{
-		"2022-11-12 Niddah 12",
-		"2022-11-13 Niddah 13",
-		"2022-11-14 Berakhot 1",
-		"2022-11-15 Berakhot 2",
-		"2022-11-16 Berakhot 3",
-		"2022-11-17 Berakhot 4",
+		"2022-11-12 Yerushalmi Niddah 12",
+		"2022-11-13 Yerushalmi Niddah 13",
+		"2022-11-14 Yerushalmi Berakhot 1",
+		"2022-11-15 Yerushalmi Berakhot 2",
+		"2022-11-16 Yerushalmi Berakhot 3",
+		"2022-11-17 Yerushalmi Berakhot 4",
 	}
 	actual := make([]string, 0, len(events))
 	for _, ev := range events {

@@ -320,6 +320,7 @@ var dict_he = map[string]string{
 	"Shushan Purim Katan": "שׁוּשָׁן פּוּרִים קָטָן",
 	"Purim Meshulash": "פּוּרִים מְשׁוּלָּשׁ",
 	"after sunset": "אחרי השקיעה",
+	"Yerushalmi": "יְרוּשַׁלְמִי",
 }
 
 func Lookup_he(s string) (string, bool) {

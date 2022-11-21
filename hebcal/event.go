@@ -364,11 +364,12 @@ func (ev yyomiEvent) GetDate() hdate.HDate {
 }
 
 func (ev yyomiEvent) Render(locale string) string {
+	yerushalmiStr, _ := locales.LookupTranslation("Yerushalmi", locale)
 	name, _ := locales.LookupTranslation(ev.Daf.Name, locale)
 	if locale == "he" {
-		return name + " דף " + gematriya.Gematriya(ev.Daf.Blatt)
+		return yerushalmiStr + " " + name + " דף " + gematriya.Gematriya(ev.Daf.Blatt)
 	}
-	return name + " " + strconv.Itoa(ev.Daf.Blatt)
+	return yerushalmiStr + " " + name + " " + strconv.Itoa(ev.Daf.Blatt)
 }
 
 func (ev yyomiEvent) GetFlags() HolidayFlags {
