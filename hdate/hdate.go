@@ -421,8 +421,6 @@ With the exception of Adar 1/Adar 2, Hebrew months are unique to their second le
 	E        Elul
 	C        Cheshvan
 	K        Kislev
-	1        1Adar
-	2        2Adar
 	Si Sh     Sivan, Shvat
 	Ta Ti Te Tamuz, Tishrei, Tevet
 	Av Ad    Av, Adar
