@@ -90,21 +90,31 @@ func TestAdar2ResetToAdar1(t *testing.T) {
 }
 
 func TestMonthFromName(t *testing.T) {
-	assert := assert.New(t)
-	monthName, _ := MonthFromName("adar")
-	assert.Equal(Adar2, monthName)
-	monthName, _ = MonthFromName("Adar I")
-	assert.Equal(Adar1, monthName)
-	monthName, _ = MonthFromName("Adar II")
-	assert.Equal(Adar2, monthName)
-	monthName, _ = MonthFromName("Adar 2")
-	assert.Equal(Adar2, monthName)
-	monthName, _ = MonthFromName("Adar 1")
-	assert.Equal(Adar1, monthName)
-	monthName, _ = MonthFromName("אדר א")
-	assert.Equal(Adar1, monthName)
-	monthName, _ = MonthFromName("אדר ב")
-	assert.Equal(Adar2, monthName)
+	toTest := []struct {
+		s string
+		m HMonth
+	}{
+		{"adar", Adar2},
+		{"Adar I", Adar1},
+		{"Adar II", Adar2},
+		{"Adar 1", Adar1},
+		{"Adar 2", Adar2},
+		{"Adar1", Adar1},
+		{"Adar2", Adar2},
+		{"אדר א", Adar1},
+		{"אדר ב", Adar2},
+		{"אדר א׳", Adar1},
+		{"אדר ב׳", Adar2},
+		{"אדר", Adar2},
+		{"Iyyar", Iyyar},
+		{"Iyar", Iyyar},
+		{"tammuz", Tamuz},
+	}
+	for _, item := range toTest {
+		month, err := MonthFromName(item.s)
+		assert.Equal(t, nil, err)
+		assert.Equal(t, item.m, month)
+	}
 }
 
 func TestDaysInHebYear(t *testing.T) {
@@ -258,11 +268,23 @@ func ExampleFromRD() {
 }
 
 func ExampleMonthFromName() {
-	m1, _ := MonthFromName("Shvat")
-	m2, _ := MonthFromName("cheshvan")
-	m3, _ := MonthFromName("טבת")
-	fmt.Printf("%s (%d), %s (%d), %s (%d)", m1, int(m1), m2, int(m2), m3, int(m3))
-	// Output: Sh'vat (11), Cheshvan (8), Tevet (10)
+	var month HMonth
+	month, _ = MonthFromName("Shvat")
+	fmt.Printf("%s (%d)\n", month, int(month))
+	month, _ = MonthFromName("cheshvan")
+	fmt.Printf("%s (%d)\n", month, int(month))
+	month, _ = MonthFromName("טבת")
+	fmt.Printf("%s (%d)\n", month, int(month))
+	month, _ = MonthFromName("Adar 1")
+	fmt.Printf("%s (%d)\n", month, int(month))
+	month, _ = MonthFromName("Adar 2")
+	fmt.Printf("%s (%d)\n", month, int(month))
+	// Output:
+	// Sh'vat (11)
+	// Cheshvan (8)
+	// Tevet (10)
+	// Adar I (12)
+	// Adar II (13)
 }
 
 func ExampleDaysInYear() {

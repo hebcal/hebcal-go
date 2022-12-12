@@ -414,7 +414,7 @@ func (hd HDate) String() string {
 /*
 MonthFromName parses a Hebrew month string name to determine the month number.
 
-the Hebrew months are unique to their second letter
+With the exception of Adar 1/Adar 2, Hebrew months are unique to their second letter.
 
 	N         Nisan  (November?)
 	I         Iyyar
@@ -435,6 +435,9 @@ the Hebrew months are unique to their second letter
 	ס            סיון
 	ש            שבט
 	תמ תש        תמוז תשרי
+
+	Adar1, Adar 1, Adar I, אדר א׳
+	Adar2, Adar 2, Adar II, אדר ב׳
 */
 func MonthFromName(monthName string) (HMonth, error) {
 	str := s.ToLower(monthName)
@@ -476,7 +479,7 @@ func MonthFromName(monthName string) (HMonth, error) {
 		case 'v':
 			return Av, nil
 		case 'd':
-			regex := regexp.MustCompile("(?i)(1|[^i]i|a|א)$")
+			regex := regexp.MustCompile("(?i)(1|[^i]i|a|א)(׳?)$")
 			if regex.MatchString(monthName) {
 				return Adar1, nil
 			}
@@ -493,7 +496,7 @@ func MonthFromName(monthName string) (HMonth, error) {
 		case 'ב':
 			return Av, nil
 		case 'ד':
-			regex := regexp.MustCompile("(?i)(1|[^i]i|a|א)$")
+			regex := regexp.MustCompile("(?i)(1|[^i]i|a|א)(׳?)$")
 			if regex.MatchString(monthName) {
 				return Adar1, nil
 			}
