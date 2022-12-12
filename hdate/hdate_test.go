@@ -1,6 +1,7 @@
 package hdate
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -472,4 +473,18 @@ func ExampleHDate_Day() {
 	hd := New(5769, Cheshvan, 15)
 	fmt.Println(hd.Day())
 	// Output: 15
+}
+
+func TestHDateJsonMarshal(t *testing.T) {
+	hd := New(5769, Cheshvan, 15)
+	b, err := json.Marshal(hd)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, []byte(`{"hy":5769,"hm":"Cheshvan","hd":15}`), b)
+}
+
+func TestHDateJsonUnMarshal(t *testing.T) {
+	hdJson := `{"hy":5783,"hm":"Kislev","hd":18}`
+	var hd HDate
+	json.Unmarshal([]byte(hdJson), &hd)
+	assert.Equal(t, HDate{year: 5783, month: Kislev, day: 18}, hd)
 }

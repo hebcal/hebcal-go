@@ -24,6 +24,7 @@ package hdate
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import (
+	"encoding/json"
 	"errors"
 	"math"
 	"regexp"
@@ -557,4 +558,33 @@ func (hd HDate) OnOrAfter(dayOfWeek time.Weekday) HDate {
 // the Hebrew date specified by hd.
 func (hd HDate) After(dayOfWeek time.Weekday) HDate {
 	return onOrBefore(dayOfWeek, hd.Abs()+7)
+}
+
+type hdJson struct {
+	Year  int    `json:"hy"` // Hebrew year
+	Month string `json:"hm"` // Hebrew month ("Kislev", "Adar I", ...)
+	Day   int    `json:"hd"` // Hebrew day of month (1-30)
+}
+
+func (hd HDate) MarshalJSON() ([]byte, error) {
+	var tmp hdJson
+	tmp.Year = hd.year
+	tmp.Month = hd.MonthName("en")
+	tmp.Day = hd.day
+	return json.Marshal(tmp)
+}
+
+func (hd *HDate) UnmarshalJSON(b []byte) error {
+	var tmp hdJson
+	if err := json.Unmarshal(b, &tmp); err != nil {
+		return err
+	}
+	month, err := MonthFromName(tmp.Month)
+	if err != nil {
+		return err
+	}
+	hd.year = tmp.Year
+	hd.day = tmp.Day
+	hd.month = month
+	return nil
 }
