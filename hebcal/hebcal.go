@@ -27,6 +27,7 @@ import (
 	"github.com/hebcal/hebcal-go/greg"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/mishnayomi"
+	"github.com/hebcal/hebcal-go/molad"
 	"github.com/hebcal/hebcal-go/omer"
 	"github.com/hebcal/hebcal-go/sedra"
 	"github.com/hebcal/hebcal-go/yerushalmi"
@@ -240,7 +241,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		}
 		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
 			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
-			molad := hdate.NewMolad(hd.Year(), nextMonth)
+			molad := molad.New(hd.Year(), nextMonth)
 			events = append(events, event.NewMoladEvent(hd, molad, nextMonthName))
 		}
 		if (opts.AddHebrewDates && (!opts.WeeklyAbbreviated || dow == firstWeekday)) ||

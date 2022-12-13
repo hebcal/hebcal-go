@@ -21,11 +21,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/dustin/go-humanize"
 	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/locales"
-	"github.com/hebcal/hebcal-go/number"
 )
 
 type OmerEvent struct {
@@ -58,7 +58,7 @@ func (ev OmerEvent) Render(locale string) string {
 		return gematriya.Gematriya(ev.OmerDay) + " " + dayOfTheOmer
 	case "", "en", "sephardic", "ashkenazi",
 		"ashkenazi_litvish", "ashkenazi_poylish", "ashkenazi_standard":
-		return number.Ordinal(ev.OmerDay) + " " + dayOfTheOmer
+		return humanize.Ordinal(ev.OmerDay) + " " + dayOfTheOmer
 	case "es":
 		return strconv.Itoa(ev.OmerDay) + "º " + dayOfTheOmer
 	}

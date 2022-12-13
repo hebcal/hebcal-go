@@ -4,18 +4,19 @@ import (
 	"fmt"
 
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/molad"
 )
 
 type moladEvent struct {
 	Date      hdate.HDate
-	Molad     hdate.Molad
+	Molad     molad.Molad
 	MonthName string
 }
 
-func NewMoladEvent(date hdate.HDate, molad hdate.Molad, monthName string) CalEvent {
+func NewMoladEvent(date hdate.HDate, m molad.Molad, monthName string) CalEvent {
 	return moladEvent{
 		Date:      date,
-		Molad:     molad,
+		Molad:     m,
 		MonthName: monthName,
 	}
 }

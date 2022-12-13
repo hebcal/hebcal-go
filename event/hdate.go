@@ -3,10 +3,10 @@ package event
 import (
 	"strconv"
 
+	"github.com/dustin/go-humanize"
 	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/locales"
-	"github.com/hebcal/hebcal-go/number"
 )
 
 type hebrewDateEvent struct {
@@ -25,7 +25,7 @@ func (ev hebrewDateEvent) Render(locale string) string {
 		return gematriya.Gematriya(hd.Day()) + " " + hd.MonthName("he") + " " + gematriya.Gematriya(hd.Year())
 	case "", "en", "sephardic", "ashkenazi",
 		"ashkenazi_litvish", "ashkenazi_poylish", "ashkenazi_standard":
-		return number.Ordinal(hd.Day()) + " of " + enMonthName +
+		return humanize.Ordinal(hd.Day()) + " of " + enMonthName +
 			", " + strconv.Itoa(hd.Year())
 	case "es":
 		monthName, _ := locales.LookupTranslation(enMonthName, locale)

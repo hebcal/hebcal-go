@@ -1,13 +1,20 @@
-package hdate
+// Hebcal's molad package calculates the time at which the
+// New Moon is "born" each month.
+//
+// This code was largely ported from the Java implementation
+// com.kosherjava.zmanim.hebrewcalendar.JewishDate
+package molad
+
+import "github.com/hebcal/hebcal-go/hdate"
 
 type Molad struct {
-	Date     HDate
+	Date     hdate.HDate
 	Hours    int
 	Minutes  int
 	Chalakim int
 }
 
-// Borrowed from com.kosherjava.zmanim.hebrewcalendar.JewishDate
+const epoch int64 = -1373428
 
 // Days from the beginning of Sunday till molad BaHaRaD.
 // Calculated as 1 day, 5 hours and 204 chalakim = (24 + 5) * 1080 + 204 = 31524
@@ -23,9 +30,9 @@ const chalakimPerMonth int64 = 765433 // (29 * 24 + 12) * 1080 + 793
 
 // Converts the NISSAN based constants used by this class to numeric month
 // starting from TISHREI. This is required for Molad claculations.
-func getJewishMonthOfYear(year int, month HMonth) int {
+func getJewishMonthOfYear(year int, month hdate.HMonth) int {
 	offset := 0
-	if IsLeapYear(year) {
+	if hdate.IsLeapYear(year) {
 		offset = 1
 	}
 	return (int(month)+(offset+5))%(offset+12) + 1
@@ -33,7 +40,7 @@ func getJewishMonthOfYear(year int, month HMonth) int {
 
 // Returns the number of chalakim (parts - 1080 to the hour) from the original hypothetical Molad Tohu to the year
 // and month passed in.
-func getChalakimSinceMoladTohu(year int, month HMonth) int64 {
+func getChalakimSinceMoladTohu(year int, month hdate.HMonth) int64 {
 	// Jewish lunar month = 29 days, 12 hours and 793 chalakim
 	// chalakim since Molad Tohu BeHaRaD - 1 day, 5 hours and 204 chalakim
 	monthOfYear := getJewishMonthOfYear(year, month)
@@ -59,9 +66,11 @@ func (m *Molad) setMoladTime(chalakim int) {
 	m.Chalakim = (adjustedChalakim - m.Minutes*chalakimPerMinute)
 }
 
-func NewMolad(year int, month HMonth) Molad {
+// New makes an instance of Molad for a given Hebrew year and
+// month.
+func New(year int, month hdate.HMonth) Molad {
 	chalakim := getChalakimSinceMoladTohu(year, month)
-	hd := FromRD(moladToAbsDate(chalakim))
+	hd := hdate.FromRD(moladToAbsDate(chalakim))
 	conjunctionDay := chalakim / chalakimPerDay
 	conjunctionParts := chalakim - conjunctionDay*chalakimPerDay
 	molad := Molad{}
@@ -75,11 +84,11 @@ func NewMolad(year int, month HMonth) Molad {
 }
 
 // This is Dershowitz & Reingold's floating point version here for reference
-func molad(year int, month HMonth) float64 {
+func molad(year int, month hdate.HMonth) float64 {
 	yy := year
-	if month < Tishrei {
+	if month < hdate.Tishrei {
 		yy++
 	}
-	monthsElapsed := int(month-Tishrei) + (235*yy-234)/19
+	monthsElapsed := int(month-hdate.Tishrei) + (235*yy-234)/19
 	return float64(epoch) - 876.0/25920.0 + float64(monthsElapsed)*(29.5+(793.0/25920.0))
 }

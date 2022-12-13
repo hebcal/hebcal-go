@@ -21,16 +21,23 @@ interfaces.
 
 Hebcal incorporates and uses several related packages:
 
+  - dafyomi: Daf Yomi, a daily regimen of learning the Babylonian
+    Talmud (Bavli).
+  - event: an interface for calendar events.
+  - greg: converts between Gregorian dates and R.D. (Rata Die)
+    day numbers.
   - hdate: converts between Hebrew and Gregorian dates.
     Also includes functions for calculating personal anniversaries
     (Yahrzeit, Birthday) according to the Hebrew calendar.
-  - dafyomi: Daf Yomi, a daily regimen of learning the Babylonian
-    Talmud (Bavli).
-  - greg: converts between Gregorian dates and R.D. (Rata Die)
-    day numbers.
-  - sedra: weekly Torah reading (Parashat HaShavua).
-  - zmanim: calculates halachic times.
+  - hebcal: provides functionality for calculating Jewish holidays,
+    candle-lighting and havdalah times, and fast start/end times.
   - locales: translations and transliterations of Jewish holiday
     names into several languages.
-  - yrushalmi: Yerushalmi Yomi, a daily regimen of learning the
+  - mishnayomi: calculates the Mishna Yomi, a program of daily
+    learning in which participants study two Mishnayot each day.
+  - molad: calculates the time at which the New Moon is born.
+  - omer: calculates the Sefirat HaOmer.
+  - sedra: weekly Torah reading (Parashat HaShavua).
+  - yerushalmi: Yerushalmi Yomi, a daily regimen of learning the
     Jerusalem Talmud.
+  - zmanim: calculates halachic times.
