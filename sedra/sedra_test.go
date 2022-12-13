@@ -62,7 +62,6 @@ func TestSedraYearTypes(t *testing.T) {
 func TestSedraEarlyYears(t *testing.T) {
 	years := []int{3762, 3761, 3760, 3759, 100, 2, 1}
 	for _, year := range years {
-		fmt.Println(year)
 		s := sedra.New(year, false)
 		assert.Equal(t, year, s.Year)
 	}

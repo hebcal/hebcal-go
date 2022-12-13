@@ -11,15 +11,15 @@ type Molad struct {
 
 // Days from the beginning of Sunday till molad BaHaRaD.
 // Calculated as 1 day, 5 hours and 204 chalakim = (24 + 5) * 1080 + 204 = 31524
-const chalakimMoladTohu = 31524
+const chalakimMoladTohu int64 = 31524
 
 const chalakimPerMinute = 18
 const chalakimPerHour = 1080
-const chalakimPerDay = 25920 // 24 * 1080
+const chalakimPerDay int64 = 25920 // 24 * 1080
 
 // The number of chalakim in an average Jewish month. A month has 29 days, 12 hours and 793
 // chalakim (44 minutes and 3.3 seconds) for a total of 765,433 chalakim
-const chalakimPerMonth = 765433 // (29 * 24 + 12) * 1080 + 793
+const chalakimPerMonth int64 = 765433 // (29 * 24 + 12) * 1080 + 793
 
 // Converts the NISSAN based constants used by this class to numeric month
 // starting from TISHREI. This is required for Molad claculations.
@@ -33,20 +33,20 @@ func getJewishMonthOfYear(year int, month HMonth) int {
 
 // Returns the number of chalakim (parts - 1080 to the hour) from the original hypothetical Molad Tohu to the year
 // and month passed in.
-func getChalakimSinceMoladTohu(year int, month HMonth) int {
+func getChalakimSinceMoladTohu(year int, month HMonth) int64 {
 	// Jewish lunar month = 29 days, 12 hours and 793 chalakim
 	// chalakim since Molad Tohu BeHaRaD - 1 day, 5 hours and 204 chalakim
 	monthOfYear := getJewishMonthOfYear(year, month)
-	prevYear := year - 1
+	prevYear := int64(year) - 1
 	monthsElapsed := (235 * (prevYear / 19)) + // Months in complete 19 year lunar (Metonic) cycles so far
 		(12 * (prevYear % 19)) + // Regular months in this cycle
 		((7*(prevYear%19) + 1) / 19) + // Leap months this cycle
-		(monthOfYear - 1) // add elapsed months till the start of the molad of the month
+		int64(monthOfYear-1) // add elapsed months till the start of the molad of the month
 	// return chalakim prior to BeHaRaD + number of chalakim since
 	return chalakimMoladTohu + (chalakimPerMonth * monthsElapsed)
 }
 
-func moladToAbsDate(chalakim int) int {
+func moladToAbsDate(chalakim int64) int64 {
 	return (chalakim / chalakimPerDay) + epoch - 1
 }
 
@@ -65,7 +65,7 @@ func NewMolad(year int, month HMonth) Molad {
 	conjunctionDay := chalakim / chalakimPerDay
 	conjunctionParts := chalakim - conjunctionDay*chalakimPerDay
 	molad := Molad{}
-	molad.setMoladTime(conjunctionParts)
+	molad.setMoladTime(int(conjunctionParts))
 	if molad.Hours >= 6 {
 		hd = hd.Next()
 	}

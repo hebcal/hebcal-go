@@ -278,7 +278,7 @@ func getSedraArray(leap bool, rhDay time.Weekday, ytype yearType, il bool) []int
 type Sedra struct {
 	Year          int   // Hebrew year
 	IL            bool  // Israel flag (true for Israel schedule, false for Diaspora)
-	firstSaturday int   // R.D. date of the first Shabbat of the year
+	firstSaturday int64 // R.D. date of the first Shabbat of the year
 	theSedraArray []int // read-only array of parshiot read this year
 }
 
@@ -320,17 +320,19 @@ func New(year int, il bool) Sedra {
 }
 
 // Returns the Parsha that's read on the Saturday on or after R.D. date.
-func (sedra *Sedra) LookupByRD(rataDie int) Parsha {
+func (sedra *Sedra) LookupByRD(rataDie int64) Parsha {
 	sedraNumWeeks := len(sedra.theSedraArray)
 	if sedraNumWeeks == 0 {
 		panic("invalid Sedra state, did you forget sedra.New()?")
 	}
 	abs := hdate.DayOnOrBefore(time.Saturday, rataDie+6)
 	if abs < sedra.firstSaturday {
-		panic("lookup date " + strconv.Itoa(abs) + " is earlier than start of year " + strconv.Itoa(sedra.firstSaturday))
+		panic("lookup date " + strconv.FormatInt(abs, 10) +
+			" is earlier than start of year " +
+			strconv.FormatInt(sedra.firstSaturday, 10))
 	}
 	var idx int
-	weekNum := ((abs - sedra.firstSaturday) / 7)
+	weekNum := int((abs - sedra.firstSaturday) / 7)
 	if weekNum >= sedraNumWeeks {
 		indexLast := sedra.theSedraArray[sedraNumWeeks-1]
 		if indexLast < 0 {
@@ -370,7 +372,7 @@ func (sedra *Sedra) FindParshaNum(num int) (hdate.HDate, error) {
 	}
 	for idx, candidate := range sedra.theSedraArray {
 		if candidate == parshaNum {
-			return hdate.FromRD(sedra.firstSaturday + (idx * 7)), nil
+			return hdate.FromRD(sedra.firstSaturday + int64(idx*7)), nil
 		}
 	}
 	panic("not found parsha num " + strconv.Itoa(num))

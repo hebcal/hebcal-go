@@ -136,8 +136,8 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		currentYear  int  = -1
 		holidaysYear []event.HolidayEvent
 		sedraYear    sedra.Sedra
-		beginOmer    int
-		endOmer      int
+		beginOmer    int64
+		endOmer      int64
 		myIdx        mishnayomi.MishnaYomiIndex
 		userEvents   []event.HolidayEvent
 	)
@@ -206,7 +206,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		}
 		if !opts.WeeklyAbbreviated || dow == firstWeekday {
 			if opts.Omer && abs >= beginOmer && abs <= endOmer {
-				omerDay := abs - beginOmer + 1
+				omerDay := int(abs - beginOmer + 1)
 				events = append(events, omer.NewOmerEvent(hd, omerDay))
 			}
 			if opts.DafYomi && hyear >= 5684 {
@@ -253,7 +253,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 	return events, nil
 }
 
-func getStartAndEnd(opts *CalOptions) (int, int, error) {
+func getStartAndEnd(opts *CalOptions) (int64, int64, error) {
 	if (opts.Start != hdate.HDate{} && opts.End == hdate.HDate{}) ||
 		(opts.Start == hdate.HDate{} && opts.End != hdate.HDate{}) {
 		return 0, 0, errors.New("opts.Start requires opts.End")
@@ -300,7 +300,7 @@ func getStartAndEnd(opts *CalOptions) (int, int, error) {
 		}
 		startAbs := greg.ToRD(year, month, 1)
 		if opts.Month != 0 {
-			endAbs := startAbs + greg.DaysIn(opts.Month, year)
+			endAbs := startAbs + int64(greg.DaysIn(opts.Month, year))
 			return startAbs, endAbs - 1, nil
 		}
 		endAbs := greg.ToRD(year+numYears, time.January, 1)

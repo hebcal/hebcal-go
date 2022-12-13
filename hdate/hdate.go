@@ -120,13 +120,13 @@ type HDate struct {
 	year  int    // Hebrew year
 	month HMonth // Hebrew month (1-13)
 	day   int    // Hebrew day of month (1-30)
-	abs   int    // R.D. absolute date
+	abs   int64  // R.D. absolute date
 }
 
-const epoch = -1373428
+const epoch int64 = -1373428
 
 // Avg year length in the cycle (19 solar years with 235 lunar months)
-const avgHebrewYearDays = 365.24682220597794
+const avgHebrewYearDays float64 = 365.24682220597794
 
 // IsLeapYear returns true if Hebrew year is a leap year.
 func IsLeapYear(year int) bool {
@@ -147,7 +147,7 @@ func MonthsInYear(year int) int {
 //
 // The year can be 353, 354, 355, 383, 384 or 385 days long.
 func DaysInYear(year int) int {
-	return elapsedDays(year+1) - elapsedDays(year)
+	return int(elapsedDays(year+1) - elapsedDays(year))
 }
 
 // LongCheshvan returns true if Cheshvan is long (30 days) in Hebrew year.
@@ -175,9 +175,9 @@ func DaysInMonth(month HMonth, year int) int {
 	}
 }
 
-var edCache map[int]int = make(map[int]int)
+var edCache map[int]int64 = make(map[int]int64)
 
-func elapsedDays(year int) int {
+func elapsedDays(year int) int64 {
 	days, ok := edCache[year]
 	if ok {
 		return days
@@ -189,8 +189,8 @@ func elapsedDays(year int) int {
 
 // Days from sunday prior to start of Hebrew calendar to mean
 // conjunction of Tishrei in Hebrew YEAR
-func elapsedDays0(year int) int {
-	prevYear := year - 1
+func elapsedDays0(year int) int64 {
+	prevYear := int64(year) - 1
 	mElapsed := 235*(prevYear/19) + // Months in complete 19 year lunar (Metonic) cycles so far
 		12*(prevYear%19) + // Regular months in this cycle
 		(((prevYear%19)*7 + 1) / 19) // Leap months this cycle
@@ -210,7 +210,7 @@ func elapsedDays0(year int) int {
 
 	if (parts >= 19440) ||
 		(((day % 7) == 2) && (parts >= 9924) && !(IsLeapYear(year))) ||
-		(((day % 7) == 1) && (parts >= 16789) && IsLeapYear(prevYear)) {
+		(((day % 7) == 1) && (parts >= 16789) && IsLeapYear(int(prevYear))) {
 		altDay = day + 1
 	}
 
@@ -227,19 +227,19 @@ func elapsedDays0(year int) int {
 // Note also that R.D. = Julian Date − 1,721,424.5
 //
 // https://en.wikipedia.org/wiki/Rata_Die
-func HebrewToRD(year int, month HMonth, day int) int {
-	tempabs := day
+func HebrewToRD(year int, month HMonth, day int) int64 {
+	tempabs := int64(day)
 	if month < Tishrei {
 		monthsInYear := HMonth(MonthsInYear(year))
 		for m := Tishrei; m <= monthsInYear; m++ {
-			tempabs += DaysInMonth(m, year)
+			tempabs += int64(DaysInMonth(m, year))
 		}
 		for m := Nisan; m < month; m++ {
-			tempabs += DaysInMonth(m, year)
+			tempabs += int64(DaysInMonth(m, year))
 		}
 	} else {
 		for m := Tishrei; m < month; m++ {
-			tempabs += DaysInMonth(m, year)
+			tempabs += int64(DaysInMonth(m, year))
 		}
 	}
 	return epoch + elapsedDays(year) + tempabs - 1
@@ -270,16 +270,16 @@ func New(year int, month HMonth, day int) HDate {
 	return HDate{year: year, month: month, day: day}
 }
 
-func newYear(year int) int {
+func newYear(year int) int64 {
 	return epoch + elapsedDays(year)
 }
 
 // Converts absolute Rata Die days to Hebrew date.
 //
 // Panics if rataDie is before the Hebrew epoch.
-func FromRD(rataDie int) HDate {
+func FromRD(rataDie int64) HDate {
 	if rataDie <= epoch {
-		panic("invalid R.D. date " + strconv.Itoa(rataDie))
+		panic("invalid R.D. date " + strconv.FormatInt(rataDie, 10))
 	}
 	approx := float64(rataDie-epoch) / avgHebrewYearDays
 	year := int(approx)
@@ -297,7 +297,7 @@ func FromRD(rataDie int) HDate {
 		month++
 	}
 	day := 1 + rataDie - HebrewToRD(year, month, 1)
-	return HDate{year: year, month: month, day: day, abs: rataDie}
+	return HDate{year: year, month: month, day: int(day), abs: rataDie}
 }
 
 // Creates an HDate from Gregorian year, month and day.
@@ -316,7 +316,7 @@ func FromTime(t time.Time) HDate {
 // Converts Hebrew date to R.D. (Rata Die) fixed days.
 //
 // R.D. 1 is the imaginary date Monday, January 1, 1 on the Gregorian Calendar.
-func (hd *HDate) Abs() int {
+func (hd *HDate) Abs() int64 {
 	if hd.abs == 0 {
 		hd.abs = HebrewToRD(hd.Year(), hd.Month(), hd.Day())
 	}
@@ -356,8 +356,10 @@ func (hd HDate) Gregorian() time.Time {
 	return time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 }
 
-func mod(x, y int) int {
-	return x - y*int(math.Floor(float64(x)/float64(y)))
+func mod(x, y int64) int64 {
+	X := float64(x)
+	Y := float64(y)
+	return int64(X - Y*math.Floor(X/Y))
 }
 
 // Weekday returns the day of the week specified by hd.
@@ -522,11 +524,11 @@ func MonthFromName(monthName string) (HMonth, error) {
 // Similarly, applying it to d+3 gives the dayOfWeek nearest to
 // rataDie, applying it to d-1 gives the dayOfWeek previous to
 // rataDie, and applying it to d+7 gives the dayOfWeek following rataDie.
-func DayOnOrBefore(dayOfWeek time.Weekday, rataDie int) int {
-	return rataDie - ((rataDie - int(dayOfWeek)) % 7)
+func DayOnOrBefore(dayOfWeek time.Weekday, rataDie int64) int64 {
+	return rataDie - ((rataDie - int64(dayOfWeek)) % 7)
 }
 
-func onOrBefore(dayOfWeek time.Weekday, rataDie int) HDate {
+func onOrBefore(dayOfWeek time.Weekday, rataDie int64) HDate {
 	return FromRD(DayOnOrBefore(dayOfWeek, rataDie))
 }
 

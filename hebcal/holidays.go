@@ -233,7 +233,7 @@ func tzomGedaliahDate(rh hdate.HDate) hdate.HDate {
 }
 
 func taanitEstherDate(pesach hdate.HDate) hdate.HDate {
-	offset := 31
+	var offset int64 = 31
 	if pesach.Weekday() == time.Tuesday {
 		offset = 33
 	}
@@ -595,7 +595,7 @@ func getAllHolidaysForYear(year int) []event.HolidayEvent {
 //
 // Due to drift, this will eventually slip into Iyyar
 //   - 2 Iyyar 7141 (Gregorian year 3381)
-func getBirkatHaChama(year int) int {
+func getBirkatHaChama(year int) int64 {
 	startMonth := hdate.Nisan
 	startDay := 1
 	if hdate.IsLeapYear(year) {
@@ -604,7 +604,7 @@ func getBirkatHaChama(year int) int {
 	}
 	baseRD := hdate.HebrewToRD(year, startMonth, startDay)
 	for day := 0; day <= 40; day++ {
-		rataDie := baseRD + day
+		rataDie := baseRD + int64(day)
 		elapsed := rataDie + 1373429
 		if elapsed%10227 == 172 {
 			return rataDie

@@ -114,7 +114,8 @@ func TestTodayIsHe(t *testing.T) {
 	start := hdate.New(5782, hdate.Nisan, 16)
 	startAbs := start.Abs()
 	for i := 1; i <= 49; i++ {
-		ev := omer.NewOmerEvent(hdate.FromRD(startAbs+i-1), i)
+		abs := startAbs + int64(i) - 1
+		ev := omer.NewOmerEvent(hdate.FromRD(abs), i)
 		actual[i] = ev.TodayIs("he")
 	}
 	assert.Equal(t, expected, actual)
@@ -135,7 +136,8 @@ func TestEmoji(t *testing.T) {
 	start := hdate.New(5782, hdate.Nisan, 16)
 	startAbs := start.Abs()
 	for i := 1; i <= 49; i++ {
-		ev := omer.NewOmerEvent(hdate.FromRD(startAbs+i-1), i)
+		abs := startAbs + int64(i) - 1
+		ev := omer.NewOmerEvent(hdate.FromRD(abs), i)
 		actual[i] = ev.GetEmoji()
 	}
 	assert.Equal(t, expected, actual)

@@ -21,7 +21,6 @@ package greg
 
 import (
 	"math"
-	"strconv"
 	"time"
 )
 
@@ -43,7 +42,7 @@ func IsLeapYear(year int) bool {
 
 // Converts Gregorian date to absolute R.D. (Rata Die) days.
 // Hours, minutes and seconds are ignored
-func DateToRD(t time.Time) int {
+func DateToRD(t time.Time) int64 {
 	year, month, day := t.Date()
 	abs := ToRD(year, month, day)
 	return abs
@@ -62,41 +61,7 @@ func monthOffset(year int, month time.Month) int {
 // Converts Gregorian date to absolute R.D. (Rata Die) days.
 //
 // Panics if Gregorian year is 0.
-func ToRD(year int, month time.Month, day int) int {
-	if year == 0 {
-		panic("invalid Gregorian year " + strconv.Itoa(year))
-	}
-	dayOfYear := ((367*int(month) - 362) / 12) + monthOffset(year, month) + day
-	var prevYear int
-	if year >= 1 {
-		prevYear = year - 1
-	} else {
-		prevYear = year + 1
-		var yearLen int
-		if IsLeapYear(year) {
-			yearLen = 366
-		} else {
-			yearLen = 365
-		}
-		dayOfYear = -1 * (yearLen - dayOfYear)
-	}
-	rataDie := 365*prevYear + /* + days in prior years */
-		(prevYear / 4) - /* + Julian Leap years */
-		(prevYear / 100) + /* - century years */
-		(prevYear / 400) + /* + Gregorian leap years */
-		dayOfYear /* days this year */
-	return rataDie
-}
-
-func mod(x, y int64) int64 {
-	return x - y*int64(math.Floor(float64(x)/float64(y)))
-}
-
-func quotient(x, y int64) int64 {
-	return int64(math.Floor(float64(x) / float64(y)))
-}
-
-func toFixed(year int, month time.Month, day int) int {
+func ToRD(year int, month time.Month, day int) int64 {
 	py := int64(year - 1)
 	abs := 365*py +
 		quotient(py, 4) -
@@ -104,10 +69,20 @@ func toFixed(year int, month time.Month, day int) int {
 		quotient(py, 400) +
 		quotient((367*int64(month)-362), 12) +
 		int64(monthOffset(year, month)) + int64(day)
-	return int(abs)
+	return abs
 }
 
-func yearFromFixed(rataDie int) int {
+func mod(x, y int64) int64 {
+	X := float64(x)
+	Y := float64(y)
+	return int64(X - Y*math.Floor(X/Y))
+}
+
+func quotient(x, y int64) int64 {
+	return int64(math.Floor(float64(x) / float64(y)))
+}
+
+func yearFromFixed(rataDie int64) int {
 	l0 := int64(rataDie) - 1
 	n400 := quotient(l0, 146097)
 	d1 := mod(l0, 146097)
@@ -124,23 +99,6 @@ func yearFromFixed(rataDie int) int {
 	return yy + 1
 }
 
-func negativeFromRD(rataDie int) (int, time.Month, int) {
-	year := yearFromFixed(rataDie)
-	mar1 := toFixed(year, time.March, 1)
-	var correction int
-	if mar1 <= rataDie {
-		correction = 0
-	} else if IsLeapYear(year) {
-		correction = 1
-	} else {
-		correction = 2
-	}
-	priorDays := rataDie - toFixed(year, time.January, 1)
-	month := quotient(12*int64(priorDays+correction)+373, 367)
-	day := rataDie - toFixed(year, time.Month(month), 1) + 1
-	return year, time.Month(month), day
-}
-
 /*
 Converts from Rata Die (R.D. number) to Gregorian date.
 
@@ -149,28 +107,18 @@ Three Historical Calendars” by E. M. Reingold,  N. Dershowitz, and S. M.
 Clamen, Software--Practice and Experience, Volume 23, Number 4
 (April, 1993), pages 383-404 for an explanation.
 */
-func FromRD(rataDie int) (int, time.Month, int) {
-	if rataDie < 1 {
-		return negativeFromRD(rataDie)
+func FromRD(rataDie int64) (int, time.Month, int) {
+	year := yearFromFixed(rataDie)
+	var correction int64
+	if rataDie < ToRD(year, time.March, 1) {
+		correction = 0
+	} else if IsLeapYear(year) {
+		correction = 1
+	} else {
+		correction = 2
 	}
-	d0 := rataDie - 1
-	n400 := d0 / 146097
-	d1 := d0 % 146097
-	n100 := d1 / 36524
-	d2 := d1 % 36524
-	n4 := d2 / 1461
-	d3 := d2 % 1461
-	n1 := d3 / 365
-	year := 400*n400 + 100*n100 + 4*n4 + n1
-	if n100 == 4 || n1 == 4 {
-		return year, time.December, 31
-	}
-	year++
-	var day = (d3 % 365) + 1
-	var month = time.January
-	for numDays := DaysIn(month, year); numDays < day; numDays = DaysIn(month, year) {
-		day -= numDays
-		month++
-	}
-	return year, month, day
+	priorDays := rataDie - ToRD(year, time.January, 1)
+	month := quotient(12*(priorDays+correction)+373, 367)
+	day := rataDie - ToRD(year, time.Month(month), 1) + 1
+	return year, time.Month(month), int(day)
 }

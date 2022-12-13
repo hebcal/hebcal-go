@@ -92,11 +92,11 @@ func New(hd hdate.HDate) (Daf, error) {
 
 	var cno, dno int
 	if cday >= nsday { // "new" cycle
-		cno = 8 + ((cday - nsday) / 2711)
-		dno = (cday - nsday) % 2711
+		cno = 8 + int((cday-nsday)/2711)
+		dno = int((cday - nsday) % 2711)
 	} else { // old cycle
-		cno = 1 + ((cday - osday) / 2702)
-		dno = (cday - osday) % 2702
+		cno = 1 + int((cday-osday)/2702)
+		dno = int((cday - osday) % 2702)
 	}
 
 	// Find the daf taking note that the cycle changed slightly after cycle 7.

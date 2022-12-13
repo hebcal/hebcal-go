@@ -156,11 +156,11 @@ func New(hd hdate.HDate, edition Edition) dafyomi.Daf {
 
 	for cday >= nextCycle {
 		prevCycle = nextCycle
-		nextCycle += numDapim
-		nextCycle += numSpecialDays(edition, prevCycle, nextCycle)
+		nextCycle += int64(numDapim)
+		nextCycle += int64(numSpecialDays(edition, prevCycle, nextCycle))
 	}
 
-	total := cday - prevCycle - numSpecialDays(edition, prevCycle, cday)
+	total := int(cday - prevCycle - int64(numSpecialDays(edition, prevCycle, cday)))
 
 	for j := 0; j < len(shas); j++ {
 		masechet := shas[j]
@@ -194,7 +194,7 @@ func skipDay(hd hdate.HDate) bool {
 
 // Calculates the number of YK and 9Av that occur during between
 // startAbs and endAbs.
-func numSpecialDays(edition Edition, startAbs, endAbs int) int {
+func numSpecialDays(edition Edition, startAbs, endAbs int64) int {
 	if edition == Schottenstein {
 		return 0
 	}
