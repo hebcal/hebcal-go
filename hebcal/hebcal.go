@@ -147,7 +147,7 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 		if hyear != currentYear {
 			currentYear = hyear
 			holidaysYear = GetHolidaysForYear(hyear, il)
-			if (opts.Sedrot || opts.DailySedra) && currentYear >= 3762 {
+			if opts.Sedrot || opts.DailySedra {
 				sedraYear = sedra.New(hyear, il)
 			}
 			if opts.Omer {
@@ -185,7 +185,7 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 		if opts.SunriseSunset && (!opts.WeeklyAbbreviated || dow == firstWeekday) {
 			events = append(events, riseSetEvent{date: hd, opts: opts})
 		}
-		if (opts.DailySedra || (opts.Sedrot && dow == time.Saturday)) && hyear >= 3762 {
+		if opts.DailySedra || (opts.Sedrot && dow == time.Saturday) {
 			parsha := sedraYear.LookupByRD(abs)
 			if !parsha.Chag {
 				events = append(events, parshaEvent{Date: hd, Parsha: parsha, IL: il})
@@ -280,7 +280,10 @@ func getStartAndEnd(opts *CalOptions) (int, int, error) {
 		// for full Hebrew year, start on Erev Rosh Hashana which
 		// is technically in the previous Hebrew year
 		// (but conveniently lets us get candle-lighting time for Erev)
-		startAbs := startDate.Abs() - 1
+		startAbs := startDate.Abs()
+		if year > 1 {
+			startAbs--
+		}
 		endDate := hdate.New(year+numYears, hdate.Tishrei, 1)
 		endAbs := endDate.Abs() - 1
 		return startAbs, endAbs, nil

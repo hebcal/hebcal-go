@@ -520,3 +520,24 @@ func TestHebrewCalendarSchottenstein(t *testing.T) {
 	}
 	assert.Equal(t, expected, actual)
 }
+
+func TestYear2(t *testing.T) {
+	opts := CalOptions{
+		Year:         2,
+		IsHebrewYear: true,
+		Sedrot:       true,
+	}
+	events, err := HebrewCalendar(&opts)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 126, len(events))
+}
+
+func TestYear1(t *testing.T) {
+	opts := CalOptions{
+		Year:         1,
+		IsHebrewYear: true,
+	}
+	events, err := HebrewCalendar(&opts)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 78, len(events))
+}
