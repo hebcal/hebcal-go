@@ -3,7 +3,7 @@ package event
 import (
 	"regexp"
 
-	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/locales"
 )
 

@@ -5,7 +5,7 @@
 // com.kosherjava.zmanim.hebrewcalendar.JewishDate
 package molad
 
-import "github.com/hebcal/hebcal-go/hdate"
+import "github.com/hebcal/hdate"
 
 type Molad struct {
 	Date     hdate.HDate

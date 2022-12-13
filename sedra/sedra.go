@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hdate"
 )
 
 type yearType int

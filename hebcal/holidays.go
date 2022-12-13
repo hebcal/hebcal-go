@@ -22,8 +22,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/sedra"
 )
 
@@ -602,7 +602,7 @@ func getBirkatHaChama(year int) int64 {
 		startMonth = hdate.Adar2
 		startDay = 20
 	}
-	baseRD := hdate.HebrewToRD(year, startMonth, startDay)
+	baseRD := hdate.ToRD(year, startMonth, startDay)
 	for day := 0; day <= 40; day++ {
 		rataDie := baseRD + int64(day)
 		elapsed := rataDie + 1373429

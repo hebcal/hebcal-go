@@ -24,8 +24,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hebcal/hebcal-go/greg"
-	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/greg"
+	"github.com/hebcal/hdate"
 )
 
 // Daf represents a page of Talmud, such as Pesachim 103

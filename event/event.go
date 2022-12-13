@@ -1,7 +1,7 @@
 // Hebcal's event package provides an interface for calendar events.
 package event
 
-import "github.com/hebcal/hebcal-go/hdate"
+import "github.com/hebcal/hdate"
 
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin

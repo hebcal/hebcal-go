@@ -5,7 +5,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/hebcal/gematriya"
-	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/locales"
 )
 

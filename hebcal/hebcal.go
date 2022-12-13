@@ -22,10 +22,10 @@ import (
 	"math"
 	"time"
 
+	"github.com/hebcal/greg"
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/dafyomi"
 	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/greg"
-	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/mishnayomi"
 	"github.com/hebcal/hebcal-go/molad"
 	"github.com/hebcal/hebcal-go/omer"
@@ -154,8 +154,8 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 				sedraYear = sedra.New(hyear, il)
 			}
 			if opts.Omer {
-				beginOmer = hdate.HebrewToRD(hyear, hdate.Nisan, 16)
-				endOmer = hdate.HebrewToRD(hyear, hdate.Sivan, 5)
+				beginOmer = hdate.ToRD(hyear, hdate.Nisan, 16)
+				endOmer = hdate.ToRD(hyear, hdate.Sivan, 5)
 			}
 			numUserEvents := len(opts.Yahrzeits) + len(opts.UserEvents)
 			if numUserEvents != 0 {

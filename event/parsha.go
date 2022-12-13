@@ -3,7 +3,7 @@ package event
 import (
 	"strings"
 
-	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/sedra"
 )

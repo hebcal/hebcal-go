@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/stretchr/testify/assert"
 )

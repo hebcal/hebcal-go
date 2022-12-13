@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/hebcal/gematriya"
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/dafyomi"
-	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/locales"
 )
 

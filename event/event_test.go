@@ -3,8 +3,8 @@ package event_test
 import (
 	"testing"
 
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/sedra"
 	"github.com/stretchr/testify/assert"
 )

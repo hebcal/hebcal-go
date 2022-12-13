@@ -7,7 +7,7 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hdate"
 )
 
 // Hebcal - A Jewish Calendar Generator

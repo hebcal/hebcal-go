@@ -7,9 +7,9 @@ package yerushalmi
 import (
 	"time"
 
+	"github.com/hebcal/greg"
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/dafyomi"
-	"github.com/hebcal/hebcal-go/greg"
-	"github.com/hebcal/hebcal-go/hdate"
 )
 
 // Using the Vilna edition, the Yerushalmi Daf Yomi program takes

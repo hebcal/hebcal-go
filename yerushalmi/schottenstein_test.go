@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hdate"
 	"github.com/stretchr/testify/assert"
 )
 
