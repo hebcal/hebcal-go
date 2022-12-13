@@ -1,19 +1,17 @@
-package hebcal
+package hebcal_test
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetAllHolidaysForYear(t *testing.T) {
-	assert.Equal(t, 125, len(getAllHolidaysForYear(5783)))
-}
-
 func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
-	events := GetHolidaysForYear(5771, false)
+	events := hebcal.GetHolidaysForYear(5771, false)
 	assert.Equal(t, 109, len(events))
 
 	expected := []string{
@@ -138,7 +136,7 @@ func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 }
 
 func TestGetHolidaysForYearArrayIL(t *testing.T) {
-	events := GetHolidaysForYear(5720, true)
+	events := hebcal.GetHolidaysForYear(5720, true)
 	assert.Equal(t, 98, len(events))
 
 	expected := []string{
@@ -252,10 +250,10 @@ func TestGetHolidaysForYearArrayIL(t *testing.T) {
 }
 
 func TestModernILHolidays(t *testing.T) {
-	events0Israel := GetHolidaysForYear(5783, true)
-	eventsIsrael := make([]HolidayEvent, 0, 12)
+	events0Israel := hebcal.GetHolidaysForYear(5783, true)
+	eventsIsrael := make([]event.HolidayEvent, 0, 12)
 	for _, ev := range events0Israel {
-		if (ev.Flags & MODERN_HOLIDAY) != 0 {
+		if (ev.Flags & event.MODERN_HOLIDAY) != 0 {
 			eventsIsrael = append(eventsIsrael, ev)
 		}
 	}
@@ -281,10 +279,10 @@ func TestModernILHolidays(t *testing.T) {
 	}
 	assert.Equal(t, expectedIsrael, actualIsrael)
 
-	events0Diaspora := GetHolidaysForYear(5783, false)
-	eventsDiaspora := make([]HolidayEvent, 0, 12)
+	events0Diaspora := hebcal.GetHolidaysForYear(5783, false)
+	eventsDiaspora := make([]event.HolidayEvent, 0, 12)
 	for _, ev := range events0Diaspora {
-		if (ev.Flags & MODERN_HOLIDAY) != 0 {
+		if (ev.Flags & event.MODERN_HOLIDAY) != 0 {
 			eventsDiaspora = append(eventsDiaspora, ev)
 		}
 	}
@@ -306,8 +304,8 @@ func TestModernILHolidays(t *testing.T) {
 }
 
 func TestModernFriSatMovetoThu(t *testing.T) {
-	events := GetHolidaysForYear(5781, true)
-	var rabinDay HolidayEvent
+	events := hebcal.GetHolidaysForYear(5781, true)
+	var rabinDay event.HolidayEvent
 	for _, ev := range events {
 		if ev.Desc == "Yitzhak Rabin Memorial Day" {
 			rabinDay = ev
@@ -319,7 +317,7 @@ func TestModernFriSatMovetoThu(t *testing.T) {
 func TestBirkatHachamah(t *testing.T) {
 	actual := make([]int, 0, 10)
 	for year := 5650; year < 5920; year++ {
-		events := GetHolidaysForYear(year, false)
+		events := hebcal.GetHolidaysForYear(year, false)
 		for _, ev := range events {
 			if ev.Desc == "Birkat Hachamah" {
 				actual = append(actual, year)
@@ -329,7 +327,7 @@ func TestBirkatHachamah(t *testing.T) {
 	expected := []int{5657, 5685, 5713, 5741, 5769, 5797, 5825, 5853, 5881, 5909}
 	assert.Equal(t, expected, actual)
 
-	events := GetHolidaysForYear(5965, false)
+	events := hebcal.GetHolidaysForYear(5965, false)
 	var hd hdate.HDate
 	for _, ev := range events {
 		if ev.Desc == "Birkat Hachamah" {
@@ -339,7 +337,7 @@ func TestBirkatHachamah(t *testing.T) {
 	assert.Equal(t, "19 Nisan 5965", hd.String())
 
 	hd = hdate.HDate{}
-	events = GetHolidaysForYear(5993, false)
+	events = hebcal.GetHolidaysForYear(5993, false)
 	for _, ev := range events {
 		if ev.Desc == "Birkat Hachamah" {
 			hd = ev.Date
@@ -350,7 +348,7 @@ func TestBirkatHachamah(t *testing.T) {
 
 func TestPurimMeshulash(t *testing.T) {
 	actual := make([]string, 0, 10)
-	events := GetHolidaysForYear(5781, true)
+	events := hebcal.GetHolidaysForYear(5781, true)
 	for _, ev := range events {
 		if ev.Date.Month() == hdate.Adar1 && ev.Date.Day() >= 13 && ev.Date.Day() <= 17 {
 			line := fmt.Sprintf("%s / %s / %s", hd2iso(ev.Date), ev.Date.String(), ev.Desc)
@@ -432,7 +430,7 @@ func TestHolidayEmoji(t *testing.T) {
 		"Yom Kippur Katan Kislev":         "",
 		"Shabbat Mevarchim Chodesh Iyyar": "",
 	}
-	events := GetHolidaysForYear(5765, false)
+	events := hebcal.GetHolidaysForYear(5765, false)
 	for _, ev := range events {
 		actual := ev.GetEmoji()
 		expected, ok := expectedEmoji[ev.Desc]
@@ -448,16 +446,16 @@ func TestHolidayEmoji(t *testing.T) {
 }
 
 func TestHolidaysEarlyYears(t *testing.T) {
-	events := GetHolidaysForYear(3763, false)
+	events := hebcal.GetHolidaysForYear(3763, false)
 	assert.Equal(t, 97, len(events))
-	events = GetHolidaysForYear(3762, false)
+	events = hebcal.GetHolidaysForYear(3762, false)
 	assert.Equal(t, 103, len(events))
-	events = GetHolidaysForYear(3761, false)
+	events = hebcal.GetHolidaysForYear(3761, false)
 	assert.Equal(t, 98, len(events))
-	events = GetHolidaysForYear(3760, false)
+	events = hebcal.GetHolidaysForYear(3760, false)
 	assert.Equal(t, 104, len(events))
-	events = GetHolidaysForYear(2, false)
+	events = hebcal.GetHolidaysForYear(2, false)
 	assert.Equal(t, 98, len(events))
-	events = GetHolidaysForYear(1, false)
+	events = hebcal.GetHolidaysForYear(1, false)
 	assert.Equal(t, 98, len(events))
 }

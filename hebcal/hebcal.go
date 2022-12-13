@@ -23,9 +23,11 @@ import (
 	"time"
 
 	"github.com/hebcal/hebcal-go/dafyomi"
+	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/greg"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/mishnayomi"
+	"github.com/hebcal/hebcal-go/omer"
 	"github.com/hebcal/hebcal-go/sedra"
 	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
@@ -34,7 +36,7 @@ import (
 /*
 Calculates holidays and other Hebrew calendar events based on CalOptions.
 
-Each holiday is represented by CalEvent object which includes a date,
+Each holiday is represented by event.CalEvent object which includes a date,
 a description, flags and optional attributes.
 If given no options, returns holidays for the Diaspora for the current Gregorian year.
 
@@ -103,7 +105,7 @@ Two options also exist for generating an Event with the Hebrew date:
   - opts.AddHebrewDates - print the Hebrew date for the entire date range
   - opts.AddHebrewDatesForEvents - print the Hebrew date for dates with some events
 */
-func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
+func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 	err := checkCandleOptions(opts)
 	if err != nil {
 		return nil, err
@@ -132,15 +134,15 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 	var (
 		il           bool = opts.IL
 		currentYear  int  = -1
-		holidaysYear []HolidayEvent
+		holidaysYear []event.HolidayEvent
 		sedraYear    sedra.Sedra
 		beginOmer    int
 		endOmer      int
 		myIdx        mishnayomi.MishnaYomiIndex
-		userEvents   []HolidayEvent
+		userEvents   []event.HolidayEvent
 	)
 	firstWeekday := time.Weekday(startAbs % 7)
-	events := make([]CalEvent, 0, 20)
+	events := make([]event.CalEvent, 0, 20)
 	for abs := startAbs; abs <= endAbs; abs++ {
 		hd := hdate.FromRD(abs)
 		hyear := hd.Year()
@@ -156,25 +158,25 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 			}
 			numUserEvents := len(opts.Yahrzeits) + len(opts.UserEvents)
 			if numUserEvents != 0 {
-				userEvents = make([]HolidayEvent, 0, numUserEvents)
+				userEvents = make([]event.HolidayEvent, 0, numUserEvents)
 				for _, yahrzeit := range opts.Yahrzeits {
 					origDate := hdate.FromTime(yahrzeit.Date)
 					observedDate, err := hdate.GetYahrzeit(currentYear, origDate)
 					if err == nil {
-						userEvents = append(userEvents, HolidayEvent{
+						userEvents = append(userEvents, event.HolidayEvent{
 							Date:  observedDate,
 							Desc:  yahrzeit.Name,
-							Flags: USER_EVENT,
+							Flags: event.USER_EVENT,
 						})
 					}
 				}
-				for _, event := range opts.UserEvents {
+				for _, userEv := range opts.UserEvents {
 					// Watch for ShortKislev and LongCheshvan
-					if event.Day <= hdate.DaysInMonth(event.Month, hyear) {
-						userEvents = append(userEvents, HolidayEvent{
-							Date:  hdate.New(hyear, event.Month, event.Day),
-							Desc:  event.Desc,
-							Flags: USER_EVENT,
+					if userEv.Day <= hdate.DaysInMonth(userEv.Month, hyear) {
+						userEvents = append(userEvents, event.HolidayEvent{
+							Date:  hdate.New(hyear, userEv.Month, userEv.Day),
+							Desc:  userEv.Desc,
+							Flags: event.USER_EVENT,
 						})
 					}
 				}
@@ -188,7 +190,7 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 		if opts.DailySedra || (opts.Sedrot && dow == time.Saturday) {
 			parsha := sedraYear.LookupByRD(abs)
 			if !parsha.Chag {
-				events = append(events, parshaEvent{Date: hd, Parsha: parsha, IL: il})
+				events = append(events, event.NewParshaEvent(hd, parsha, il))
 			}
 		}
 		var candlesEv TimedEvent
@@ -205,17 +207,17 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 		if !opts.WeeklyAbbreviated || dow == firstWeekday {
 			if opts.Omer && abs >= beginOmer && abs <= endOmer {
 				omerDay := abs - beginOmer + 1
-				events = append(events, NewOmerEvent(hd, omerDay))
+				events = append(events, omer.NewOmerEvent(hd, omerDay))
 			}
 			if opts.DafYomi && hyear >= 5684 {
 				daf, _ := dafyomi.New(hd)
-				events = append(events, dafYomiEvent{Date: hd, Daf: daf})
+				events = append(events, event.NewDafYomiEvent(hd, daf))
 			}
 			if opts.YerushalmiYomi && abs >= beginYerushalmi {
 				daf := yerushalmi.New(hd, opts.YerushalmiEdition)
 				// daf.Blatt will be 0 to signal no Yerushalmi Yomi on YK and 9Av
 				if daf.Blatt != 0 {
-					events = append(events, yyomiEvent{Date: hd, Daf: daf})
+					events = append(events, event.NewYerushalmiYomiEvent(hd, daf))
 				}
 			}
 			if opts.MishnaYomi && abs >= mishnayomi.MishnaYomiStart {
@@ -223,7 +225,7 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 					myIdx = mishnayomi.MakeIndex()
 				}
 				mishna, _ := myIdx.Lookup(hd)
-				events = append(events, mishnaYomiEvent{Date: hd, Mishna: mishna})
+				events = append(events, event.NewMishnaYomiEvent(hd, mishna))
 			}
 			if opts.DailyZmanim {
 				zmanEvents := dailyZemanim(hd, opts)
@@ -239,13 +241,13 @@ func HebrewCalendar(opts *CalOptions) ([]CalEvent, error) {
 		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
 			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 			molad := hdate.NewMolad(hd.Year(), nextMonth)
-			events = append(events, moladEvent{Date: hd, Molad: molad, MonthName: nextMonthName})
+			events = append(events, event.NewMoladEvent(hd, molad, nextMonthName))
 		}
 		if (opts.AddHebrewDates && (!opts.WeeklyAbbreviated || dow == firstWeekday)) ||
 			((opts.AddHebrewDates || opts.AddHebrewDatesForEvents) && prevEventsLength != len(events)) {
 			events = append(events, nil)
 			copy(events[prevEventsLength+1:], events[prevEventsLength:])
-			events[prevEventsLength] = hebrewDateEvent{Date: hd}
+			events[prevEventsLength] = event.NewHebrewDateEvent(hd)
 		}
 	}
 	return events, nil
@@ -361,112 +363,112 @@ func checkCandleOptions(opts *CalOptions) error {
 	return nil
 }
 
-const maskLightCandles = LIGHT_CANDLES |
-	LIGHT_CANDLES_TZEIS |
-	CHANUKAH_CANDLES |
-	YOM_TOV_ENDS
+const maskLightCandles = event.LIGHT_CANDLES |
+	event.LIGHT_CANDLES_TZEIS |
+	event.CHANUKAH_CANDLES |
+	event.YOM_TOV_ENDS
 
-func getMaskFromOptions(opts *CalOptions) HolidayFlags {
+func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 	if opts.Mask != 0 {
 		m := opts.Mask
-		if (m & ROSH_CHODESH) != 0 {
+		if (m & event.ROSH_CHODESH) != 0 {
 			opts.NoRoshChodesh = false
 		}
-		if (m & MODERN_HOLIDAY) != 0 {
+		if (m & event.MODERN_HOLIDAY) != 0 {
 			opts.NoModern = false
 		}
-		if (m & MINOR_FAST) != 0 {
+		if (m & event.MINOR_FAST) != 0 {
 			opts.NoMinorFast = false
 		}
-		if (m & SPECIAL_SHABBAT) != 0 {
+		if (m & event.SPECIAL_SHABBAT) != 0 {
 			opts.NoSpecialShabbat = false
 		}
-		if (m & PARSHA_HASHAVUA) != 0 {
+		if (m & event.PARSHA_HASHAVUA) != 0 {
 			opts.Sedrot = true
 		}
-		if (m & DAF_YOMI) != 0 {
+		if (m & event.DAF_YOMI) != 0 {
 			opts.DafYomi = true
 		}
-		if (m & OMER_COUNT) != 0 {
+		if (m & event.OMER_COUNT) != 0 {
 			opts.Omer = true
 		}
-		if (m & SHABBAT_MEVARCHIM) != 0 {
+		if (m & event.SHABBAT_MEVARCHIM) != 0 {
 			opts.ShabbatMevarchim = true
 		}
-		if (m & MISHNA_YOMI) != 0 {
+		if (m & event.MISHNA_YOMI) != 0 {
 			opts.MishnaYomi = true
 		}
-		if (m & YOM_KIPPUR_KATAN) != 0 {
+		if (m & event.YOM_KIPPUR_KATAN) != 0 {
 			opts.YomKippurKatan = true
 		}
-		if (m & YERUSHALMI_YOMI) != 0 {
+		if (m & event.YERUSHALMI_YOMI) != 0 {
 			opts.YerushalmiYomi = true
 		}
 		return m
 	}
-	var mask HolidayFlags
+	var mask event.HolidayFlags
 	// default opts
 	if !opts.NoHolidays {
-		mask |= ROSH_CHODESH | YOM_TOV_ENDS | MINOR_FAST |
-			SPECIAL_SHABBAT | MODERN_HOLIDAY | MAJOR_FAST |
-			MINOR_HOLIDAY | EREV | CHOL_HAMOED |
-			LIGHT_CANDLES | LIGHT_CANDLES_TZEIS | CHANUKAH_CANDLES
+		mask |= event.ROSH_CHODESH | event.YOM_TOV_ENDS | event.MINOR_FAST |
+			event.SPECIAL_SHABBAT | event.MODERN_HOLIDAY | event.MAJOR_FAST |
+			event.MINOR_HOLIDAY | event.EREV | event.CHOL_HAMOED |
+			event.LIGHT_CANDLES | event.LIGHT_CANDLES_TZEIS | event.CHANUKAH_CANDLES
 	}
 	if opts.CandleLighting {
-		mask |= LIGHT_CANDLES | LIGHT_CANDLES_TZEIS | YOM_TOV_ENDS
+		mask |= event.LIGHT_CANDLES | event.LIGHT_CANDLES_TZEIS | event.YOM_TOV_ENDS
 	}
 	// suppression of defaults
 	if opts.NoRoshChodesh {
-		mask &= ^ROSH_CHODESH
+		mask &= ^event.ROSH_CHODESH
 	}
 	if opts.NoModern {
-		mask &= ^MODERN_HOLIDAY
+		mask &= ^event.MODERN_HOLIDAY
 	}
 	if opts.NoMinorFast {
-		mask &= ^MINOR_FAST
+		mask &= ^event.MINOR_FAST
 	}
 	if opts.NoSpecialShabbat {
-		mask &= ^SPECIAL_SHABBAT
-		mask &= ^SHABBAT_MEVARCHIM
+		mask &= ^event.SPECIAL_SHABBAT
+		mask &= ^event.SHABBAT_MEVARCHIM
 	}
 	if opts.IL {
-		mask |= IL_ONLY
+		mask |= event.IL_ONLY
 	} else {
-		mask |= CHUL_ONLY
+		mask |= event.CHUL_ONLY
 	}
 	// non-default opts
 	if opts.Sedrot {
-		mask |= PARSHA_HASHAVUA
+		mask |= event.PARSHA_HASHAVUA
 	}
 	if opts.DafYomi {
-		mask |= DAF_YOMI
+		mask |= event.DAF_YOMI
 	}
 	if opts.MishnaYomi {
-		mask |= MISHNA_YOMI
+		mask |= event.MISHNA_YOMI
 	}
 	if opts.YerushalmiYomi {
-		mask |= YERUSHALMI_YOMI
+		mask |= event.YERUSHALMI_YOMI
 	}
 	if opts.Omer {
-		mask |= OMER_COUNT
+		mask |= event.OMER_COUNT
 	}
 	if opts.ShabbatMevarchim {
-		mask |= SHABBAT_MEVARCHIM
+		mask |= event.SHABBAT_MEVARCHIM
 	}
 	if opts.YomKippurKatan {
-		mask |= YOM_KIPPUR_KATAN
+		mask |= event.YOM_KIPPUR_KATAN
 	}
 	return mask
 }
 
-func appendHolidayAndRelated(events []CalEvent, candlesEv TimedEvent, ev CalEvent, opts *CalOptions) ([]CalEvent, TimedEvent) {
+func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev event.CalEvent, opts *CalOptions) ([]event.CalEvent, TimedEvent) {
 	mask := ev.GetFlags()
-	if (!opts.YomKippurKatan && (mask&YOM_KIPPUR_KATAN) != 0) ||
-		(opts.NoModern && (mask&MODERN_HOLIDAY) != 0) {
+	if (!opts.YomKippurKatan && (mask&event.YOM_KIPPUR_KATAN) != 0) ||
+		(opts.NoModern && (mask&event.MODERN_HOLIDAY) != 0) {
 		return events, candlesEv // bail out early
 	}
-	isMajorFast := (mask & MAJOR_FAST) != 0
-	isMinorFast := (mask & MINOR_FAST) != 0
+	isMajorFast := (mask & event.MAJOR_FAST) != 0
+	isMinorFast := (mask & event.MINOR_FAST) != 0
 	var startEvent, endEvent TimedEvent
 	if opts.CandleLighting && (isMajorFast || isMinorFast) && ev.Render("en") != "Yom Kippur" {
 		startEvent, endEvent = makeFastStartEnd(ev, opts)
@@ -476,10 +478,10 @@ func appendHolidayAndRelated(events []CalEvent, candlesEv TimedEvent, ev CalEven
 	}
 	if (mask & opts.Mask) != 0 {
 		if opts.CandleLighting && (mask&maskLightCandles) != 0 {
-			if (mask&CHANUKAH_CANDLES) != 0 && !opts.NoHolidays {
+			if (mask&event.CHANUKAH_CANDLES) != 0 && !opts.NoHolidays {
 				// Replace Chanukah event with a clone that includes candle lighting time.
 				// For clarity, allow a "duplicate" candle lighting event to remain for Shabbat
-				tmp := makeChanukahCandleLighting(ev.(HolidayEvent), opts)
+				tmp := makeChanukahCandleLighting(ev.(event.HolidayEvent), opts)
 				if (tmp != TimedEvent{}) {
 					ev = tmp
 				}
@@ -488,7 +490,7 @@ func appendHolidayAndRelated(events []CalEvent, candlesEv TimedEvent, ev CalEven
 				candlesEv = makeCandleEvent(hd, opts, ev)
 			}
 		}
-		if opts.YomKippurKatan && (mask&YOM_KIPPUR_KATAN) != 0 {
+		if opts.YomKippurKatan && (mask&event.YOM_KIPPUR_KATAN) != 0 {
 			events = append(events, ev)
 		} else if !opts.NoHolidays {
 			events = append(events, ev)

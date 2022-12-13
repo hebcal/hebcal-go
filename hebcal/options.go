@@ -19,6 +19,7 @@ package hebcal
 import (
 	"time"
 
+	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
@@ -98,7 +99,7 @@ type CalOptions struct {
 	/* print the Hebrew date for dates with some events */
 	AddHebrewDatesForEvents bool
 	/* use bitmask from flags to filter events */
-	Mask HolidayFlags
+	Mask event.HolidayFlags
 	// include Yom Kippur Katan (default false).
 	// יוֹם כִּפּוּר קָטָן is a minor day of atonement occurring monthly on the day preceeding each Rosh Chodesh.
 	//

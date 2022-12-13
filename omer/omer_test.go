@@ -1,27 +1,27 @@
-package hebcal_test
+package omer_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/hebcal/hebcal-go/hdate"
-	"github.com/hebcal/hebcal-go/hebcal"
+	"github.com/hebcal/hebcal-go/omer"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSefira(t *testing.T) {
 	assert := assert.New(t)
-	omer := hebcal.NewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
+	omer := omer.NewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
 	assert.Equal("Eternity within Majesty", omer.Sefira("en"))
 	assert.Equal("נֶּֽצַח שֶׁבְּמַּלְכוּת", omer.Sefira("he"))
 	assert.Equal("Netzach sheb'Malkhut", omer.Sefira("translit"))
 }
 
 func ExampleOmerEvent_Sefira() {
-	omer := hebcal.NewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
-	fmt.Println(omer.Sefira("en"))
-	fmt.Println(omer.Sefira("he"))
-	fmt.Println(omer.Sefira("translit"))
+	ev := omer.NewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
+	fmt.Println(ev.Sefira("en"))
+	fmt.Println(ev.Sefira("he"))
+	fmt.Println(ev.Sefira("translit"))
 	// Output:
 	// Eternity within Majesty
 	// נֶּֽצַח שֶׁבְּמַּלְכוּת
@@ -31,29 +31,29 @@ func ExampleOmerEvent_Sefira() {
 func TestTodayIsEn(t *testing.T) {
 	assert := assert.New(t)
 
-	var omer = hebcal.NewOmerEvent(hdate.New(5770, hdate.Nisan, 16), 1)
-	assert.Equal("Today is 1 day of the Omer", omer.TodayIs("en"))
+	var ev = omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 16), 1)
+	assert.Equal("Today is 1 day of the Omer", ev.TodayIs("en"))
 
-	omer = hebcal.NewOmerEvent(hdate.New(5770, hdate.Nisan, 17), 2)
-	assert.Equal("Today is 2 days of the Omer", omer.TodayIs("en"))
+	ev = omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 17), 2)
+	assert.Equal("Today is 2 days of the Omer", ev.TodayIs("en"))
 
-	omer = hebcal.NewOmerEvent(hdate.New(5770, hdate.Nisan, 22), 7)
-	assert.Equal("Today is 7 days, which is 1 week of the Omer", omer.TodayIs("en"))
+	ev = omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 22), 7)
+	assert.Equal("Today is 7 days, which is 1 week of the Omer", ev.TodayIs("en"))
 
-	omer = hebcal.NewOmerEvent(hdate.New(5770, hdate.Nisan, 23), 8)
-	assert.Equal("Today is 8 days, which is 1 week and 1 day of the Omer", omer.TodayIs("en"))
+	ev = omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 23), 8)
+	assert.Equal("Today is 8 days, which is 1 week and 1 day of the Omer", ev.TodayIs("en"))
 
-	omer = hebcal.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
-	assert.Equal("Today is 13 days, which is 1 week and 6 days of the Omer", omer.TodayIs("en"))
+	ev = omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
+	assert.Equal("Today is 13 days, which is 1 week and 6 days of the Omer", ev.TodayIs("en"))
 
-	omer = hebcal.NewOmerEvent(hdate.New(5770, hdate.Nisan, 29), 14)
-	assert.Equal("Today is 14 days, which is 2 weeks of the Omer", omer.TodayIs("en"))
+	ev = omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 29), 14)
+	assert.Equal("Today is 14 days, which is 2 weeks of the Omer", ev.TodayIs("en"))
 
-	omer = hebcal.NewOmerEvent(hdate.New(5770, hdate.Iyyar, 26), 41)
-	assert.Equal("Today is 41 days, which is 5 weeks and 6 days of the Omer", omer.TodayIs("en"))
+	ev = omer.NewOmerEvent(hdate.New(5770, hdate.Iyyar, 26), 41)
+	assert.Equal("Today is 41 days, which is 5 weeks and 6 days of the Omer", ev.TodayIs("en"))
 
-	omer = hebcal.NewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
-	assert.Equal("Today is 46 days, which is 6 weeks and 4 days of the Omer", omer.TodayIs("en"))
+	ev = omer.NewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
+	assert.Equal("Today is 46 days, which is 6 weeks and 4 days of the Omer", ev.TodayIs("en"))
 
 }
 
@@ -114,7 +114,7 @@ func TestTodayIsHe(t *testing.T) {
 	start := hdate.New(5782, hdate.Nisan, 16)
 	startAbs := start.Abs()
 	for i := 1; i <= 49; i++ {
-		ev := hebcal.NewOmerEvent(hdate.FromRD(startAbs+i-1), i)
+		ev := omer.NewOmerEvent(hdate.FromRD(startAbs+i-1), i)
 		actual[i] = ev.TodayIs("he")
 	}
 	assert.Equal(t, expected, actual)
@@ -135,20 +135,20 @@ func TestEmoji(t *testing.T) {
 	start := hdate.New(5782, hdate.Nisan, 16)
 	startAbs := start.Abs()
 	for i := 1; i <= 49; i++ {
-		ev := hebcal.NewOmerEvent(hdate.FromRD(startAbs+i-1), i)
+		ev := omer.NewOmerEvent(hdate.FromRD(startAbs+i-1), i)
 		actual[i] = ev.GetEmoji()
 	}
 	assert.Equal(t, expected, actual)
 }
 
 func ExampleOmerEvent_GetEmoji() {
-	omer := hebcal.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
+	omer := omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
 	fmt.Println(omer.GetEmoji())
 	// Output: ⑬
 }
 
 func ExampleOmerEvent_TodayIs() {
-	omer := hebcal.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
+	omer := omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
 	fmt.Println(omer.TodayIs("en"))
 	fmt.Println(omer.TodayIs("he"))
 	// Output:

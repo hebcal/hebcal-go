@@ -1,4 +1,4 @@
-package hdate
+package hdate_test
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,10 +40,10 @@ func TestYahrzeit(t *testing.T) {
 		name := item[1]
 		expected := strings.Split(item[2], " ")
 		t, _ := time.Parse("2006-01-02", gregDate)
-		hd := FromTime(t)
+		hd := hdate.FromTime(t)
 		for i := 0; i < 25; i++ {
 			hyear := i + 5778
-			yahrzeit, _ := GetYahrzeit(hyear, hd)
+			yahrzeit, _ := hdate.GetYahrzeit(hyear, hd)
 			gy, gm, gd := yahrzeit.Greg()
 			actual := fmt.Sprintf("%d/%d/%d", gm, gd, gy)
 			assert.Equal(expected[i], actual, name)
@@ -77,33 +78,13 @@ func TestBirthday(t *testing.T) {
 		name := item[1]
 		expected := strings.Split(item[2], " ")
 		t, _ := time.Parse("2006-01-02", gregDate)
-		hd := FromTime(t)
+		hd := hdate.FromTime(t)
 		for i := 0; i < 21; i++ {
 			hyear := i + 5753
-			birthday, _ := GetBirthdayOrAnniversary(hyear, hd)
+			birthday, _ := hdate.GetBirthdayOrAnniversary(hyear, hd)
 			gy, gm, gd := birthday.Greg()
 			actual := fmt.Sprintf("%d/%d/%d", gm, gd, gy)
 			assert.Equal(expected[i], actual, name+" "+birthday.String())
 		}
 	}
-}
-
-func ExampleGetYahrzeit() {
-	hd := FromGregorian(2014, time.March, 2)
-	fmt.Println(hd)
-	yahrzeit, _ := GetYahrzeit(5783, hd)
-	fmt.Println(yahrzeit)
-	// Output:
-	// 30 Adar I 5774
-	// 30 Sh'vat 5783
-}
-
-func ExampleGetBirthdayOrAnniversary() {
-	hd := FromGregorian(2014, time.March, 2)
-	fmt.Println(hd)
-	yahrzeit, _ := GetBirthdayOrAnniversary(5783, hd)
-	fmt.Println(yahrzeit)
-	// Output:
-	// 30 Adar I 5774
-	// 1 Nisan 5783
 }

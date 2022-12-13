@@ -21,6 +21,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hdate"
 	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/zmanim"
@@ -37,29 +38,29 @@ func formatTime(t *time.Time, opts *CalOptions) string {
 
 // TimedEvent is used for Candle-lighting, Havdalah, and fast start/end
 type TimedEvent struct {
-	HolidayEvent
+	event.HolidayEvent
 	EventTime    time.Time
-	LinkedEvent  CalEvent
+	LinkedEvent  event.CalEvent
 	sunsetOffset int
 	opts         *CalOptions
 }
 
-func NewTimedEvent(hd hdate.HDate, desc string, flags HolidayFlags, t time.Time,
-	sunsetOffset int, linkedEvent CalEvent, opts *CalOptions) TimedEvent {
+func NewTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time.Time,
+	sunsetOffset int, linkedEvent event.CalEvent, opts *CalOptions) TimedEvent {
 	if (t == time.Time{}) {
 		return TimedEvent{}
 	}
 	var emoji string
 	switch flags {
-	case LIGHT_CANDLES, LIGHT_CANDLES_TZEIS:
+	case event.LIGHT_CANDLES, event.LIGHT_CANDLES_TZEIS:
 		emoji = "🕯️"
-	case YOM_TOV_ENDS:
+	case event.YOM_TOV_ENDS:
 		emoji = "✨"
-	case CHANUKAH_CANDLES:
+	case event.CHANUKAH_CANDLES:
 		emoji = chanukahEmoji
 	}
 	return TimedEvent{
-		HolidayEvent: HolidayEvent{
+		HolidayEvent: event.HolidayEvent{
 			Date:  hd,
 			Desc:  desc,
 			Flags: flags,
@@ -86,7 +87,7 @@ func (ev TimedEvent) Render(locale string) string {
 	return fmt.Sprintf("%s: %s", desc, timeStr)
 }
 
-func (ev TimedEvent) GetFlags() HolidayFlags {
+func (ev TimedEvent) GetFlags() event.HolidayFlags {
 	return ev.Flags
 }
 
@@ -98,27 +99,27 @@ func (ev TimedEvent) Basename() string {
 	return ev.Desc
 }
 
-func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev CalEvent) TimedEvent {
+func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev event.CalEvent) TimedEvent {
 	havdalahTitle := false
 	useHavdalahOffset := false
 	dow := hd.Weekday()
 	if dow == time.Saturday {
 		useHavdalahOffset = true
 	}
-	flags := LIGHT_CANDLES
+	flags := event.LIGHT_CANDLES
 	if ev != nil {
 		flags = ev.GetFlags()
 		if dow != time.Friday {
-			if (flags & (LIGHT_CANDLES_TZEIS | CHANUKAH_CANDLES)) != 0 {
+			if (flags & (event.LIGHT_CANDLES_TZEIS | event.CHANUKAH_CANDLES)) != 0 {
 				useHavdalahOffset = true
-			} else if (flags & YOM_TOV_ENDS) != 0 {
+			} else if (flags & event.YOM_TOV_ENDS) != 0 {
 				havdalahTitle = true
 				useHavdalahOffset = true
 			}
 		}
 	} else if dow == time.Saturday {
 		havdalahTitle = true
-		flags = LIGHT_CANDLES_TZEIS
+		flags = event.LIGHT_CANDLES_TZEIS
 	}
 	// if offset is 0 or undefined, we'll use tzeit time
 	offset := opts.CandleLightingMins
@@ -145,7 +146,7 @@ func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev CalEvent) TimedEvent {
 	return NewTimedEvent(hd, desc, flags, eventTime, offset, ev, opts)
 }
 
-func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
+func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEvent {
 	hd := ev.Date
 	dow := hd.Weekday()
 	if dow == time.Friday || dow == time.Saturday {
@@ -173,7 +174,7 @@ func makeChanukahCandleLighting(ev HolidayEvent, opts *CalOptions) TimedEvent {
 	}
 }
 
-func makeFastStartEnd(ev CalEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
+func makeFastStartEnd(ev event.CalEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
 	year, month, day := ev.GetDate().Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	loc := opts.Location
@@ -220,8 +221,8 @@ func (ev riseSetEvent) Render(locale string) string {
 	return fmt.Sprintf("Sunrise: %s; Sunset %s", riseStr, setStr)
 }
 
-func (ev riseSetEvent) GetFlags() HolidayFlags {
-	return ZMANIM
+func (ev riseSetEvent) GetFlags() event.HolidayFlags {
+	return event.ZMANIM
 }
 
 func (ev riseSetEvent) GetEmoji() string {
@@ -232,7 +233,7 @@ func (ev riseSetEvent) Basename() string {
 	return ev.Render("en")
 }
 
-func dailyZemanim(date hdate.HDate, opts *CalOptions) []CalEvent {
+func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 	loc := opts.Location
 	year, month, day := date.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
@@ -258,9 +259,9 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []CalEvent {
 		{"Dusk", z.Dusk()},
 		{"Tzeit HaKochavim", z.Tzeit(zmanim.Tzeit3SmallStars)},
 	}
-	events := make([]CalEvent, len(times))
+	events := make([]event.CalEvent, len(times))
 	for i, ev := range times {
-		events[i] = NewTimedEvent(date, ev.desc, ZMANIM, ev.t, 0, nil, opts)
+		events[i] = NewTimedEvent(date, ev.desc, event.ZMANIM, ev.t, 0, nil, opts)
 	}
 	return events
 }
