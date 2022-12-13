@@ -63,3 +63,12 @@ func TestIsValidDouble(t *testing.T) {
 	assert.Equal(t, false, isValidDouble(-1))
 	assert.Equal(t, false, isValidDouble(26))
 }
+
+func TestSedraEarlyYears(t *testing.T) {
+	years := []int{3762, 3761, 3760, 3759, 100, 2, 1}
+	for _, year := range years {
+		fmt.Println(year)
+		s := New(year, false)
+		assert.Equal(t, year, s.Year)
+	}
+}

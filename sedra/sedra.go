@@ -311,10 +311,10 @@ func New(year int, il bool) Sedra {
 	} else {
 		ytype = regular
 	}
-	rh := hdate.HebrewToRD(year, hdate.Tishrei, 1)
-	rhDay := time.Weekday(rh % 7)
+	rh := hdate.New(year, hdate.Tishrei, 1)
+	rhDay := rh.Weekday()
 	leap := hdate.IsLeapYear(year)
-	firstSaturday := hdate.DayOnOrBefore(time.Saturday, rh+6)
+	firstSaturday := hdate.DayOnOrBefore(time.Saturday, rh.Abs()+6)
 	theSedraArray := getSedraArray(leap, rhDay, ytype, il)
 	return Sedra{Year: year, IL: il, firstSaturday: firstSaturday, theSedraArray: theSedraArray}
 }

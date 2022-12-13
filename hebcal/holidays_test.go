@@ -446,3 +446,18 @@ func TestHolidayEmoji(t *testing.T) {
 		}
 	}
 }
+
+func TestHolidaysEarlyYears(t *testing.T) {
+	events := GetHolidaysForYear(3763, false)
+	assert.Equal(t, 97, len(events))
+	events = GetHolidaysForYear(3762, false)
+	assert.Equal(t, 103, len(events))
+	events = GetHolidaysForYear(3761, false)
+	assert.Equal(t, 98, len(events))
+	events = GetHolidaysForYear(3760, false)
+	assert.Equal(t, 104, len(events))
+	events = GetHolidaysForYear(2, false)
+	assert.Equal(t, 98, len(events))
+	events = GetHolidaysForYear(1, false)
+	assert.Equal(t, 98, len(events))
+}
