@@ -118,60 +118,59 @@ func TestRD2Greg1ce(t *testing.T) {
 	assert.Equal(1, day)
 }
 
-/*
 func TestRD2GregNegative(t *testing.T) {
 	assert := assert.New(t)
 	var year int
 	var month time.Month
 	var day int
-	year, month, day = RDtoGregorian(0)
-	assert.Equal(-1, year)
-	assert.Equal(time.December, month)
-	assert.Equal(31, day)
-	year, month, day = RDtoGregorian(-1)
-	assert.Equal(-1, year)
-	assert.Equal(time.December, month)
-	assert.Equal(30, day)
-	year, month, day = RDtoGregorian(-2)
-	assert.Equal(-1, year)
-	assert.Equal(time.December, month)
-	assert.Equal(29, day)
-	year, month, day = RDtoGregorian(-48)
-	assert.Equal(-1, year)
-	assert.Equal(time.November, month)
-	assert.Equal(13, day)
-	year, month, day = RDtoGregorian(-61)
-	assert.Equal(-1, year)
-	assert.Equal(time.October, month)
-	assert.Equal(31, day)
 
-	year, month, day = RDtoGregorian(-91)
-	assert.Equal(-1, year)
-	assert.Equal(time.October, month)
-	assert.Equal(1, day)
-	year, month, day = RDtoGregorian(-305)
-	assert.Equal(-1, year)
-	assert.Equal(time.March, month)
-	assert.Equal(1, day)
-
-	year, month, day = RDtoGregorian(-349)
-	assert.Equal(-1, year)
-	assert.Equal(time.January, month)
-	assert.Equal(16, day)
-	year, month, day = RDtoGregorian(-364)
+	year, month, day = greg.FromRD(-730)
 	assert.Equal(-1, year)
 	assert.Equal(time.January, month)
 	assert.Equal(1, day)
-	year, month, day = RDtoGregorian(-365)
-	assert.Equal(-2, year)
-	assert.Equal(time.December, month)
-	assert.Equal(31, day)
-	year, month, day = RDtoGregorian(-36535)
+
+	year, month, day = greg.FromRD(-36536)
 	assert.Equal(-100, year)
 	assert.Equal(time.December, month)
 	assert.Equal(20, day)
+
+	year, month, day = greg.FromRD(0)
+	assert.Equal(0, year)
+	assert.Equal(time.December, month)
+	assert.Equal(31, day)
+	year, month, day = greg.FromRD(-1)
+	assert.Equal(0, year)
+	assert.Equal(time.December, month)
+	assert.Equal(30, day)
+	year, month, day = greg.FromRD(-2)
+	assert.Equal(0, year)
+	assert.Equal(time.December, month)
+	assert.Equal(29, day)
+	year, month, day = greg.FromRD(-48)
+	assert.Equal(0, year)
+	assert.Equal(time.November, month)
+	assert.Equal(13, day)
+	year, month, day = greg.FromRD(-61)
+	assert.Equal(0, year)
+	assert.Equal(time.October, month)
+	assert.Equal(31, day)
+
+	// September 31? Something can't be right
+	year, month, day = greg.FromRD(-91)
+	assert.Equal(0, year)
+	assert.Equal(time.September, month)
+	assert.Equal(31, day)
+
+	year, month, day = greg.FromRD(-365)
+	assert.Equal(0, year)
+	assert.Equal(time.January, month)
+	assert.Equal(1, day)
+
+	year, month, day = greg.FromRD(-366)
+	assert.Equal(-1, year)
+	assert.Equal(time.December, month)
+	assert.Equal(31, day)
 }
-*/
 
 func ExampleDaysIn() {
 	days := greg.DaysIn(time.February, 2004)
