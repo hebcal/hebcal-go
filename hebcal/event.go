@@ -221,11 +221,19 @@ func (ev hebrewDateEvent) Basename() string {
 	return ev.Date.String()
 }
 
+func NewHebrewDateEvent(hd hdate.HDate) CalEvent {
+	return hebrewDateEvent{Date: hd}
+}
+
 // Represents one of 54 weekly Torah portions, always on a Saturday
 type parshaEvent struct {
 	Date   hdate.HDate
 	Parsha sedra.Parsha
 	IL     bool
+}
+
+func NewParshaEvent(hd hdate.HDate, parsha sedra.Parsha, il bool) CalEvent {
+	return parshaEvent{Date: hd, Parsha: parsha, IL: il}
 }
 
 func (ev parshaEvent) GetDate() hdate.HDate {

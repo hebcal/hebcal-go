@@ -1,4 +1,4 @@
-package yerushalmi
+package yerushalmi_test
 
 import (
 	"fmt"
@@ -7,27 +7,28 @@ import (
 
 	"github.com/hebcal/hebcal-go/dafyomi"
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestYerushalmiYomi(t *testing.T) {
 	assert := assert.New(t)
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 1},
-		New(hdate.FromGregorian(1997, time.March, 14), Vilna))
+		yerushalmi.New(hdate.FromGregorian(1997, time.March, 14), yerushalmi.Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 2},
-		New(hdate.FromGregorian(1997, time.March, 15), Vilna))
+		yerushalmi.New(hdate.FromGregorian(1997, time.March, 15), yerushalmi.Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 3},
-		New(hdate.FromGregorian(1997, time.March, 16), Vilna))
+		yerushalmi.New(hdate.FromGregorian(1997, time.March, 16), yerushalmi.Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Yevamot", Blatt: 49},
-		New(hdate.FromGregorian(1999, time.September, 21), Vilna))
+		yerushalmi.New(hdate.FromGregorian(1999, time.September, 21), yerushalmi.Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Niddah", Blatt: 13},
-		New(hdate.FromGregorian(2001, time.June, 22), Vilna))
+		yerushalmi.New(hdate.FromGregorian(2001, time.June, 22), yerushalmi.Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 1},
-		New(hdate.FromGregorian(2022, time.November, 14), Vilna))
+		yerushalmi.New(hdate.FromGregorian(2022, time.November, 14), yerushalmi.Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Peah", Blatt: 1},
-		New(hdate.FromGregorian(2023, time.January, 21), Vilna))
+		yerushalmi.New(hdate.FromGregorian(2023, time.January, 21), yerushalmi.Vilna))
 	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 1},
-		New(hdate.FromGregorian(1980, time.February, 2), Vilna))
+		yerushalmi.New(hdate.FromGregorian(1980, time.February, 2), yerushalmi.Vilna))
 }
 
 func TestYerushalmiYomi2(t *testing.T) {
@@ -37,7 +38,7 @@ func TestYerushalmiYomi2(t *testing.T) {
 	endAbs := end.Abs()
 	for abs := start.Abs(); abs <= endAbs; abs++ {
 		hd := hdate.FromRD(abs)
-		daf := New(hd, Vilna)
+		daf := yerushalmi.New(hd, yerushalmi.Vilna)
 		actual = append(actual, hd.String()+","+daf.String())
 	}
 	expected := []string{
@@ -1609,7 +1610,7 @@ func TestYerushalmiYomi2(t *testing.T) {
 
 func ExampleNew() {
 	hd := hdate.FromGregorian(1995, time.December, 17)
-	daf := New(hd, Vilna)
+	daf := yerushalmi.New(hd, yerushalmi.Vilna)
 	fmt.Println(daf)
 	// Output: Nedarim 33
 }

@@ -1,4 +1,4 @@
-package mishnayomi
+package mishnayomi_test
 
 import (
 	"fmt"
@@ -6,28 +6,29 @@ import (
 	"time"
 
 	"github.com/hebcal/hebcal-go/hdate"
+	"github.com/hebcal/hebcal-go/mishnayomi"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMishnaYomi(t *testing.T) {
-	idx := MakeIndex()
+	idx := mishnayomi.MakeIndex()
 	hd := hdate.FromGregorian(1995, time.December, 17)
 	mishna, err := idx.Lookup(hd)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, mishna, MishnaPair{
-		Mishna{Tractate: "Bava Kamma", Chap: 5, Verse: 7},
-		Mishna{Tractate: "Bava Kamma", Chap: 6, Verse: 1},
+	assert.Equal(t, mishna, mishnayomi.MishnaPair{
+		mishnayomi.Mishna{Tractate: "Bava Kamma", Chap: 5, Verse: 7},
+		mishnayomi.Mishna{Tractate: "Bava Kamma", Chap: 6, Verse: 1},
 	})
 	mishna, _ = idx.Lookup(hdate.FromGregorian(2024, time.April, 5))
-	assert.Equal(t, mishna, MishnaPair{
-		Mishna{Tractate: "Nedarim", Chap: 11, Verse: 12},
-		Mishna{Tractate: "Nazir", Chap: 1, Verse: 1},
+	assert.Equal(t, mishna, mishnayomi.MishnaPair{
+		mishnayomi.Mishna{Tractate: "Nedarim", Chap: 11, Verse: 12},
+		mishnayomi.Mishna{Tractate: "Nazir", Chap: 1, Verse: 1},
 	})
 	assert.Equal(t, "Nedarim 11:12-Nazir 1:1", mishna.String())
 }
 
 func ExampleMishnaYomiIndex_Lookup() {
-	idx := MakeIndex()
+	idx := mishnayomi.MakeIndex()
 	mishna, _ := idx.Lookup(hdate.FromGregorian(1947, time.May, 20))
 	fmt.Println(mishna)
 	mishna, _ = idx.Lookup(hdate.FromGregorian(1995, time.December, 17))

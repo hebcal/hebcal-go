@@ -1,10 +1,14 @@
-package zmanim
+package zmanim_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/hebcal/hebcal-go/zmanim"
+)
 
 func TestNoDuplicateCities(t *testing.T) {
 	m := make(map[string]int)
-	for idx, city := range AllCities() {
+	for idx, city := range zmanim.AllCities() {
 		prev, found := m[city.Name]
 		if found {
 			t.Errorf("Found %s at %d and %d", city.Name, prev, idx)
