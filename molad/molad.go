@@ -14,8 +14,6 @@ type Molad struct {
 	Chalakim int
 }
 
-const epoch int64 = -1373428
-
 // Days from the beginning of Sunday till molad BaHaRaD.
 // Calculated as 1 day, 5 hours and 204 chalakim = (24 + 5) * 1080 + 204 = 31524
 const chalakimMoladTohu int64 = 31524
@@ -54,7 +52,7 @@ func getChalakimSinceMoladTohu(year int, month hdate.HMonth) int64 {
 }
 
 func moladToAbsDate(chalakim int64) int64 {
-	return (chalakim / chalakimPerDay) + epoch - 1
+	return (chalakim / chalakimPerDay) + hdate.Epoch - 1
 }
 
 // Sets the molad time (hours minutes and chalakim) based on the number of chalakim since the start of the day.
@@ -81,14 +79,4 @@ func New(year int, month hdate.HMonth) Molad {
 	molad.Date = hd
 	molad.Hours = (molad.Hours + 18) % 24
 	return molad
-}
-
-// This is Dershowitz & Reingold's floating point version here for reference
-func molad(year int, month hdate.HMonth) float64 {
-	yy := year
-	if month < hdate.Tishrei {
-		yy++
-	}
-	monthsElapsed := int(month-hdate.Tishrei) + (235*yy-234)/19
-	return float64(epoch) - 876.0/25920.0 + float64(monthsElapsed)*(29.5+(793.0/25920.0))
 }
