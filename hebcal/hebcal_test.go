@@ -174,7 +174,7 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 	}
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.Equal(nil, err)
-	assert.Equal(13, len(events))
+	assert.Equal(14, len(events))
 	expected := []string{
 		"2022-12-18 Chanukah: 1 Candle: 5:04",
 		"2022-12-19 Chanukah: 2 Candles: 5:05",
@@ -183,6 +183,7 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 		"2022-12-22 Chanukah: 5 Candles: 5:06",
 		"2022-12-23 Chanukah: 6 Candles: 4:00",
 		"2022-12-23 Candle lighting: 4:00",
+		"2022-12-24 Chag HaBanot",
 		"2022-12-24 Chanukah: 7 Candles: 5:20",
 		"2022-12-24 Rosh Chodesh Tevet",
 		"2022-12-24 Havdalah: 5:20",
@@ -388,6 +389,7 @@ func TestNoModern(t *testing.T) {
 		"2022-12-21 Chanukah: 4 Candles",
 		"2022-12-22 Chanukah: 5 Candles",
 		"2022-12-23 Chanukah: 6 Candles",
+		"2022-12-24 Chag HaBanot",
 		"2022-12-24 Chanukah: 7 Candles",
 		"2022-12-25 Chanukah: 8 Candles",
 		"2022-12-26 Chanukah: 8th Day",
@@ -532,7 +534,7 @@ func TestYear2(t *testing.T) {
 	}
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 126, len(events))
+	assert.Equal(t, 127, len(events))
 }
 
 func TestYear1(t *testing.T) {
@@ -542,5 +544,5 @@ func TestYear1(t *testing.T) {
 	}
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 78, len(events))
+	assert.Equal(t, 79, len(events))
 }

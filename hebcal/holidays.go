@@ -387,6 +387,13 @@ func getAllHolidaysForYear(year int) []event.HolidayEvent {
 			Emoji:       chanukahEmoji,
 			ChanukahDay: 8})
 
+	// On the 1st day of Rosh Chodesh Tevet
+	events = append(events,
+		event.HolidayEvent{
+			Date:  chanukah7,
+			Desc:  "Chag HaBanot",
+			Flags: event.MINOR_HOLIDAY})
+
 	// Tisha BAv and the 3 weeks
 	var tamuz17 = hdate.New(year, hdate.Tamuz, 17)
 	if tamuz17.Weekday() == time.Saturday {

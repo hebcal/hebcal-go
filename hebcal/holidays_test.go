@@ -12,7 +12,7 @@ import (
 
 func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 	events := hebcal.GetHolidaysForYear(5771, false)
-	assert.Equal(t, 109, len(events))
+	assert.Equal(t, 110, len(events))
 
 	expected := []string{
 		"2010-09-09 Rosh Hashana 5771",
@@ -46,6 +46,7 @@ func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 		"2010-12-04 Shabbat Mevarchim Chodesh Tevet",
 		"2010-12-05 Chanukah: 5 Candles",
 		"2010-12-06 Chanukah: 6 Candles",
+		"2010-12-07 Chag HaBanot",
 		"2010-12-07 Chanukah: 7 Candles",
 		"2010-12-07 Rosh Chodesh Tevet",
 		"2010-12-08 Chanukah: 8 Candles",
@@ -137,7 +138,7 @@ func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 
 func TestGetHolidaysForYearArrayIL(t *testing.T) {
 	events := hebcal.GetHolidaysForYear(5720, true)
-	assert.Equal(t, 98, len(events))
+	assert.Equal(t, 99, len(events))
 
 	expected := []string{
 		"1959-10-03 Rosh Hashana 5720",
@@ -169,6 +170,7 @@ func TestGetHolidaysForYearArrayIL(t *testing.T) {
 		"1959-12-28 Chanukah: 4 Candles",
 		"1959-12-29 Chanukah: 5 Candles",
 		"1959-12-30 Chanukah: 6 Candles",
+		"1959-12-31 Chag HaBanot",
 		"1959-12-31 Chanukah: 7 Candles",
 		"1959-12-31 Rosh Chodesh Tevet",
 		"1960-01-01 Chanukah: 8 Candles",
@@ -447,15 +449,15 @@ func TestHolidayEmoji(t *testing.T) {
 
 func TestHolidaysEarlyYears(t *testing.T) {
 	events := hebcal.GetHolidaysForYear(3763, false)
-	assert.Equal(t, 97, len(events))
+	assert.Equal(t, 98, len(events))
 	events = hebcal.GetHolidaysForYear(3762, false)
-	assert.Equal(t, 103, len(events))
-	events = hebcal.GetHolidaysForYear(3761, false)
-	assert.Equal(t, 98, len(events))
-	events = hebcal.GetHolidaysForYear(3760, false)
 	assert.Equal(t, 104, len(events))
+	events = hebcal.GetHolidaysForYear(3761, false)
+	assert.Equal(t, 99, len(events))
+	events = hebcal.GetHolidaysForYear(3760, false)
+	assert.Equal(t, 105, len(events))
 	events = hebcal.GetHolidaysForYear(2, false)
-	assert.Equal(t, 98, len(events))
+	assert.Equal(t, 99, len(events))
 	events = hebcal.GetHolidaysForYear(1, false)
-	assert.Equal(t, 98, len(events))
+	assert.Equal(t, 99, len(events))
 }
