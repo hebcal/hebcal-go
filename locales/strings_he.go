@@ -233,7 +233,7 @@ var dict_he = map[string]string{
 	"Fast ends": "סִיּוּם הַצוֹם",
 	"Rosh Hashana LaBehemot": "רֹאשׁ הַשָּׁנָה לְמַעְשַׂר בְּהֵמָה",
 	"Tish'a B'Av (observed)": "תִּשְׁעָה בְּאָב נִדחֶה",
-	"Shabbat Mevarchim Chodesh": "שַׁבָּת מברכים חוֹדֶשׁ",
+	"Shabbat Mevarchim Chodesh": "שַׁבָּת מְבָרְכִים חוֹדֶשׁ",
 	"Shabbat Shirah": "שַׁבָּת שִׁירָה",
 	"Chatzot HaLailah": "חֲצוֹת הַלַיְלָה",
 	"Alot haShachar": "עֲלוֹת הַשַּׁחַר",
@@ -321,6 +321,7 @@ var dict_he = map[string]string{
 	"Purim Meshulash": "פּוּרִים מְשׁוּלָּשׁ",
 	"after sunset": "אחרי השקיעה",
 	"Yerushalmi": "יְרוּשַׁלְמִי",
+	"Chag HaBanot": "חַג הַבָּנוֹת",
 }
 
 func Lookup_he(s string) (string, bool) {
