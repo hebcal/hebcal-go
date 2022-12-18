@@ -88,6 +88,8 @@ type CalOptions struct {
 	MishnaYomi bool
 	/* include Jerusalem Talmud Daf Yomi */
 	YerushalmiYomi bool
+	/* include Nach Yomi */
+	NachYomi bool
 	/* Either the Vilna or Schottenstein edition of Yerushalmi Yomi */
 	YerushalmiEdition yerushalmi.Edition
 	/* include Days of the Omer */

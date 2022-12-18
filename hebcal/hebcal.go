@@ -28,6 +28,7 @@ import (
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/mishnayomi"
 	"github.com/hebcal/hebcal-go/molad"
+	"github.com/hebcal/hebcal-go/nachyomi"
 	"github.com/hebcal/hebcal-go/omer"
 	"github.com/hebcal/hebcal-go/sedra"
 	"github.com/hebcal/hebcal-go/yerushalmi"
@@ -67,6 +68,7 @@ Additional non-default event types can be specified:
   - Babylonian Talmud Daf Yomi (opts.DafYomi)
   - Jerusalem Talmud (Yerushalmi) Yomi (opts.YerushalmiYomi)
   - Mishna Yomi (opts.MishnaYomi)
+  - Nach Yomi (opts.NachYomi)
   - Shabbat Mevarchim HaChodesh on Saturday before Rosh Chodesh (opts.ShabbatMevarchim)
   - Molad announcement on Saturday before Rosh Chodesh (opts.Molad)
   - Yom Kippur Katan (opts.YomKippurKatan)
@@ -140,6 +142,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		beginOmer    int64
 		endOmer      int64
 		myIdx        mishnayomi.MishnaYomiIndex
+		nachIdx      nachyomi.NachYomiIndex
 		userEvents   []event.HolidayEvent
 	)
 	firstWeekday := time.Weekday(startAbs % 7)
@@ -227,6 +230,13 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 				}
 				mishna, _ := myIdx.Lookup(hd)
 				events = append(events, event.NewMishnaYomiEvent(hd, mishna))
+			}
+			if opts.NachYomi && abs >= nachyomi.NachYomiStart {
+				if len(nachIdx) == 0 {
+					nachIdx = nachyomi.MakeIndex()
+				}
+				chapter, _ := nachIdx.Lookup(hd)
+				events = append(events, event.NewNachYomiEvent(hd, chapter))
 			}
 			if opts.DailyZmanim {
 				zmanEvents := dailyZemanim(hd, opts)
@@ -399,6 +409,9 @@ func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 		if (m & event.MISHNA_YOMI) != 0 {
 			opts.MishnaYomi = true
 		}
+		if (m & event.NACH_YOMI) != 0 {
+			opts.NachYomi = true
+		}
 		if (m & event.YOM_KIPPUR_KATAN) != 0 {
 			opts.YomKippurKatan = true
 		}
@@ -449,6 +462,9 @@ func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 	}
 	if opts.YerushalmiYomi {
 		mask |= event.YERUSHALMI_YOMI
+	}
+	if opts.NachYomi {
+		mask |= event.NACH_YOMI
 	}
 	if opts.Omer {
 		mask |= event.OMER_COUNT

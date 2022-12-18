@@ -75,6 +75,8 @@ const (
 	ZMANIM
 	// Daily page of Jerusalem Talmud (Yerushalmi)
 	YERUSHALMI_YOMI
+	// Daily page of Nach (Nevi'im + Ketuvim)
+	NACH_YOMI
 )
 
 type CalEvent interface {

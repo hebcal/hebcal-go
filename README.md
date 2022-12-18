@@ -36,6 +36,8 @@ Hebcal incorporates and uses several related packages:
   - mishnayomi: calculates the Mishna Yomi, a program of daily
     learning in which participants study two Mishnayot each day.
   - molad: calculates the time at which the New Moon is born.
+  - nachyomi: calculates Nach Yomi, a daily regimen of learning
+    the books of Nevi'im (Prophets) and Ketuvim (Writings).
   - omer: calculates the Sefirat HaOmer.
   - sedra: weekly Torah reading (Parashat HaShavua).
   - yerushalmi: Yerushalmi Yomi, a daily regimen of learning the
