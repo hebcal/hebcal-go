@@ -140,4 +140,6 @@ type CalOptions struct {
 	DailySedra bool
 	//
 	//	-------- End: CLI legacy compatibility options  --------
+	// Add all dates that the Torah is read.
+	TorahReading bool
 }

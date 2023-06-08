@@ -77,6 +77,8 @@ const (
 	YERUSHALMI_YOMI
 	// Daily page of Nach (Nevi'im + Ketuvim)
 	NACH_YOMI
+	// Torah reading days
+	TORAH_READING
 )
 
 type CalEvent interface {
