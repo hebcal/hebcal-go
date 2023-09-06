@@ -18,7 +18,7 @@ var dict_he = map[string]string{
 	"Devarim": "דְּבָרִים",
 	"Eikev": "עֵקֶב",
 	"Emor": "אֱמוֹר",
-	"Ha'Azinu": "הַאֲזִינוּ",
+	"Ha'azinu": "הַאֲזִינוּ",
 	"Kedoshim": "קְדשִׁים",
 	"Ki Tavo": "כִּי־תָבוֹא",
 	"Ki Teitzei": "כִּי־תֵצֵא",

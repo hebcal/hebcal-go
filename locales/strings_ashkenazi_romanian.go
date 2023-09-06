@@ -67,7 +67,7 @@ var dict_ashkenazi_romanian = map[string]string{
 	"Devarim": "Dâvorim",
 	"Eikev": "Eiqev",
 	"Emor": "Emor",
-	"Ha'Azinu": "Haazinu",
+	"Ha'azinu": "Haazinu",
 	"Kedoshim": "Qdoişim",
 	"Ki Tavo": "Chi-Sovo",
 	"Ki Teitzei": "Chi-Seiţei",

@@ -69,7 +69,7 @@ func TestHebrewCalendarSedrotOnly(t *testing.T) {
 	assert.Equal(47, len(events))
 	expected := []string{
 		"2022-10-01 Parashat Vayeilech",
-		"2022-10-08 Parashat Ha'Azinu",
+		"2022-10-08 Parashat Ha'azinu",
 		"2022-10-22 Parashat Bereshit",
 		"2022-10-29 Parashat Noach",
 		"2022-11-05 Parashat Lech-Lecha",

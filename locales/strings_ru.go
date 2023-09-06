@@ -56,7 +56,7 @@ var dict_ru = map[string]string{
 	"Devarim": "Дварим",
 	"Eikev": "Эйкев",
 	"Emor": "Эмор",
-	"Ha'Azinu": "А-Азину",
+	"Ha'azinu": "А-Азину",
 	"Kedoshim": "Кдошим",
 	"Ki Tavo": "Ки Таво",
 	"Ki Teitzei": "Ки Теце",

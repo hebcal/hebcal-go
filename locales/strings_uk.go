@@ -56,7 +56,7 @@ var dict_uk = map[string]string{
 	"Devarim": "Дварім",
 	"Eikev": "Єйкев",
 	"Emor": "Емор",
-	"Ha'Azinu": "А-Азіну",
+	"Ha'azinu": "А-Азіну",
 	"Kedoshim": "Кдошім",
 	"Ki Tavo": "Кі Таво",
 	"Ki Teitzei": "Кі Теце",

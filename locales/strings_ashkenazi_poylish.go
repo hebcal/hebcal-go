@@ -56,7 +56,7 @@ var dict_ashkenazi_poylish = map[string]string{
 	"Devarim": "Dvurim",
 	"Eikev": "Aikev",
 	"Emor": "Emoyr",
-	"Ha'Azinu": "Haazini",
+	"Ha'azinu": "Haazini",
 	"Kedoshim": "Kdoyshim",
 	"Ki Tavo": "Ki-Sovo",
 	"Ki Teitzei": "Ki-Seitzei",

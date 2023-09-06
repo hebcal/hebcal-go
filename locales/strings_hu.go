@@ -66,7 +66,7 @@ var dict_hu = map[string]string{
 	"Devarim": "Dvárim",
 	"Eikev": "Ékev",
 	"Emor": "Emor",
-	"Ha'Azinu": "Háázinu",
+	"Ha'azinu": "Háázinu",
 	"Kedoshim": "Ködosim",
 	"Ki Tavo": "Ki Távó",
 	"Ki Teitzei": "Ki Técé",

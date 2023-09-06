@@ -17,7 +17,7 @@ var dict_pl = map[string]string{
 	"Chayei Sara": "Chaje Sara",
 	"Devarim": "Dewarim",
 	"Eikev": "Ekew",
-	"Ha'Azinu": "Haazinu",
+	"Ha'azinu": "Haazinu",
 	"Kedoshim": "Kedoszim",
 	"Ki Tavo": "Ki Tawo",
 	"Ki Teitzei": "Ki Tece",

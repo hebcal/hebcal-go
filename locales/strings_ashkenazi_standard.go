@@ -56,7 +56,7 @@ var dict_ashkenazi_standard = map[string]string{
 	"Devarim": "Dvorim",
 	"Eikev": "Eikev",
 	"Emor": "Emor",
-	"Ha'Azinu": "Haazinu",
+	"Ha'azinu": "Haazinu",
 	"Kedoshim": "Kdoyshim",
 	"Ki Tavo": "Ki-Sovo",
 	"Ki Teitzei": "Ki-Seitzei",
