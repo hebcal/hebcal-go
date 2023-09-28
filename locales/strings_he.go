@@ -112,7 +112,7 @@ var dict_he = map[string]string{
 	"Sivan": "סִיוָן",
 	"Tamuz": "תַּמּוּז",
 	"Tevet": "טֵבֵת",
-	"Tishrei": "תִשְׁרֵי",
+	"Tishrei": "תִּשְׁרֵי",
 	"Rosh Hashana": "רֹאשׁ הַשָּׁנָה",
 	"Rosh Hashana I": "רֹאשׁ הַשָּׁנָה א׳",
 	"Rosh Hashana II": "רֹאשׁ הַשָּׁנָה ב׳",

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hebcal/hdate"
+	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/molad"
 )
 
@@ -25,9 +26,38 @@ func (ev moladEvent) GetDate() hdate.HDate {
 	return ev.Date
 }
 
+var heDayNames = []string{
+	"רִאשׁוֹן", "שֵׁנִי", "שְׁלִישִׁי", "רְבִיעִי", "חֲמִישִׁי", "שִׁישִּׁי", "שַׁבָּת",
+}
+
+const night = "בַּלַּ֥יְלָה"
+const morning = "בַּבֹּקֶר"
+const afternoon = "בַּצׇּהֳרַיִים"
+const evening = "בָּעֶרֶב"
+
 func (ev moladEvent) Render(locale string) string {
+	monthStr, _ := locales.LookupTranslation(ev.MonthName, locale)
+	if locale == "he" {
+		dow := heDayNames[ev.Molad.Date.Weekday()]
+		var ampm string
+		if ev.Molad.Hours < 5 {
+			ampm = night
+		} else if ev.Molad.Hours < 12 {
+			ampm = morning
+		} else if ev.Molad.Hours < 17 {
+			ampm = afternoon
+		} else if ev.Molad.Hours < 21 {
+			ampm = evening
+		} else {
+			ampm = night
+		}
+		return fmt.Sprintf("מוֹלָד הָלְּבָנָה %s יִהְיֶה בַּיּוֹם %s בשָׁבוּעַ, "+
+			"בְּשָׁעָה %d %s, ו-%d דַּקּוֹת "+"ו-%d חֲלָקִים",
+			monthStr, dow,
+			ev.Molad.Hours, ampm, ev.Molad.Minutes, ev.Molad.Chalakim)
+	}
 	return fmt.Sprintf("Molad %s: %s, %d minutes and %d chalakim after %d:00",
-		ev.MonthName, ev.Molad.Date.Weekday().String()[0:3],
+		monthStr, ev.Molad.Date.Weekday().String()[0:3],
 		ev.Molad.Minutes, ev.Molad.Chalakim, ev.Molad.Hours)
 }
 
