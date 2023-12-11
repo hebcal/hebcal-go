@@ -259,10 +259,11 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 		{"Dusk", z.Dusk()},
 		{"Tzeit HaKochavim", z.Tzeit(zmanim.Tzeit3SmallStars)},
 	}
-	events := make([]event.CalEvent, len(times))
-	for i, ev := range times {
-		if !ev.t.IsZero() {
-			events[i] = NewTimedEvent(date, ev.desc, event.ZMANIM, ev.t, 0, nil, opts)
+	events := make([]event.CalEvent, 0, len(times))
+	for _, zman := range times {
+		if !zman.t.IsZero() {
+			ev := NewTimedEvent(date, zman.desc, event.ZMANIM, zman.t, 0, nil, opts)
+			events = append(events, ev)
 		}
 	}
 	return events

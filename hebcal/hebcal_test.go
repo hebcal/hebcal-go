@@ -546,3 +546,17 @@ func TestYear1(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 79, len(events))
 }
+
+func TestHebrewCalendarZmanimOnly(t *testing.T) {
+	assert := assert.New(t)
+	loc := zmanim.LookupCity("Amsterdam")
+	opts := hebcal.CalOptions{
+		Start:       hdate.New(5783, hdate.Sivan, 9),
+		End:         hdate.New(5783, hdate.Sivan, 9),
+		Location:    loc,
+		DailyZmanim: true,
+	}
+	events, err := hebcal.HebrewCalendar(&opts)
+	assert.Equal(nil, err)
+	assert.Equal(15, len(events)) // not 16 (no Alot HaShachar)
+}
