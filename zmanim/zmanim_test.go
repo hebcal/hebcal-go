@@ -185,3 +185,13 @@ func ExampleZmanim_Dusk() {
 	fmt.Println(dusk)
 	// Output: 0001-01-01 00:00:00 +0000 UTC
 }
+
+func TestZmanimAmsterdam(t *testing.T) {
+	assert := assert.New(t)
+	dt := time.Date(2023, time.May, 29, 12, 0, 0, 0, time.UTC)
+	location := zmanim.NewLocation("Amsterdam", "NL", 52.37403, 4.88969, "Europe/Amsterdam")
+	zman := zmanim.New(&location, dt)
+	alot := zman.AlotHaShachar()
+	assert.Equal(alot.IsZero(), true)
+	assert.Equal(time.Time{}, alot)
+}

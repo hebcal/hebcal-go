@@ -261,7 +261,9 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 	}
 	events := make([]event.CalEvent, len(times))
 	for i, ev := range times {
-		events[i] = NewTimedEvent(date, ev.desc, event.ZMANIM, ev.t, 0, nil, opts)
+		if !ev.t.IsZero() {
+			events[i] = NewTimedEvent(date, ev.desc, event.ZMANIM, ev.t, 0, nil, opts)
+		}
 	}
 	return events
 }
