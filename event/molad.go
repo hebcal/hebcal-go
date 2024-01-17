@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/locales"
-	"github.com/hebcal/hebcal-go/molad"
+	"github.com/MaxBGreenberg/hebcal-go/locales"
+	"github.com/MaxBGreenberg/hebcal-go/molad"
 )
 
 type moladEvent struct {

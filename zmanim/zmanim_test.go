@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hebcal/hebcal-go/zmanim"
+	"github.com/MaxBGreenberg/hebcal-go/zmanim"
 	"github.com/stretchr/testify/assert"
 )
 

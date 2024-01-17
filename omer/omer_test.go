@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/omer"
+	"github.com/MaxBGreenberg/hebcal-go/omer"
 	"github.com/stretchr/testify/assert"
 )
 

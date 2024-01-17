@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/molad"
+	"github.com/MaxBGreenberg/hebcal-go/event"
+	"github.com/MaxBGreenberg/hebcal-go/molad"
 	"github.com/stretchr/testify/assert"
 )
 

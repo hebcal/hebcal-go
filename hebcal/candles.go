@@ -22,9 +22,9 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/locales"
-	"github.com/hebcal/hebcal-go/zmanim"
+	"github.com/MaxBGreenberg/hebcal-go/event"
+	"github.com/MaxBGreenberg/hebcal-go/locales"
+	"github.com/MaxBGreenberg/hebcal-go/zmanim"
 )
 
 func formatTime(t *time.Time, opts *CalOptions) string {

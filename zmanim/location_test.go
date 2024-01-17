@@ -3,7 +3,7 @@ package zmanim_test
 import (
 	"testing"
 
-	"github.com/hebcal/hebcal-go/zmanim"
+	"github.com/MaxBGreenberg/hebcal-go/zmanim"
 )
 
 func TestNoDuplicateCities(t *testing.T) {
