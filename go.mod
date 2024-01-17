@@ -1,4 +1,4 @@
-module MaxBGreenberg/hebcal-go
+module github.com/MaxBGreenberg/hebcal-go
 
 go 1.21.5
 

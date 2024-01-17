@@ -8,7 +8,7 @@ import (
 
 	"github.com/hebcal/hdate"
 	"github.com/MaxBGreenberg/hebcal-go/dafyomi"
-	"github.com/hebcal/MaxBGreenberg/nachyomi"
+	"github.com/MaxBGreenberg/hebcal.go/nachyomi"
 	"github.com/stretchr/testify/assert"
 )
 
