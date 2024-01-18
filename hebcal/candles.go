@@ -243,8 +243,8 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 		t    time.Time
 	}{
 		{"Alot haShachar", z.AlotHaShachar()},
-		{"Misheyakir", z.Misheyakir()},
-		{"Misheyakir Machmir", z.MisheyakirMachmir()},
+		//{"Misheyakir", z.Misheyakir()},
+		{"Misheyakir", z.MisheyakirMachmir()},
 		//{"Dawn", z.Dawn()},
 		{"Sunrise", z.Sunrise()},
 		{"Kriat Shema, sof zeman (MGA)", z.SofZmanShmaMGA()},
