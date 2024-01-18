@@ -162,7 +162,7 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEv
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	z := zmanim.New(loc, gregDate)
-	candleLightingTime := z.Dusk()
+	candleLightingTime := z.Tzeit(zmanim.Tzeit3MediumStars)
 	if (candleLightingTime == time.Time{}) {
 		return TimedEvent{} // no sunset
 	}
