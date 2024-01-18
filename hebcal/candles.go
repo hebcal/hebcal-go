@@ -257,7 +257,7 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 		{"Plag HaMincha", z.PlagHaMincha()},
 		{"Sunset", z.Sunset()},
 		{"Dusk", z.Dusk()},
-		{"Tzeit HaKochavim", z.Tzeit(zmanim.Tzeit3SmallStars)},
+		{"Tzeit HaKochavim", z.Tzeit(zmanim.Tzeit3MediumStars)},
 	}
 	events := make([]event.CalEvent, 0, len(times))
 	for _, zman := range times {
