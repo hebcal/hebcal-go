@@ -256,6 +256,7 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 		{"Mincha Ketanah", z.MinchaKetana()},
 		{"Plag HaMincha", z.PlagHaMincha()},
 		{"Sunset", z.Sunset()},
+		{" Bein HaShemashot", z.BeinHashmashos()},
 		//{"Dusk", z.Dusk()},
 		{"Tzeit HaKochavim", z.Tzeit(zmanim.Tzeit3MediumStars)},
 	}
