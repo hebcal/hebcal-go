@@ -224,7 +224,7 @@ func (z *Zmanim) PlagHaMincha() time.Time {
 // For 3 medium stars use 7.083°
 func (z *Zmanim) Tzeit(angle float64) time.Time {
 	if angle == 0 {
-		angle = Tzeit3SmallStars
+		angle = Tzeit3MediumStars
 	}
 	return z.timeAtAngle(angle, false)
 }
