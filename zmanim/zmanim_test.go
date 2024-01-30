@@ -34,26 +34,7 @@ func TestZmanimChicago(t *testing.T) {
 		"Fri, 05 Jun 2020 21:03:32 -0500",
 		"Fri, 05 Jun 2020 21:13:28 -0500",
 	}
-	times := []time.Time{
-		zman.GregEve(),
-		zman.ChatzotNight(),
-		zman.AlotHaShachar(),
-		zman.Misheyakir(),
-		zman.MisheyakirMachmir(),
-		zman.Sunrise(),
-		zman.SofZmanShma(),
-		zman.SofZmanShmaMGA(),
-		zman.SofZmanTfilla(),
-		zman.SofZmanTfillaMGA(),
-		zman.Chatzot(),
-		zman.MinchaGedola(),
-		zman.MinchaKetana(),
-		zman.PlagHaMincha(),
-		zman.Sunset(),
-		zman.BeinHashmashos(),
-		zman.Tzeit(7.083),
-		zman.Tzeit(8.5),
-	}
+	times := makeTestTimes(zman)
 	actual := make([]string, 18)
 	for idx, t := range times {
 		actual[idx] = t.Format(time.RFC1123Z)
@@ -89,6 +70,15 @@ func TestZmanimTelAviv(t *testing.T) {
 		"Sat, 06 Mar 2021 18:11:41 +0200",
 		"Sat, 06 Mar 2021 18:18:23 +0200",
 	}
+	times := makeTestTimes(zman)
+	actual := make([]string, 18)
+	for idx, t := range times {
+		actual[idx] = t.Format(time.RFC1123Z)
+	}
+	assert.Equal(expected, actual)
+}
+
+func makeTestTimes(zman zmanim.Zmanim) []time.Time {
 	times := []time.Time{
 		zman.GregEve(),
 		zman.ChatzotNight(),
@@ -109,11 +99,7 @@ func TestZmanimTelAviv(t *testing.T) {
 		zman.Tzeit(7.083),
 		zman.Tzeit(8.5),
 	}
-	actual := make([]string, 18)
-	for idx, t := range times {
-		actual[idx] = t.Format(time.RFC1123Z)
-	}
-	assert.Equal(expected, actual)
+	return times
 }
 
 func TestZmanimHelsinki(t *testing.T) {
