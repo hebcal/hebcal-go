@@ -23,8 +23,8 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/sedra"
+	"github.com/MaxBGreenberg/hebcal-go/event"
+	"github.com/MaxBGreenberg/hebcal-go/sedra"
 )
 
 type holiday struct {

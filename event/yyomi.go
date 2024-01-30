@@ -5,8 +5,8 @@ import (
 
 	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/dafyomi"
-	"github.com/hebcal/hebcal-go/locales"
+	"github.com/MaxBGreenberg/hebcal-go/dafyomi"
+	"github.com/MaxBGreenberg/hebcal-go/locales"
 )
 
 type yyomiEvent struct {

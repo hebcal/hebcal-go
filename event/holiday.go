@@ -4,7 +4,7 @@ import (
 	"regexp"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/locales"
+	"github.com/MaxBGreenberg/hebcal-go/locales"
 )
 
 // HolidayEvent represents a built-in holiday like Pesach, Purim or Tu BiShvat

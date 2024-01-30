@@ -9,7 +9,7 @@ import (
 
 	"github.com/hebcal/greg"
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/dafyomi"
+	"github.com/MaxBGreenberg/hebcal-go/dafyomi"
 )
 
 // Using the Vilna edition, the Yerushalmi Daf Yomi program takes

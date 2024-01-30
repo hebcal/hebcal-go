@@ -22,9 +22,9 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/locales"
-	"github.com/hebcal/hebcal-go/zmanim"
+	"github.com/MaxBGreenberg/hebcal-go/event"
+	"github.com/MaxBGreenberg/hebcal-go/locales"
+	"github.com/MaxBGreenberg/hebcal-go/zmanim"
 )
 
 func formatTime(t *time.Time, opts *CalOptions) string {
@@ -162,7 +162,7 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEv
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	z := zmanim.New(loc, gregDate)
-	candleLightingTime := z.Dusk()
+	candleLightingTime := z.Tzeit(zmanim.Tzeit3MediumStars)
 	if (candleLightingTime == time.Time{}) {
 		return TimedEvent{} // no sunset
 	}
@@ -243,9 +243,9 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 		t    time.Time
 	}{
 		{"Alot haShachar", z.AlotHaShachar()},
-		{"Misheyakir", z.Misheyakir()},
-		{"Misheyakir Machmir", z.MisheyakirMachmir()},
-		{"Dawn", z.Dawn()},
+		//{"Misheyakir", z.Misheyakir()},
+		{"Misheyakir", z.MisheyakirMachmir()},
+		//{"Dawn", z.Dawn()},
 		{"Sunrise", z.Sunrise()},
 		{"Kriat Shema, sof zeman (MGA)", z.SofZmanShmaMGA()},
 		{"Kriat Shema, sof zeman (GRA)", z.SofZmanShma()},
@@ -256,8 +256,10 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 		{"Mincha Ketanah", z.MinchaKetana()},
 		{"Plag HaMincha", z.PlagHaMincha()},
 		{"Sunset", z.Sunset()},
-		{"Dusk", z.Dusk()},
-		{"Tzeit HaKochavim", z.Tzeit(zmanim.Tzeit3SmallStars)},
+		{"Bein HaShemashot", z.BeinHashmashos()},
+		//{"Dusk", z.Dusk()},
+		{"Tzeit HaKochavim", z.Tzeit(zmanim.Tzeit3MediumStars)},
+		{"Chatzoz Halayla", z.ChatzotNight()},
 	}
 	events := make([]event.CalEvent, 0, len(times))
 	for _, zman := range times {

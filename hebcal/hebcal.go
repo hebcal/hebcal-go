@@ -24,15 +24,15 @@ import (
 
 	"github.com/hebcal/greg"
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/dafyomi"
-	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/mishnayomi"
-	"github.com/hebcal/hebcal-go/molad"
-	"github.com/hebcal/hebcal-go/nachyomi"
-	"github.com/hebcal/hebcal-go/omer"
-	"github.com/hebcal/hebcal-go/sedra"
-	"github.com/hebcal/hebcal-go/yerushalmi"
-	"github.com/hebcal/hebcal-go/zmanim"
+	"github.com/MaxBGreenberg/hebcal-go/dafyomi"
+	"github.com/MaxBGreenberg/hebcal-go/event"
+	"github.com/MaxBGreenberg/hebcal-go/mishnayomi"
+	"github.com/MaxBGreenberg/hebcal-go/molad"
+	"github.com/MaxBGreenberg/hebcal-go/nachyomi"
+	"github.com/MaxBGreenberg/hebcal-go/omer"
+	"github.com/MaxBGreenberg/hebcal-go/sedra"
+	"github.com/MaxBGreenberg/hebcal-go/yerushalmi"
+	"github.com/MaxBGreenberg/hebcal-go/zmanim"
 )
 
 /*

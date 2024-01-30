@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/locales"
-	"github.com/hebcal/hebcal-go/mishnayomi"
+	"github.com/MaxBGreenberg/hebcal-go/locales"
+	"github.com/MaxBGreenberg/hebcal-go/mishnayomi"
 )
 
 type mishnaYomiEvent struct {
