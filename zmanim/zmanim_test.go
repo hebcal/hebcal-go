@@ -40,7 +40,6 @@ func TestZmanimChicago(t *testing.T) {
 		zman.AlotHaShachar(),
 		zman.Misheyakir(),
 		zman.MisheyakirMachmir(),
-		zman.Dawn(),
 		zman.Sunrise(),
 		zman.SofZmanShma(),
 		zman.SofZmanShmaMGA(),
@@ -51,7 +50,7 @@ func TestZmanimChicago(t *testing.T) {
 		zman.MinchaKetana(),
 		zman.PlagHaMincha(),
 		zman.Sunset(),
-		zman.Dusk(),
+		zman.BeinHashmashos(),
 		zman.Tzeit(8.5),
 	}
 	actual := make([]string, 18)
@@ -107,6 +106,7 @@ func TestZmanimTelAviv(t *testing.T) {
 		zman.PlagHaMincha(),
 		zman.Sunset(),
 		zman.Dusk(),
+		zman.BeinHashmashos(),
 		zman.Tzeit(8.5),
 	}
 	actual := make([]string, 18)
