@@ -107,7 +107,7 @@ func TestZmanimTelAviv(t *testing.T) {
 		zman.PlagHaMincha(),
 		zman.Sunset(),
 		zman.Dusk(),
-		zman.BeinHashmashos()
+		zman.BeinHashmashos(),
 		zman.Tzeit(8.5),
 	}
 	actual := make([]string, 18)
