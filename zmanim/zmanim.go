@@ -59,10 +59,8 @@ func New(location *Location, date time.Time) Zmanim {
 	return Zmanim{Location: location, Year: year, Month: month, Day: day, loc: loc}
 }
 
-var nilTime = time.Time{}
-
 func (z *Zmanim) inLoc(dt time.Time) time.Time {
-	if dt == nilTime {
+	if dt.IsZero() {
 		return dt
 	}
 	return dt.In(z.loc)
@@ -229,15 +227,20 @@ func (z *Zmanim) Tzeit(angle float64) time.Time {
 	return z.timeAtAngle(angle, false)
 }
 
+const ThirteenFive time.Duration = -1 * time.Duration(13.5*float64(time.Minute))
+
 // Rabbeinu Tam holds that bein hashmashos is a specific time between sunset and tzeis hakochavim
 // One opinion on how to calculate this time is that it is 13.5 minutes before tzies 7.083
 func (z *Zmanim) BeinHashmashos() time.Time {
-	tzeis:=z.Tzeit(Tzeit3MediumStars)
-	return tzeis.Add(-time.Duration(13.5 * float64(time.Minute)))
+	tzeis := z.Tzeit(Tzeit3MediumStars)
+	if tzeis.IsZero() {
+		return tzeis
+	}
+	return tzeis.Add(ThirteenFive)
 }
 
 func (z *Zmanim) riseSetOffset(t time.Time, offset int, roundTime bool) time.Time {
-	if t == nilTime {
+	if t.IsZero() {
 		return t
 	}
 	year, month, day := t.Date()

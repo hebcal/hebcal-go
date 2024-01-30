@@ -176,18 +176,18 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 	assert.Equal(nil, err)
 	assert.Equal(14, len(events))
 	expected := []string{
-		"2022-12-18 Chanukah: 1 Candle: 5:04",
-		"2022-12-19 Chanukah: 2 Candles: 5:05",
-		"2022-12-20 Chanukah: 3 Candles: 5:05",
-		"2022-12-21 Chanukah: 4 Candles: 5:06",
-		"2022-12-22 Chanukah: 5 Candles: 5:06",
+		"2022-12-18 Chanukah: 1 Candle: 4:56",
+		"2022-12-19 Chanukah: 2 Candles: 4:57",
+		"2022-12-20 Chanukah: 3 Candles: 4:57",
+		"2022-12-21 Chanukah: 4 Candles: 4:58",
+		"2022-12-22 Chanukah: 5 Candles: 4:58",
 		"2022-12-23 Chanukah: 6 Candles: 4:00",
 		"2022-12-23 Candle lighting: 4:00",
 		"2022-12-24 Chag HaBanot",
 		"2022-12-24 Chanukah: 7 Candles: 5:20",
 		"2022-12-24 Rosh Chodesh Tevet",
 		"2022-12-24 Havdalah: 5:20",
-		"2022-12-25 Chanukah: 8 Candles: 5:08",
+		"2022-12-25 Chanukah: 8 Candles: 5:00",
 		"2022-12-25 Rosh Chodesh Tevet",
 		"2022-12-26 Chanukah: 8th Day",
 	}
@@ -557,5 +557,5 @@ func TestHebrewCalendarZmanimOnly(t *testing.T) {
 	}
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.Equal(nil, err)
-	assert.Equal(15, len(events)) // not 16 (no Alot HaShachar)
+	assert.Equal(14, len(events)) // not 15 (no Alot HaShachar)
 }

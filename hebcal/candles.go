@@ -47,7 +47,7 @@ type TimedEvent struct {
 
 func NewTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time.Time,
 	sunsetOffset int, linkedEvent event.CalEvent, opts *CalOptions) TimedEvent {
-	if (t == time.Time{}) {
+	if t.IsZero() {
 		return TimedEvent{}
 	}
 	var emoji string
@@ -136,7 +136,7 @@ func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev event.CalEvent) TimedE
 	} else {
 		eventTime = z.Tzeit(opts.HavdalahDeg)
 	}
-	if (eventTime == time.Time{}) {
+	if eventTime.IsZero() {
 		return TimedEvent{} // no sunset
 	}
 	desc := "Candle lighting"
@@ -162,8 +162,8 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEv
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	z := zmanim.New(loc, gregDate)
-	candleLightingTime := z.Dusk()
-	if (candleLightingTime == time.Time{}) {
+	candleLightingTime := z.BeinHashmashos()
+	if candleLightingTime.IsZero() {
 		return TimedEvent{} // no sunset
 	}
 	return TimedEvent{
