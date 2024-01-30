@@ -72,6 +72,7 @@ Additional non-default event types can be specified:
   - Shabbat Mevarchim HaChodesh on Saturday before Rosh Chodesh (opts.ShabbatMevarchim)
   - Molad announcement on Saturday before Rosh Chodesh (opts.Molad)
   - Yom Kippur Katan (opts.YomKippurKatan)
+  - Days the torah is read (opts.TorahReading)
 
 Candle-lighting and Havdalah times are approximated using latitude and longitude
 specified by the HLocation class. The HLocation class contains a small
@@ -209,6 +210,11 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			}
 		}
 		if !opts.WeeklyAbbreviated || dow == firstWeekday {
+			if opts.TorahReading {
+				if hd.Weekday() == time.Monday || hd.Weekday() == time.Thursday || hd.Weekday() == time.Saturday {
+					events = append(events, event.NewHebrewDateEvent(hd))
+				}
+			}
 			if opts.Omer && abs >= beginOmer && abs <= endOmer {
 				omerDay := int(abs - beginOmer + 1)
 				events = append(events, omer.NewOmerEvent(hd, omerDay))

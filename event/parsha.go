@@ -38,7 +38,7 @@ func (ev parshaEvent) Render(locale string) string {
 }
 
 func (ev parshaEvent) GetFlags() HolidayFlags {
-	return PARSHA_HASHAVUA
+	return PARSHA_HASHAVUA | TORAH_READING
 }
 
 func (ev parshaEvent) GetEmoji() string {
