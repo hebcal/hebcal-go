@@ -429,7 +429,7 @@ func TestDailyZemanim(t *testing.T) {
 		"2021-11-27 Mincha Ketanah: 14:19",
 		"2021-11-27 Plag HaMincha: 15:18",
 		"2021-11-27 Sunset: 16:17",
-		"2021-11-27 Bein HaShemashot: 16:41"
+		"2021-11-27 Bein HaShemashot: 16:41",
 		"2021-11-27 Tzeit HaKochavim: 17:02",
 	}
 	assert.Equal(t, expected, actual)
