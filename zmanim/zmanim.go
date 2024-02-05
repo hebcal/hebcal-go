@@ -183,6 +183,14 @@ func (z *Zmanim) SofZmanTfilla() time.Time {
 	return z.hourOffset(4)
 }
 
+
+// On erev pesach, sof zman achilas chametz is at the same time as sof zman fefillah
+// Sof zman biur chametz, the latested time it is permitted to have hanaa from chametz, is 1 halchik hour later
+// According to the GRA
+func (z *Zmanim) SofZmanBiur() time.Time {
+	return z.hoursOffset(5)
+}
+
 func (z *Zmanim) sofZmanMGA(hours float64) time.Time {
 	alot72 := z.SunriseOffset(-72, false)
 	tzeit72 := z.SunsetOffset(72, false)
@@ -200,6 +208,11 @@ func (z *Zmanim) SofZmanShmaMGA() time.Time {
 // Latest Shacharit (MGA); Sunrise plus 4 halachic hours, according to Magen Avraham
 func (z *Zmanim) SofZmanTfillaMGA() time.Time {
 	return z.sofZmanMGA(4)
+}
+
+// Sof zman biur chametz accoring to MGA
+func (z *Zmanim) SofZmanBiurMGA() time.Time {
+	return z.sofZmanMGA(5)
 }
 
 // Earliest Mincha – Mincha Gedola; Sunrise plus 6.5 halachic hours
