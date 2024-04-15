@@ -270,6 +270,7 @@ func TestModernILHolidays(t *testing.T) {
 		"2022-11-06 Yitzhak Rabin Memorial Day",
 		"2022-11-23 Sigd",
 		"2022-11-30 Ben-Gurion Day",
+		"2023-01-12 Hebrew Language Day",
 		"2023-02-21 Family Day",
 		"2023-04-01 Yom HaAliyah",
 		"2023-04-18 Yom HaShoah",

@@ -7,5 +7,5 @@ import (
 )
 
 func TestGetAllHolidaysForYear(t *testing.T) {
-	assert.Equal(t, 126, len(getAllHolidaysForYear(5783)))
+	assert.Equal(t, 127, len(getAllHolidaysForYear(5783)))
 }

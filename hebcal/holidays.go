@@ -222,6 +222,9 @@ var staticModernHolidays = []struct {
 	{firstYear: 5777, mm: hdate.Nisan, dd: 10, desc: "Yom HaAliyah",
 		chul: true},
 	{firstYear: 5777, mm: hdate.Cheshvan, dd: 7, desc: "Yom HaAliyah School Observance"},
+	// https://www.gov.il/he/departments/policies/2012_des5234
+	{firstYear: 5773, mm: hdate.Tevet, dd: 21, desc: "Hebrew Language Day",
+		friSatMovetoThu: true},
 }
 
 func tzomGedaliahDate(rh hdate.HDate) hdate.HDate {
