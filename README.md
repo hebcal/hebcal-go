@@ -1,6 +1,6 @@
 # hebcal-go
 
-[![Build Status](https://app.travis-ci.com/hebcal/hebcal-go.svg?branch=main)](https://app.travis-ci.com/hebcal/hebcal-go)
+[![Build Status](https://github.com/hebcal/hebcal-go/actions/workflows/go.yml/badge.svg)](https://github.com/hebcal/hebcal-go/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hebcal/hebcal-go)](https://goreportcard.com/report/github.com/hebcal/hebcal-go)
 [![GoDoc](https://pkg.go.dev/badge/github.com/hebcal/hebcal-go?status.svg)](https://pkg.go.dev/github.com/hebcal/hebcal-go)
 
