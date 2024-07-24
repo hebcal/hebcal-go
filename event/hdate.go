@@ -2,6 +2,7 @@ package event
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/dustin/go-humanize"
 	"github.com/hebcal/gematriya"
@@ -37,6 +38,9 @@ func (ev hebrewDateEvent) Render(locale string) string {
 }
 
 func (ev hebrewDateEvent) GetFlags() HolidayFlags {
+	if ev.Date.Weekday() == time.Monday || ev.Date.Weekday() == time.Thursday || ev.Date.Weekday() == time.Saturday {
+		return HEBREW_DATE | TORAH_READING
+	}
 	return HEBREW_DATE
 }
 
