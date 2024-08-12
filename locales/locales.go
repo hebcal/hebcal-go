@@ -5,6 +5,7 @@ import "strings"
 // AllLocales is an array of all supported locale names.
 var AllLocales = []string{
 	"en",
+	"he-x-NoNikud",
 	"ashkenazi",
 	"he",
 	"ashkenazi_litvish",
@@ -29,16 +30,16 @@ func LookupTranslation(key string, locale string) (string, bool) {
 	switch lang {
 	case "", "en", "sephardic":
 		return key, true
-	case "ashkenazi":
-		return Lookup_ashkenazi(key)
-	case "he":
-		return Lookup_he(key)
 	case "he-x-nonikud":
 		v, ok := Lookup_he(key)
 		if ok {
 			return HebrewStripNikkud(v), true
 		}
 		return v, ok
+	case "ashkenazi":
+		return Lookup_ashkenazi(key)
+	case "he":
+		return Lookup_he(key)
 	case "ashkenazi_litvish":
 		return Lookup_ashkenazi_litvish(key)
 	case "ashkenazi_poylish":
