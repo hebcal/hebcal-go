@@ -2,6 +2,7 @@ package event
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hdate"
@@ -24,7 +25,8 @@ func (ev dafYomiEvent) GetDate() hdate.HDate {
 
 func (ev dafYomiEvent) Render(locale string) string {
 	name, _ := locales.LookupTranslation(ev.Daf.Name, locale)
-	if locale == "he" {
+	locale = strings.ToLower(locale)
+	if locale == "he" || locale == "he-x-nonikud" {
 		return name + " דף " + gematriya.Gematriya(ev.Daf.Blatt)
 	}
 	return name + " " + strconv.Itoa(ev.Daf.Blatt)

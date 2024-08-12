@@ -33,6 +33,12 @@ func LookupTranslation(key string, locale string) (string, bool) {
 		return Lookup_ashkenazi(key)
 	case "he":
 		return Lookup_he(key)
+	case "he-x-nonikud":
+		v, ok := Lookup_he(key)
+		if ok {
+			return HebrewStripNikkud(v), true
+		}
+		return v, ok
 	case "ashkenazi_litvish":
 		return Lookup_ashkenazi_litvish(key)
 	case "ashkenazi_poylish":

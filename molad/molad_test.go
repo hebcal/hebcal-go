@@ -27,4 +27,5 @@ func TestMoladEvent_Render(t *testing.T) {
 	ev := event.NewMoladEvent(hd, molad, month.String())
 	assert.Equal(t, "Molad Iyyar: Thu, 8 minutes and 13 chalakim after 14:00", ev.Render("en"))
 	assert.Equal(t, "מוֹלָד הָלְּבָנָה אִיָיר יִהְיֶה בַּיּוֹם חֲמִישִׁי בשָׁבוּעַ, בְּשָׁעָה 14 בַּצׇּהֳרַיִים, ו-8 דַּקּוֹת ו-13 חֲלָקִים", ev.Render("he"))
+	assert.Equal(t, "מולד הלבנה אייר יהיה ביום חמישי בשבוע, בשעה 14 בצהריים, ו-8 דקות ו-13 חלקים", ev.Render("he-x-NoNikud"))
 }

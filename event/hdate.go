@@ -2,6 +2,7 @@ package event
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/dustin/go-humanize"
 	"github.com/hebcal/gematriya"
@@ -20,9 +21,10 @@ func (ev hebrewDateEvent) GetDate() hdate.HDate {
 func (ev hebrewDateEvent) Render(locale string) string {
 	hd := ev.Date
 	enMonthName := hd.MonthName("en")
+	locale = strings.ToLower(locale)
 	switch locale {
-	case "he":
-		return gematriya.Gematriya(hd.Day()) + " " + hd.MonthName("he") + " " + gematriya.Gematriya(hd.Year())
+	case "he", "he-x-nonikud":
+		return gematriya.Gematriya(hd.Day()) + " " + hd.MonthName(locale) + " " + gematriya.Gematriya(hd.Year())
 	case "", "en", "sephardic", "ashkenazi",
 		"ashkenazi_litvish", "ashkenazi_poylish", "ashkenazi_standard":
 		return humanize.Ordinal(hd.Day()) + " of " + enMonthName +

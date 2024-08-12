@@ -25,6 +25,7 @@ func TestHebrewDateEvent(t *testing.T) {
 	assert.Equal(t, "3rd of Sivan, 5781", ev.Render("en"))
 	assert.Equal(t, "ג׳ סִיוָן תשפ״א", ev.Render("he"))
 	assert.Equal(t, "3 Sziván 5781", ev.Render("hu"))
+	assert.Equal(t, "ג׳ סיון תשפ״א", ev.Render("he-x-NoNikud"))
 }
 
 func TestParshaEvent_Render(t *testing.T) {

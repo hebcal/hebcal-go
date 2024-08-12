@@ -52,9 +52,10 @@ func (ev OmerEvent) GetDate() hdate.HDate {
 }
 
 func (ev OmerEvent) Render(locale string) string {
+	locale = strings.ToLower(locale)
 	dayOfTheOmer, _ := locales.LookupTranslation("day of the Omer", locale)
 	switch locale {
-	case "he":
+	case "he", "he-x-nonikud":
 		return gematriya.Gematriya(ev.OmerDay) + " " + dayOfTheOmer
 	case "", "en", "sephardic", "ashkenazi",
 		"ashkenazi_litvish", "ashkenazi_poylish", "ashkenazi_standard":
@@ -175,8 +176,13 @@ func todayIsHe(omer int) string {
 }
 
 func (ev OmerEvent) TodayIs(locale string) string {
-	if locale == "he" {
-		return todayIsHe(ev.OmerDay)
+	locale = strings.ToLower(locale)
+	if locale == "he" || locale == "he-x-nonikud" {
+		str := todayIsHe(ev.OmerDay)
+		if locale == "he-x-nonikud" {
+			str = locales.HebrewStripNikkud(str)
+		}
+		return str
 	}
 	totalDaysStr := "days"
 	if ev.OmerDay == 1 {
@@ -231,12 +237,16 @@ func (ev OmerEvent) Sefira(locale string) string {
 	weekStr := sefirot[ev.WeekNumber]
 	dayWithinWeekStr := sefirot[ev.DaysWithinWeeks]
 	weekNum2or6 := ev.WeekNumber == 2 || ev.WeekNumber == 6
-	if locale == "he" {
+	locale = strings.ToLower(locale)
+	if locale == "he" || locale == "he-x-nonikud" {
 		week, _ := locales.LookupTranslation(weekStr, locale)
 		dayWithinWeek, _ := locales.LookupTranslation(dayWithinWeekStr, locale)
 		prefix := "שֶׁבְּ"
 		if weekNum2or6 {
 			prefix = "שֶׁבִּ"
+		}
+		if locale == "he-x-nonikud" {
+			prefix = locales.HebrewStripNikkud(prefix)
 		}
 		return dayWithinWeek + " " + prefix + week
 	} else if locale == "translit" {

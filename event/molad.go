@@ -2,6 +2,7 @@ package event
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/locales"
@@ -37,7 +38,8 @@ const evening = "בָּעֶרֶב"
 
 func (ev moladEvent) Render(locale string) string {
 	monthStr, _ := locales.LookupTranslation(ev.MonthName, locale)
-	if locale == "he" {
+	locale = strings.ToLower(locale)
+	if locale == "he" || locale == "he-x-nonikud" {
 		dow := heDayNames[ev.Molad.Date.Weekday()]
 		var ampm string
 		if ev.Molad.Hours < 5 {
@@ -51,10 +53,14 @@ func (ev moladEvent) Render(locale string) string {
 		} else {
 			ampm = night
 		}
-		return fmt.Sprintf("מוֹלָד הָלְּבָנָה %s יִהְיֶה בַּיּוֹם %s בשָׁבוּעַ, "+
+		str := fmt.Sprintf("מוֹלָד הָלְּבָנָה %s יִהְיֶה בַּיּוֹם %s בשָׁבוּעַ, "+
 			"בְּשָׁעָה %d %s, ו-%d דַּקּוֹת "+"ו-%d חֲלָקִים",
 			monthStr, dow,
 			ev.Molad.Hours, ampm, ev.Molad.Minutes, ev.Molad.Chalakim)
+		if locale == "he-x-nonikud" {
+			str = locales.HebrewStripNikkud(str)
+		}
+		return str
 	}
 	return fmt.Sprintf("Molad %s: %s, %d minutes and %d chalakim after %d:00",
 		monthStr, ev.Molad.Date.Weekday().String()[0:3],

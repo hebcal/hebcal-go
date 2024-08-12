@@ -153,7 +153,9 @@ func ExampleOmerEvent_TodayIs() {
 	omer := omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
 	fmt.Println(omer.TodayIs("en"))
 	fmt.Println(omer.TodayIs("he"))
+	fmt.Println(omer.TodayIs("he-x-NoNikud"))
 	// Output:
 	// Today is 13 days, which is 1 week and 6 days of the Omer
 	// הַיוֹם שְׁלוֹשָׁה עָשָׂר יוֹם, שְׁהֵם שָׁבוּעַ אֶחָד וְשִׁשָׁה יָמִים לָעוֹמֶר
+	// היום שלושה עשר יום, שהם שבוע אחד וששה ימים לעומר
 }
