@@ -34,9 +34,9 @@ func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 		"2010-10-02 Shabbat Mevarchim Chodesh Cheshvan",
 		"2010-10-08 Rosh Chodesh Cheshvan",
 		"2010-10-09 Rosh Chodesh Cheshvan",
+		"2010-11-04 Sigd",
 		"2010-11-04 Yom Kippur Katan Kislev",
 		"2010-11-06 Shabbat Mevarchim Chodesh Kislev",
-		"2010-11-06 Sigd",
 		"2010-11-07 Rosh Chodesh Kislev",
 		"2010-11-08 Rosh Chodesh Kislev",
 		"2010-12-01 Chanukah: 1 Candle",
@@ -462,4 +462,15 @@ func TestHolidaysEarlyYears(t *testing.T) {
 	assert.Equal(t, 99, len(events))
 	events = hebcal.GetHolidaysForYear(1, false)
 	assert.Equal(t, 99, len(events))
+}
+
+func TestSigdMovedToThursday(t *testing.T) {
+	events := hebcal.GetHolidaysForYear(5785, false)
+	var hd hdate.HDate
+	for _, ev := range events {
+		if ev.Desc == "Sigd" {
+			hd = ev.Date
+		}
+	}
+	assert.Equal(t, "27 Cheshvan 5785", hd.String())
 }

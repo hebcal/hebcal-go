@@ -218,7 +218,7 @@ var staticModernHolidays = []struct {
 	{firstYear: 5765, mm: hdate.Tamuz, dd: 29, desc: "Jabotinsky Day",
 		satPostponeToSun: true},
 	{firstYear: 5769, mm: hdate.Cheshvan, dd: 29, desc: "Sigd",
-		chul: true, suppressEmoji: true},
+		chul: true, suppressEmoji: true, friSatMovetoThu: true},
 	{firstYear: 5777, mm: hdate.Nisan, dd: 10, desc: "Yom HaAliyah",
 		chul: true},
 	{firstYear: 5777, mm: hdate.Cheshvan, dd: 7, desc: "Yom HaAliyah School Observance"},
