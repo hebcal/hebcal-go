@@ -474,3 +474,22 @@ func TestSigdMovedToThursday(t *testing.T) {
 	}
 	assert.Equal(t, "27 Cheshvan 5785", hd.String())
 }
+
+func TestGetHolidaysFor1752CE(t *testing.T) {
+	events := hebcal.GetHolidaysForYear(5513, true)
+	first := events[:6]
+	actual := make([]string, 0, len(first))
+	for _, ev := range first {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.Date), ev.Desc)
+		actual = append(actual, line)
+	}
+	expected := []string{
+		"1752-08-29 Rosh Hashana 5513",
+		"1752-08-30 Rosh Hashana II",
+		"1752-08-31 Tzom Gedaliah",
+		"1752-09-16 Shabbat Shuva",
+		"1752-09-17 Erev Yom Kippur",
+		"1752-09-18 Yom Kippur",
+	}
+	assert.Equal(t, expected, actual)
+}

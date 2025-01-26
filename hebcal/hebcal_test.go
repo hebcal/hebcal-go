@@ -559,3 +559,42 @@ func TestHebrewCalendarZmanimOnly(t *testing.T) {
 	assert.Equal(nil, err)
 	assert.Equal(14, len(events)) // not 15 (no Alot HaShachar)
 }
+
+func TestHebrewCalendar1752CE(t *testing.T) {
+	assert := assert.New(t)
+	opts := hebcal.CalOptions{
+		Year:           5513,
+		IsHebrewYear:   true,
+		AddHebrewDates: true,
+	}
+	events0, err := hebcal.HebrewCalendar(&opts)
+	events := events0[:18]
+
+	assert.Equal(nil, err)
+	expected := []string{
+		"1752-08-28 29th of Elul, 5512",
+		"1752-08-28 Erev Rosh Hashana",
+		"1752-08-29 1st of Tishrei, 5513",
+		"1752-08-29 Rosh Hashana 5513",
+		"1752-08-30 2nd of Tishrei, 5513",
+		"1752-08-30 Rosh Hashana II",
+		"1752-08-31 3rd of Tishrei, 5513",
+		"1752-08-31 Tzom Gedaliah",
+		"1752-09-01 4th of Tishrei, 5513",
+		"1752-09-02 5th of Tishrei, 5513",
+		"1752-09-14 6th of Tishrei, 5513",
+		"1752-09-15 7th of Tishrei, 5513",
+		"1752-09-16 8th of Tishrei, 5513",
+		"1752-09-16 Shabbat Shuva",
+		"1752-09-17 9th of Tishrei, 5513",
+		"1752-09-17 Erev Yom Kippur",
+		"1752-09-18 10th of Tishrei, 5513",
+		"1752-09-18 Yom Kippur",
+	}
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
+		actual = append(actual, line)
+	}
+	assert.Equal(expected, actual)
+}
