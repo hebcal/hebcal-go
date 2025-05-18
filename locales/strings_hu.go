@@ -189,6 +189,7 @@ var dict_hu = map[string]string{
 	"Yom HaShoah": "Jom háSoá",
 	"Yom HaZikaron": "Jom háZikáron",
 	"Yom Kippur": "Jom kipur",
+	"Yom Kippur Katan": "Jom kipur Kátán",
 	"Yom Yerushalayim": "Jom Jerusáláim",
 	"Yoma": "Jomá",
 	"Zevachim": "Zváchim",

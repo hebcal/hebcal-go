@@ -137,6 +137,7 @@ var dict_fi = map[string]string{
 	"Yom HaShoah": "Jom hashoa",
 	"Yom HaZikaron": "Jom hazikaron",
 	"Yom Kippur": "Jom kipur",
+	"Yom Kippur Katan": "Jom kipur katan",
 	"Yom Yerushalayim": "Jom Jerushalaim",
 	"Yoma": "Joma",
 	"Zevachim": "Zvachim",

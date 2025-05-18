@@ -156,6 +156,7 @@ var dict_ashkenazi_standard = map[string]string{
 	"Vezot Haberakhah": "Zoys Habrocho",
 	"Yevamot": "Yevomos",
 	"Yitro": "Yisro",
+	"Yom Kippur Katan": "Yom Kippur Koton",
 	"Yom Yerushalayim": "Yom Yerusholayim",
 	"Yoma": "Yumo",
 	"Zevachim": "Zvochim",

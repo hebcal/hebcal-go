@@ -192,6 +192,7 @@ var dict_ro = map[string]string{
 	"Yom Kippur (Mincha, Alternate)": "Iom Chipur (Minĥa, Alternare)",
 	"Yom Kippur (Mincha, Traditional)": "Iom Chipur (Minĥa, Tradiţional)",
 	"Yom Kippur (on Shabbat)": "Iom Chipur (în sabat)",
+	"Yom Kippur Katan": "Iom Chipur Catan",
 	"Yom Yerushalayim": "Iom Ieruşalaiim",
 	"Yoma": "Ioma",
 	"Zevachim": "Zevahim",

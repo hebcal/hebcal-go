@@ -40,3 +40,16 @@ func TestParshaEvent_Render(t *testing.T) {
 	assert.Equal(t, "Глава Матот-Масей", ev.Render("ru"))
 	assert.Equal(t, "פָּרָשַׁת מַּטּוֹת־מַסְעֵי", ev.Render("he"))
 }
+
+func TestYomKippurKatanEvent(t *testing.T) {
+	hd := hdate.New(5771, hdate.Tevet, 29)
+	ev := event.HolidayEvent{
+		Date:  hd,
+		Desc:  "Yom Kippur Katan Sivan",
+		Flags: event.MINOR_FAST | event.YOM_KIPPUR_KATAN}
+	assert.Equal(t, "Yom Kippur Katan Sivan", ev.Basename())
+	assert.Equal(t, "Yom Kippur Katan Sivan", ev.Render("en"))
+	assert.Equal(t, "יוֹם כִּפּוּר קָטָן סִיוָן", ev.Render("he"))
+	assert.Equal(t, "День Раскаяния Катан Сиван", ev.Render("ru"))
+	assert.Equal(t, "יום כפור קטן סיון", ev.Render("he-x-NoNikud"))
+}

@@ -18,6 +18,7 @@ var AllLocales = []string{
 	"fr",
 	"hu",
 	"pl",
+	"pt",
 	"ro",
 	"ru",
 	"uk",
@@ -60,6 +61,8 @@ func LookupTranslation(key string, locale string) (string, bool) {
 		return Lookup_hu(key)
 	case "pl":
 		return Lookup_pl(key)
+	case "pt":
+		return Lookup_pt(key)
 	case "ro":
 		return Lookup_ro(key)
 	case "ru":

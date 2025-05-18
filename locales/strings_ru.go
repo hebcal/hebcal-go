@@ -192,6 +192,7 @@ var dict_ru = map[string]string{
 	"Yom HaShoah": "День Катастрофы",
 	"Yom HaZikaron": "День Памяти",
 	"Yom Kippur": "День Раскаяния",
+	"Yom Kippur Katan": "День Раскаяния Катан",
 	"Yom Yerushalayim": "День Иерусалима",
 	"Yoma": "Йома",
 	"Zevachim": "Звахим",

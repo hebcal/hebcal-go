@@ -26,6 +26,10 @@ func (ev HolidayEvent) Render(locale string) string {
 		rchStr, _ := locales.LookupTranslation("Rosh Chodesh", locale)
 		monthStr, _ := locales.LookupTranslation(ev.Desc[13:], locale)
 		return rchStr + " " + monthStr
+	} else if (ev.Flags & YOM_KIPPUR_KATAN) != 0 {
+		rchStr, _ := locales.LookupTranslation("Yom Kippur Katan", locale)
+		monthStr, _ := locales.LookupTranslation(ev.Desc[17:], locale)
+		return rchStr + " " + monthStr
 	}
 	str, _ := locales.LookupTranslation(ev.Desc, locale)
 	return str

@@ -160,6 +160,7 @@ var dict_ashkenazi_poylish = map[string]string{
 	"Vezot Haberakhah": "Zoys Habrocho",
 	"Yevamot": "Yevumos",
 	"Yitro": "Yisro",
+	"Yom Kippur Katan": "Yom Kippur Koton",
 	"Yom Yerushalayim": "Yom Yerusholayim",
 	"Yoma": "Yimu",
 	"Zevachim": "Zvuchim",

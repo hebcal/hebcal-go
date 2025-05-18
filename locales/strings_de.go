@@ -180,6 +180,7 @@ var dict_de = map[string]string{
 	"Yom Kippur (Mincha, Alternate)": "Jom Kippur (Mincha, alternativ)",
 	"Yom Kippur (Mincha, Traditional)": "Jom Kippur (Mincha, traditionell)",
 	"Yom Kippur (on Shabbat)": "Jom Kippur (am Schabbat)",
+	"Yom Kippur Katan": "Jom Kippur Katan",
 	"Yom Yerushalayim": "Jerusalem-Tag",
 	"Yoma": "Joma",
 	"Zevachim": "Sewachim",

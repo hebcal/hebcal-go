@@ -221,6 +221,7 @@ var dict_ashkenazi_romanian = map[string]string{
 	"Yom Kippur (Mincha, Alternate)": "Iom Chipur (Minha, Alternare)",
 	"Yom Kippur (Mincha, Traditional)": "Iom Chipur (Minha, Tradiţional)",
 	"Yom Kippur (on Shabbat)": "Iom Chipur (în Sabat)",
+	"Yom Kippur Katan": "Iom Chipur Coton",
 	"Yom Yerushalayim": "Iom Ieruşolaiim",
 	"Yoma": "Iumo",
 	"Zevachim": "Zvochim",

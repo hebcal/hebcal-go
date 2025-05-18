@@ -27,7 +27,7 @@ var dict_he = map[string]string{
 	"Bava Batra": "בבא בתרא",
 	"Bava Kamma": "בבא קמא",
 	"Bava Metzia": "בבא מציעא",
-	"Beauty": "תִּפאֶרֶת",
+	"Beauty": "תִּפְאֶֽרֶת",
 	"Bechorot": "בכורות",
 	"Bechukotai": "בְּחֻקֹּתַי",
 	"Beha'alotcha": "בְּהַעֲלֹתְךָ",
