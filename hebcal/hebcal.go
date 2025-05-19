@@ -289,6 +289,10 @@ func getStartAndEnd(opts *CalOptions) (int64, int64, error) {
 		numYears = 1
 	}
 	if opts.IsHebrewYear {
+		// disable candle-lighting times for very early dates
+		if year < 5514 {
+			opts.CandleLighting = false
+		}
 		startDate := hdate.New(year, hdate.Tishrei, 1)
 		// for full Hebrew year, start on Erev Rosh Hashana which
 		// is technically in the previous Hebrew year
@@ -302,19 +306,29 @@ func getStartAndEnd(opts *CalOptions) (int64, int64, error) {
 		return startAbs, endAbs, nil
 	} else {
 		// disable candle-lighting times for very early dates
-		if year < 100 {
+		if year < 1753 {
 			opts.CandleLighting = false
 		}
 		month := time.January
 		if opts.Month != 0 {
 			month = opts.Month
 		}
-		startAbs := greg.ToRD(year, month, 1)
+		var startAbs int64
+		if opts.NoJulian {
+			startAbs = greg.ProlepticToRD(year, month, 1)
+		} else {
+			startAbs = greg.ToRD(year, month, 1)
+		}
 		if opts.Month != 0 {
 			endAbs := startAbs + int64(greg.DaysIn(opts.Month, year))
 			return startAbs, endAbs - 1, nil
 		}
-		endAbs := greg.ToRD(year+numYears, time.January, 1)
+		var endAbs int64
+		if opts.NoJulian {
+			endAbs = greg.ProlepticToRD(year+numYears, time.January, 1)
+		} else {
+			endAbs = greg.ToRD(year+numYears, time.January, 1)
+		}
 		return startAbs, endAbs - 1, nil
 	}
 }

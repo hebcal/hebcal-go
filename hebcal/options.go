@@ -46,6 +46,9 @@ type CalOptions struct {
 	Year int
 	/* to interpret year as Hebrew year */
 	IsHebrewYear bool
+	// disable Julian calendar transition and use the proleptic Gregorian calendar.
+	// only used when specifying Year !=0 and IsHebrewYear == false
+	NoJulian bool
 	/* Gregorian month (to filter results to a single month) */
 	Month time.Month
 	/* generate calendar for multiple years (default 1) */
