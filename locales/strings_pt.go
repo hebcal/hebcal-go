@@ -83,6 +83,7 @@ var dict_pt = map[string]string{
 	"Shabbat Shekalim": "Shabat Shekalim",
 	"Shabbat Shuva": "Shabat Shuva",
 	"Shabbat Zachor": "Shabat Zachor",
+	"Shabbat times for": "Horários de Shabat para",
 	"Shavuot II (on Shabbat)": "Shavuot II (no Shabat)",
 	"Shevuot": "Shavuot",
 	"Simchat Torah": "Simchat Torá",
@@ -110,6 +111,7 @@ var dict_pt = map[string]string{
 	"Temurah": "Temurá",
 	"Terumah": "Terumá",
 	"Tetzaveh": "Tetzave",
+	"This week's Torah portion is": "A porção da Torá desta semana é",
 	"Tish'a B'Av": "Tishá b'Av",
 	"Tish'a B'Av (observed)": "Tishá b'Av (observado)",
 	"Tu B'Av": "Tu b'Av",
@@ -137,6 +139,8 @@ var dict_pt = map[string]string{
 	"day of the Omer": "Dia do Omer",
 	"improper sedra year type calculated.": "tipo de ano de sedra impróprio calculado",
 	"input file read error. Skipping line %s": "erro de leitura do arquivo de entrada. Ignorando linha %s",
+	"occurs on": "ocorre na",
+	"on": "é na",
 	"yahrtzeit file read error. Skipping line %s": "Erro de leitura do arquivo yahrtzeit. Ignorando a linha %s",
 }
 

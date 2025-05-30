@@ -180,7 +180,7 @@ var dict_he = map[string]string{
 	"Kings and Wars": "הלכות מלכים ומלחמות",
 	"Kinnim": "קינים",
 	"Kislev": "כִּסְלֵו",
-	"Korach": "קוֹרַח",
+	"Korach": "קֹרַח",
 	"Kriat Shema, sof zeman": "סוֹף זְמַן קְרִיאַת שְׁמַע גר״א",
 	"Kriat Shema, sof zeman (MGA)": "סוֹף זְמַן קְרִיאַת שְׁמַע מג״א",
 	"Lag BaOmer": "ל״ג בָּעוֹמֶר",
@@ -346,6 +346,7 @@ var dict_he = map[string]string{
 	"Shabbat Shirah": "שַׁבָּת שִׁירָה",
 	"Shabbat Shuva": "שַׁבָּת שׁוּבָה",
 	"Shabbat Zachor": "שַׁבָּת זָכוֹר",
+	"Shabbat times for": "זמני שַׁבָּת",
 	"Shar Hatorah": "שער התורה",
 	"Shar Hatvuna": "שער התבונה",
 	"Shar Hazechira": "שער הזכירה",
@@ -419,6 +420,7 @@ var dict_he = map[string]string{
 	"The Sanhedrin and the Penalties within their Jurisdiction": "הלכות סנהדרין והעונשין המסורין להם",
 	"Theft": "הלכות גניבה",
 	"Things Forbidden on the Altar": "הלכות איסורי המזבח",
+	"This week's Torah portion is": "פָּרָשַׁת הַשָּׁבוּעַ הִיא",
 	"Those Who Defile Bed or Seat": "הלכות מטמאי משכב ומושב",
 	"Tish'a B'Av": "תִּשְׁעָה בְּאָב",
 	"Tish'a B'Av (Mincha)": "תִּשְׁעָה בְּאָב מִנחָה",
@@ -485,6 +487,7 @@ var dict_he = map[string]string{
 	"day": "יוֹם",
 	"day of the Omer": "בָּעוֹמֶר",
 	"min": "דַּקּוֹת",
+	"occurs on": "חָל",
 }
 
 func Lookup_he(s string) (string, bool) {

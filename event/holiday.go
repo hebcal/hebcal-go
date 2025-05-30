@@ -2,7 +2,10 @@ package event
 
 import (
 	"regexp"
+	"strconv"
+	"strings"
 
+	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/locales"
 )
@@ -26,6 +29,14 @@ func (ev HolidayEvent) Render(locale string) string {
 		rchStr, _ := locales.LookupTranslation("Rosh Chodesh", locale)
 		monthStr, _ := locales.LookupTranslation(ev.Desc[13:], locale)
 		return rchStr + " " + monthStr
+	} else if ev.Date.Month() == hdate.Tishrei && ev.Date.Day() == 1 {
+		s, _ := locales.LookupTranslation("Rosh Hashana", locale)
+		year := ev.Date.Year()
+		locale = strings.ToLower(locale)
+		if locale == "he" || locale == "he-x-nonikud" {
+			return s + " " + gematriya.Gematriya(year)
+		}
+		return s + " " + strconv.Itoa(year)
 	} else if (ev.Flags & YOM_KIPPUR_KATAN) != 0 {
 		rchStr, _ := locales.LookupTranslation("Yom Kippur Katan", locale)
 		monthStr, _ := locales.LookupTranslation(ev.Desc[17:], locale)

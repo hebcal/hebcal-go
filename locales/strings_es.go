@@ -100,6 +100,7 @@ var dict_es = map[string]string{
 	"Shabbat Rosh Chodesh": "Shabat Rosh Jodesh",
 	"Shabbat Shekalim": "Shabat Shekalim",
 	"Shabbat Zachor": "Shabat Zajor",
+	"Shabbat times for": "Horarios de Shabat para",
 	"Shavuot II (on Shabbat)": "Shavuot II (en Shabat)",
 	"Shevuot": "Shavuot",
 	"Simchat Torah": "Simját Torá",
@@ -123,6 +124,7 @@ var dict_es = map[string]string{
 	"Ta'anit Bechorot": "Ta'anit Bejorot",
 	"Ta'anit Esther": "Ta'anit Ester",
 	"Taanit": "Tanit",
+	"This week's Torah portion is": "La parashá de la semana es",
 	"Tish'a B'Av (observed)": "Tish'a B'Av (observado)",
 	"Tu B'Shvat": "Tu BiShvat",
 	"Unable to allocate memory for holiday.": "No se puede asignar memoria para las vacaciones.",
@@ -143,6 +145,8 @@ var dict_es = map[string]string{
 	"day of the Omer": "día del Omer",
 	"improper sedra year type calculated.": "tipo de año de sedra inapropiado calculado.",
 	"input file read error. Skipping line %s": "error de lectura del archivo de entrada. Saltando la línea %s",
+	"occurs on": "se celebra el",
+	"on": "en el",
 	"yahrtzeit file read error. Skipping line %s": "error de lectura del archivo yahrtzeit. Saltando la línea %s",
 }
 

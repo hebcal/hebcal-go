@@ -53,3 +53,17 @@ func TestYomKippurKatanEvent(t *testing.T) {
 	assert.Equal(t, "День Раскаяния Катан Сиван", ev.Render("ru"))
 	assert.Equal(t, "יום כפור קטן סיון", ev.Render("he-x-NoNikud"))
 }
+
+func TestRoshHashanaLocale(t *testing.T) {
+	hd := hdate.New(5771, hdate.Tishrei, 1)
+	ev := event.HolidayEvent{
+		Date:  hd,
+		Desc:  "Rosh Hashana 5771",
+		Flags: event.CHAG | event.LIGHT_CANDLES_TZEIS,
+		Emoji: "🍏🍯"}
+	assert.Equal(t, "Rosh Hashana", ev.Basename())
+	assert.Equal(t, "Rosh Hashana 5771", ev.Render("en"))
+	assert.Equal(t, "רֹאשׁ הַשָּׁנָה תשע״א", ev.Render("he"))
+	assert.Equal(t, "ראש השנה תשע״א", ev.Render("he-x-NoNikud"))
+	assert.Equal(t, "Рош-А-Шана 5771", ev.Render("ru"))
+}
