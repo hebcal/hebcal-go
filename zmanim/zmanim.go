@@ -86,7 +86,11 @@ func (z *Zmanim) Sunrise() time.Time {
 	return z.inLoc(rise)
 }
 
-func (z *Zmanim) timeAtAngle(angle float64, rising bool) time.Time {
+// TimeAtAngle returns when the center of the sun will be some angle
+// below the horizon.
+// The rising parameter chooses between the AM or PM time,
+// as normally there are two such times.
+func (z *Zmanim) TimeAtAngle(angle float64, rising bool) time.Time {
 	morning, evening := sunrise.TimeOfElevation(z.Location.Latitude, z.Location.Longitude, -angle, z.Year, z.Month, z.Day)
 	if rising {
 		return z.inLoc(morning)
@@ -97,15 +101,15 @@ func (z *Zmanim) timeAtAngle(angle float64, rising bool) time.Time {
 
 // Civil dawn; Sun is 6° below the horizon in the morning
 func (z *Zmanim) Dawn() time.Time {
-	return z.timeAtAngle(6.0, true)
+	return z.TimeAtAngle(6.0, true)
 }
 
 // Civil dusk; Sun is 6° below the horizon in the evening
 func (z *Zmanim) Dusk() time.Time {
-	return z.timeAtAngle(6.0, false)
+	return z.TimeAtAngle(6.0, false)
 }
 
-// Hour returns the number seconds in a halachic Hour.
+// Hour returns the number of seconds in a halachic Hour.
 // Calculated by taking the total time of daylight of a particular day,
 // from sunrise until sunset and dividing it into twelve equal parts.
 // A halachic Hour is thus known as a sha'ah zemanit,
@@ -116,6 +120,8 @@ func (z *Zmanim) Hour() float64 {
 	return float64(seconds) / 12.0
 }
 
+// GregEve returns the time of the previous day's sunset,
+// which is the beginning of the Hebrew calendar day.
 func (z *Zmanim) GregEve() time.Time {
 	prev := time.Date(z.Year, z.Month, z.Day-1, 0, 0, 0, 0, z.loc)
 	year, month, day := prev.Date()
@@ -129,56 +135,66 @@ func (z *Zmanim) GregEve() time.Time {
 	return zman.Sunset()
 }
 
-// seconds in hour
-func (z *Zmanim) nightHour() float64 {
+// NightHour returns the number of seconds in a proportional night hour,
+// where there are 12 night hours from yesterday's sunset to today's sunrise.
+func (z *Zmanim) NightHour() float64 {
 	set := z.GregEve()
 	rise := z.Sunrise()
 	seconds := rise.Unix() - set.Unix()
 	return float64(seconds) / 12.0
 }
 
-// sunrise plus N halachic hours
-func (z *Zmanim) hourOffset(hours float64) time.Time {
+// HourOffset returns sunrise plus some number of halachic hours.
+func (z *Zmanim) HourOffset(hours float64) time.Time {
 	rise := z.Sunrise()
 	seconds := rise.Unix() + int64(z.Hour()*hours)
 	return time.Unix(seconds, 0).In(z.loc)
 }
 
-// Midday – Chatzot; Sunrise plus 6 halachic hours
-func (z *Zmanim) Chatzot() time.Time {
-	return z.hourOffset(6)
+// NightHourOffset returns yesterday's sunset plus
+// some number of proportional night hours.
+func (z *Zmanim) NightHourOffset(hours float64) time.Time {
+	set := z.GregEve()
+	seconds := set.Unix() + int64(z.NightHour()*hours)
+	return time.Unix(seconds, 0).In(z.loc)
 }
 
-// Midnight – Chatzot; Sunset plus 6 halachic hours
+// Midday – Chatzot; Sunrise plus 6 halachic hours
+func (z *Zmanim) Chatzot() time.Time {
+	return z.HourOffset(6)
+}
+
+// ChatzotNight returns astronomical midnight,
+// which is 6 proportional night hours before sunrise.
 func (z *Zmanim) ChatzotNight() time.Time {
 	rise := z.Sunrise()
-	seconds := rise.Unix() - int64(z.nightHour()*6.0)
+	seconds := rise.Unix() - int64(z.NightHour()*6.0)
 	return time.Unix(seconds, 0).In(z.loc)
 }
 
 // Dawn – Alot haShachar; Sun is 16.1° below the horizon in the morning
 func (z *Zmanim) AlotHaShachar() time.Time {
-	return z.timeAtAngle(16.1, true)
+	return z.TimeAtAngle(16.1, true)
 }
 
 // Earliest talis & tefillin – Misheyakir; Sun is 11.5° below the horizon in the morning
 func (z *Zmanim) Misheyakir() time.Time {
-	return z.timeAtAngle(11.5, true)
+	return z.TimeAtAngle(11.5, true)
 }
 
 // Earliest talis & tefillin – Misheyakir Machmir; Sun is 10.2° below the horizon in the morning
 func (z *Zmanim) MisheyakirMachmir() time.Time {
-	return z.timeAtAngle(10.2, true)
+	return z.TimeAtAngle(10.2, true)
 }
 
 // Latest Shema (Gra); Sunrise plus 3 halachic hours, according to the Gra
 func (z *Zmanim) SofZmanShma() time.Time {
-	return z.hourOffset(3)
+	return z.HourOffset(3)
 }
 
 // Latest Shacharit (Gra); Sunrise plus 4 halachic hours, according to the Gra
 func (z *Zmanim) SofZmanTfilla() time.Time {
-	return z.hourOffset(4)
+	return z.HourOffset(4)
 }
 
 func (z *Zmanim) sofZmanMGA(hours float64) time.Time {
@@ -202,17 +218,17 @@ func (z *Zmanim) SofZmanTfillaMGA() time.Time {
 
 // Earliest Mincha – Mincha Gedola; Sunrise plus 6.5 halachic hours
 func (z *Zmanim) MinchaGedola() time.Time {
-	return z.hourOffset(6.5)
+	return z.HourOffset(6.5)
 }
 
 // Preferable earliest time to recite Minchah – Mincha Ketana; Sunrise plus 9.5 halachic hours
 func (z *Zmanim) MinchaKetana() time.Time {
-	return z.hourOffset(9.5)
+	return z.HourOffset(9.5)
 }
 
 // Plag haMincha; Sunrise plus 10.75 halachic hours
 func (z *Zmanim) PlagHaMincha() time.Time {
-	return z.hourOffset(10.75)
+	return z.HourOffset(10.75)
 }
 
 // Tzeit is defined as nightfall, when 3 stars are observable in the night sky with the naked eye.
@@ -224,7 +240,7 @@ func (z *Zmanim) Tzeit(angle float64) time.Time {
 	if angle == 0 {
 		angle = Tzeit3SmallStars
 	}
-	return z.timeAtAngle(angle, false)
+	return z.TimeAtAngle(angle, false)
 }
 
 const ThirteenFive time.Duration = -1 * time.Duration(13.5*float64(time.Minute))
