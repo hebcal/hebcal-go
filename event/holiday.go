@@ -7,6 +7,7 @@ import (
 
 	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hdate"
+
 	"github.com/hebcal/hebcal-go/locales"
 )
 
@@ -25,6 +26,9 @@ func (ev HolidayEvent) GetDate() hdate.HDate {
 }
 
 func (ev HolidayEvent) Render(locale string) string {
+	if (ev.Flags & USER_EVENT) != 0 {
+		return ev.Desc
+	}
 	if (ev.Flags & ROSH_CHODESH) != 0 {
 		rchStr, _ := locales.LookupTranslation("Rosh Chodesh", locale)
 		monthStr, _ := locales.LookupTranslation(ev.Desc[13:], locale)

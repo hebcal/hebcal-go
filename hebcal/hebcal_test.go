@@ -7,11 +7,12 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
-	"github.com/stretchr/testify/assert"
 )
 
 func hd2iso(hd hdate.HDate) string {
@@ -590,6 +591,62 @@ func TestHebrewCalendar1752CE(t *testing.T) {
 		"1752-09-17 Erev Yom Kippur",
 		"1752-09-18 10th of Tishrei, 5513",
 		"1752-09-18 Yom Kippur",
+	}
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
+		actual = append(actual, line)
+	}
+	assert.Equal(expected, actual)
+}
+
+func TestHebrewCalendarYahrzeit(t *testing.T) {
+	assert := assert.New(t)
+	opts := hebcal.CalOptions{
+		Start:                   hdate.New(5728, hdate.Tishrei, 1),
+		End:                     hdate.New(5728, hdate.Tishrei, 30),
+		AddHebrewDatesForEvents: true,
+		NoHolidays:              true,
+		Yahrzeits: []hebcal.UserYahrzeit{
+			// This date was chosen because of an observed bug,
+			// where ev.Render("en") would replace the HolidayEvent.Desc field
+			// with "Rosh Hashnanah 5728", etc. on certain special days.
+			{Date: time.Date(1966, 9, 15, 0, 0, 0, 0, time.UTC), Name: "Joe Shmo"},
+		},
+	}
+	events, err := hebcal.HebrewCalendar(&opts)
+	assert.NoError(err)
+	expected := []string{
+		"1967-10-05 1st of Tishrei, 5728",
+		"1967-10-05 Joe Shmo",
+	}
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
+		actual = append(actual, line)
+	}
+	assert.Equal(expected, actual)
+}
+
+func TestHebrewCalendarInfile(t *testing.T) {
+	assert := assert.New(t)
+	opts := hebcal.CalOptions{
+		Start:                   hdate.New(5728, hdate.Tishrei, 1),
+		End:                     hdate.New(5728, hdate.Tishrei, 30),
+		AddHebrewDatesForEvents: true,
+		NoHolidays:              true,
+		UserEvents: []hebcal.UserEvent{
+			// This date was chosen because of an observed bug,
+			// where ev.Render("en") would replace the HolidayEvent.Desc field
+			// with "Rosh Hashnanah 5728", etc. on certain special days.
+			{Month: hdate.Tishrei, Day: 1, Desc: "Ben Ploni"},
+		},
+	}
+	events, err := hebcal.HebrewCalendar(&opts)
+	assert.NoError(err)
+	expected := []string{
+		"1967-10-05 1st of Tishrei, 5728",
+		"1967-10-05 Ben Ploni",
 	}
 	actual := make([]string, 0, len(events))
 	for _, ev := range events {
