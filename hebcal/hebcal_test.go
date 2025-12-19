@@ -598,3 +598,59 @@ func TestHebrewCalendar1752CE(t *testing.T) {
 	}
 	assert.Equal(expected, actual)
 }
+
+func TestHebrewCalendarYahrzeit(t *testing.T) {
+	assert := assert.New(t)
+	opts := hebcal.CalOptions{
+		Start:                   hdate.New(5728, hdate.Tishrei, 1),
+		End:                     hdate.New(5728, hdate.Tishrei, 30),
+		AddHebrewDatesForEvents: true,
+		NoHolidays:              true,
+		Yahrzeits: []hebcal.UserYahrzeit{
+			// This date was chosen because of an observed bug,
+			// where ev.Render("en") would replace the HolidayEvent.Desc field
+			// with "Rosh Hashnanah 5728", etc. on certain special days.
+			{Date: time.Date(1966, 9, 15, 0, 0, 0, 0, time.UTC), Name: "Joe Shmo"},
+		},
+	}
+	events, err := hebcal.HebrewCalendar(&opts)
+	assert.NoError(err)
+	expected := []string{
+		"1967-10-05 1st of Tishrei, 5728",
+		"1967-10-05 Joe Shmo",
+	}
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
+		actual = append(actual, line)
+	}
+	assert.Equal(expected, actual)
+}
+
+func TestHebrewCalendarInfile(t *testing.T) {
+	assert := assert.New(t)
+	opts := hebcal.CalOptions{
+		Start:                   hdate.New(5728, hdate.Tishrei, 1),
+		End:                     hdate.New(5728, hdate.Tishrei, 30),
+		AddHebrewDatesForEvents: true,
+		NoHolidays:              true,
+		UserEvents: []hebcal.UserEvent{
+			// This date was chosen because of an observed bug,
+			// where ev.Render("en") would replace the HolidayEvent.Desc field
+			// with "Rosh Hashnanah 5728", etc. on certain special days.
+			{Month: hdate.Tishrei, Day: 1, Desc: "Ben Ploni"},
+		},
+	}
+	events, err := hebcal.HebrewCalendar(&opts)
+	assert.NoError(err)
+	expected := []string{
+		"1967-10-05 1st of Tishrei, 5728",
+		"1967-10-05 Ben Ploni",
+	}
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
+		actual = append(actual, line)
+	}
+	assert.Equal(expected, actual)
+}
