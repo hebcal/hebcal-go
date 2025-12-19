@@ -13,7 +13,7 @@ func TestSefira(t *testing.T) {
 	assert := assert.New(t)
 	omer := omer.NewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
 	assert.Equal("Eternity within Majesty", omer.Sefira("en"))
-	assert.Equal("נֶּֽצַח שֶׁבְּמַּלְכוּת", omer.Sefira("he"))
+	assert.Equal("נֶּצַח שֶׁבְּמַּלְכוּת", omer.Sefira("he"))
 	assert.Equal("Netzach sheb'Malkhut", omer.Sefira("translit"))
 }
 
@@ -24,7 +24,7 @@ func ExampleOmerEvent_Sefira() {
 	fmt.Println(ev.Sefira("translit"))
 	// Output:
 	// Eternity within Majesty
-	// נֶּֽצַח שֶׁבְּמַּלְכוּת
+	// נֶּצַח שֶׁבְּמַּלְכוּת
 	// Netzach sheb'Malkhut
 }
 

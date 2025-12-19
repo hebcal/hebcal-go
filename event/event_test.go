@@ -38,7 +38,7 @@ func TestParshaEvent_Render(t *testing.T) {
 	ev := event.NewParshaEvent(hd, parsha, false)
 	assert.Equal(t, "Parashat Matot-Masei", ev.Render("en"))
 	assert.Equal(t, "Глава Матот-Масей", ev.Render("ru"))
-	assert.Equal(t, "פָּרָשַׁת מַּטּוֹת־מַסְעֵי", ev.Render("he"))
+	assert.Equal(t, "פָּרָשַׁת מַטּוֹת־מַסְעֵי", ev.Render("he"))
 }
 
 func TestYomKippurKatanEvent(t *testing.T) {
@@ -51,7 +51,7 @@ func TestYomKippurKatanEvent(t *testing.T) {
 	assert.Equal(t, "Yom Kippur Katan Sivan", ev.Render("en"))
 	assert.Equal(t, "יוֹם כִּפּוּר קָטָן סִיוָן", ev.Render("he"))
 	assert.Equal(t, "День Раскаяния Катан Сиван", ev.Render("ru"))
-	assert.Equal(t, "יום כפור קטן סיון", ev.Render("he-x-NoNikud"))
+	assert.Equal(t, "יום כיפור קטן סיון", ev.Render("he-x-NoNikud"))
 }
 
 func TestRoshHashanaLocale(t *testing.T) {
