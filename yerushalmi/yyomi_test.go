@@ -1614,3 +1614,13 @@ func ExampleNew() {
 	fmt.Println(daf)
 	// Output: Nedarim 33
 }
+
+func TestYerushalmiYomi2082(t *testing.T) {
+	assert := assert.New(t)
+	assert.Equal(dafyomi.Daf{Name: "Niddah", Blatt: 12},
+		yerushalmi.New(hdate.FromGregorian(2082, time.October, 4), yerushalmi.Vilna))
+	assert.Equal(dafyomi.Daf{Name: "Niddah", Blatt: 13},
+		yerushalmi.New(hdate.FromGregorian(2082, time.October, 5), yerushalmi.Vilna))
+	assert.Equal(dafyomi.Daf{Name: "Berakhot", Blatt: 1},
+		yerushalmi.New(hdate.FromGregorian(2082, time.October, 6), yerushalmi.Vilna))
+}
