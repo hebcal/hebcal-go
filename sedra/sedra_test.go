@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
+	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/sedra"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,6 +31,78 @@ func TestSedra_Lookup(t *testing.T) {
 	assert.Equal(
 		sedra.Parsha{Name: []string{"Bereshit"}, Num: []int{1}, Chag: false},
 		sedraYear.Lookup(hdate.FromGregorian(2020, time.October, 17)))
+}
+
+func TestSedraAshkenazi(t *testing.T) {
+	assert := assert.New(t)
+	sedraYear := sedra.New(5749, false)
+	want := []string{
+		"Vayeilech",
+		"Vayeilech",
+		"Ha'azinu",
+		"",
+		"Bereishis",
+		"Noach",
+		"Lech Lecho",
+		"Vayeiro",
+		"Chayei Soroh",
+		"Toldos",
+		"Vayeitzei",
+		"Vayishlach",
+		"Vayeishev",
+		"Mikeitz",
+		"Vayigash",
+		"Vaichi",
+		"Shemos",
+		"Vo'eiro",
+		"Bo",
+		"Beshalach",
+		"Yisro",
+		"Mishpotim",
+		"Terumoh",
+		"Tetzaveh",
+		"Ki Siso",
+		"Vayakheil",
+		"Pekudei",
+		"Vayikro",
+		"Tzav",
+		"Shemini",
+		"Tazria",
+		"Metzoro",
+		"",
+		"Acharei Mos",
+		"Kedoshim",
+		"Emor",
+		"Behar",
+		"Bechukosai",
+		"Bemidbar",
+		"",
+		"Noso",
+		"Beha'aloscho",
+		"Shelach",
+		"Korach",
+		"Chukas-Bolok",
+		"Pinchos",
+		"Matos-Masei",
+		"Devorim",
+		"Vo'eschanan",
+		"Eikev",
+		"Re'eih",
+		"Shoftim",
+		"Ki Seitzei",
+		"Ki Sovo",
+		"Nitzovim-Vayeilech",
+	}
+	var got []string
+	hd := hdate.New(5749, hdate.Tishrei, 1)
+	for hd.Year() == 5749 {
+		parsha := sedraYear.Lookup(hd).Render("ashkenazi")
+		got = append(got, parsha)
+		hd = hd.After(time.Saturday)
+	}
+	assert.Equal(want, got)
+	vb, _ := locales.LookupTranslation("Vezot Haberakhah", "ashkenazi")
+	assert.Equal("Vezos Haberochoh", vb)
 }
 
 func ExampleSedra_Lookup() {
