@@ -5,9 +5,10 @@ import (
 	"testing"
 
 	"github.com/hebcal/hdate"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
@@ -251,6 +252,132 @@ func TestGetHolidaysForYearArrayIL(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestGetHolidaysForYearArrayDiasporaAshkenazi(t *testing.T) {
+	events := hebcal.GetHolidaysForYear(5771, false)
+	assert.Equal(t, 110, len(events))
+
+	expected := []string{
+		"2010-09-09 Rosh Hashana 5771",
+		"2010-09-10 Rosh Hashana II",
+		"2010-09-11 Shabbos Shuvah",
+		"2010-09-12 Tzom Gedaliah",
+		"2010-09-17 Erev Yom Kippur",
+		"2010-09-18 Yom Kippur",
+		"2010-09-22 Erev Sukkos",
+		"2010-09-23 Sukkos I",
+		"2010-09-24 Sukkos II",
+		"2010-09-25 Sukkos III (CH’’M)",
+		"2010-09-26 Sukkos IV (CH’’M)",
+		"2010-09-27 Sukkos V (CH’’M)",
+		"2010-09-28 Sukkos VI (CH’’M)",
+		"2010-09-29 Sukkos VII (Hoshana Raba)",
+		"2010-09-30 Shmini Atzeres",
+		"2010-10-01 Simchas Torah",
+		"2010-10-02 Shabbos Mevorchim Chodesh Cheshvan",
+		"2010-10-08 Rosh Chodesh Cheshvan",
+		"2010-10-09 Rosh Chodesh Cheshvan",
+		"2010-11-04 Sigd",
+		"2010-11-04 Yom Kippur Katan Kislev",
+		"2010-11-06 Shabbos Mevorchim Chodesh Kislev",
+		"2010-11-07 Rosh Chodesh Kislev",
+		"2010-11-08 Rosh Chodesh Kislev",
+		"2010-12-01 Chanukah: 1 Candle",
+		"2010-12-02 Chanukah: 2 Candles",
+		"2010-12-03 Chanukah: 3 Candles",
+		"2010-12-04 Chanukah: 4 Candles",
+		"2010-12-04 Shabbos Mevorchim Chodesh Teves",
+		"2010-12-05 Chanukah: 5 Candles",
+		"2010-12-06 Chanukah: 6 Candles",
+		"2010-12-07 Chag HaBanot",
+		"2010-12-07 Chanukah: 7 Candles",
+		"2010-12-07 Rosh Chodesh Teves",
+		"2010-12-08 Chanukah: 8 Candles",
+		"2010-12-08 Rosh Chodesh Teves",
+		"2010-12-09 Chanukah: 8th Day",
+		"2010-12-17 Asara B’Teves",
+		"2011-01-01 Shabbos Mevorchim Chodesh Sh'vat",
+		"2011-01-05 Yom Kippur Katan Sh'vat",
+		"2011-01-06 Rosh Chodesh Sh'vat",
+		"2011-01-15 Shabbos Shirah",
+		"2011-01-20 Tu BiShvat",
+		"2011-01-29 Shabbos Mevorchim Chodesh Adar I",
+		"2011-02-03 Yom Kippur Katan Adar I",
+		"2011-02-04 Rosh Chodesh Adar I",
+		"2011-02-05 Rosh Chodesh Adar I",
+		"2011-02-18 Purim Koton",
+		"2011-02-19 Shushan Purim Koton",
+		"2011-03-03 Yom Kippur Katan Adar II",
+		"2011-03-05 Shabbos Mevorchim Chodesh Adar II",
+		"2011-03-05 Shabbos Shekalim",
+		"2011-03-06 Rosh Chodesh Adar II",
+		"2011-03-07 Rosh Chodesh Adar II",
+		"2011-03-17 Ta’anis Esther",
+		"2011-03-19 Erev Purim",
+		"2011-03-19 Shabbos Zachor",
+		"2011-03-20 Purim",
+		"2011-03-21 Shushan Purim",
+		"2011-03-26 Shabbos Parah",
+		"2011-04-02 Shabbos HaChodesh",
+		"2011-04-02 Shabbos Mevorchim Chodesh Nisan",
+		"2011-04-04 Yom Kippur Katan Nisan",
+		"2011-04-05 Rosh Chodesh Nisan",
+		"2011-04-16 Shabbos HaGadol",
+		"2011-04-18 Erev Pesach",
+		"2011-04-18 Ta’anis Bechoros",
+		"2011-04-19 Pesach I",
+		"2011-04-20 Pesach II",
+		"2011-04-21 Pesach III (CH''M)",
+		"2011-04-22 Pesach IV (CH''M)",
+		"2011-04-23 Pesach V (CH''M)",
+		"2011-04-24 Pesach VI (CH''M)",
+		"2011-04-25 Pesach VII",
+		"2011-04-26 Pesach VIII",
+		"2011-04-30 Shabbos Mevorchim Chodesh Iyyar",
+		"2011-05-02 Yom HaShoah",
+		"2011-05-04 Rosh Chodesh Iyyar",
+		"2011-05-05 Rosh Chodesh Iyyar",
+		"2011-05-09 Yom HaZikaron",
+		"2011-05-10 Yom HaAtzma'ut",
+		"2011-05-18 Pesach Sheni",
+		"2011-05-22 Lag BaOmer",
+		"2011-05-28 Shabbos Mevorchim Chodesh Sivan",
+		"2011-06-01 Yom Yerushalayim",
+		"2011-06-02 Yom Kippur Katan Sivan",
+		"2011-06-03 Rosh Chodesh Sivan",
+		"2011-06-07 Erev Shavuos",
+		"2011-06-08 Shavuos I",
+		"2011-06-09 Shavuos II",
+		"2011-06-25 Shabbos Mevorchim Chodesh Tammuz",
+		"2011-06-30 Yom Kippur Katan Tammuz",
+		"2011-07-02 Rosh Chodesh Tammuz",
+		"2011-07-03 Rosh Chodesh Tammuz",
+		"2011-07-19 Tzom Tammuz",
+		"2011-07-30 Shabbos Mevorchim Chodesh Av",
+		"2011-07-31 Yom Kippur Katan Av",
+		"2011-08-01 Rosh Chodesh Av",
+		"2011-08-06 Shabbos Chazon",
+		"2011-08-08 Erev Tish'a B'Av",
+		"2011-08-09 Tish'a B'Av",
+		"2011-08-13 Shabbos Nachamu",
+		"2011-08-15 Tu B'Av",
+		"2011-08-27 Shabbos Mevorchim Chodesh Elul",
+		"2011-08-29 Yom Kippur Katan Elul",
+		"2011-08-30 Rosh Chodesh Elul",
+		"2011-08-31 Rosh Chodesh Elul",
+		"2011-08-31 Rosh Hashana LaBehemot",
+		"2011-09-24 Leil Selichos",
+		"2011-09-28 Erev Rosh Hashana",
+	}
+
+	actual := make([]string, 0, len(events))
+	for _, ev := range events {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.Date), ev.Render("ashkenazi"))
+		actual = append(actual, line)
+	}
+
+	assert.Equal(t, expected, actual)
+}
+
 func TestModernILHolidays(t *testing.T) {
 	events0Israel := hebcal.GetHolidaysForYear(5783, true)
 	eventsIsrael := make([]event.HolidayEvent, 0, 12)
@@ -354,8 +481,14 @@ func TestPurimMeshulash(t *testing.T) {
 	actual := make([]string, 0, 10)
 	events := hebcal.GetHolidaysForYear(5781, true)
 	for _, ev := range events {
-		if ev.Date.Month() == hdate.Adar1 && ev.Date.Day() >= 13 && ev.Date.Day() <= 17 {
-			line := fmt.Sprintf("%s / %s / %s", hd2iso(ev.Date), ev.Date.String(), ev.Desc)
+		if ev.Date.Month() == hdate.Adar1 && ev.Date.Day() >= 13 &&
+			ev.Date.Day() <= 17 {
+			line := fmt.Sprintf(
+				"%s / %s / %s",
+				hd2iso(ev.Date),
+				ev.Date.String(),
+				ev.Desc,
+			)
 			actual = append(actual, line)
 		}
 	}
@@ -370,7 +503,7 @@ func TestPurimMeshulash(t *testing.T) {
 }
 
 func TestHolidayEmoji(t *testing.T) {
-	var expectedEmoji = map[string]string{
+	expectedEmoji := map[string]string{
 		"Asara B'Tevet":                   "✡️",
 		"Chanukah: 1 Candle":              "🕎",
 		"Chanukah: 3 Candles":             "🕎",
@@ -387,7 +520,7 @@ func TestHolidayEmoji(t *testing.T) {
 		"Rosh Chodesh Nisan":              "🌒",
 		"Rosh Chodesh Iyyar":              "🌒",
 		"Rosh Chodesh Sivan":              "🌒",
-		"Rosh Chodesh Tammuz":              "🌒",
+		"Rosh Chodesh Tammuz":             "🌒",
 		"Rosh Chodesh Av":                 "🌒",
 		"Rosh Chodesh Elul":               "🌒",
 		"Rosh Chodesh Cheshvan":           "🌒",
