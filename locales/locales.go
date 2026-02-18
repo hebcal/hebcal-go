@@ -26,11 +26,13 @@ var AllLocales = []string{
 	"fi",
 	"fr",
 	"hu",
+	"nl",
 	"pl",
 	"pt",
 	"ro",
 	"ru",
 	"uk",
+	"yi",
 }
 
 // LookupTranslation returns a message for the given key.
@@ -72,6 +74,8 @@ func LookupTranslation(key string, locale string) (string, bool) {
 		return Lookup_fr(key)
 	case "hu":
 		return Lookup_hu(key)
+	case "nl":
+		return Lookup_nl(key)
 	case "pl":
 		return Lookup_pl(key)
 	case "pt":
@@ -82,6 +86,8 @@ func LookupTranslation(key string, locale string) (string, bool) {
 		return Lookup_ru(key)
 	case "uk":
 		return Lookup_uk(key)
+	case "yi":
+		return Lookup_yi(key)
 	}
 	return key, false
 }
