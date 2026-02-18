@@ -7,11 +7,12 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
-	"github.com/stretchr/testify/assert"
 )
 
 func hd2iso(hd hdate.HDate) string {
@@ -416,7 +417,7 @@ func TestDailyZemanim(t *testing.T) {
 		actual = append(actual, line)
 	}
 	expected := []string{
-		"2021-11-27 Alot haShachar: 05:21",
+		"2021-11-27 Alot HaShachar: 05:21",
 		"2021-11-27 Misheyakir: 05:47",
 		"2021-11-27 Misheyakir Machmir: 05:54",
 		"2021-11-27 Sunrise: 06:49",
@@ -424,7 +425,7 @@ func TestDailyZemanim(t *testing.T) {
 		"2021-11-27 Kriat Shema, sof zeman (GRA): 09:11",
 		"2021-11-27 Tefilah, sof zeman (MGA): 09:34",
 		"2021-11-27 Tefilah, sof zeman (GRA): 09:58",
-		"2021-11-27 Chatzot hayom: 11:33",
+		"2021-11-27 Chatzot HaYom: 11:33",
 		"2021-11-27 Mincha Gedolah: 11:57",
 		"2021-11-27 Mincha Ketanah: 14:19",
 		"2021-11-27 Plag HaMincha: 15:18",
