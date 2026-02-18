@@ -7,11 +7,12 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
-	"github.com/stretchr/testify/assert"
 )
 
 func hd2iso(hd hdate.HDate) string {
@@ -20,18 +21,29 @@ func hd2iso(hd hdate.HDate) string {
 	return d.Format(time.RFC3339)[:10]
 }
 
+func checkEvents(
+	t *testing.T,
+	locale string,
+	opts *hebcal.CalOptions,
+	want []string,
+) {
+	events, err := hebcal.HebrewCalendar(opts)
+	assert.NoError(t, err)
+	got := make([]string, 0, len(events))
+	for _, ev := range events {
+		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render(locale))
+		got = append(got, line)
+	}
+	assert.Equal(t, want, got)
+}
+
 func TestHebrewCalendar(t *testing.T) {
-	assert := assert.New(t)
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		Year:         2022,
 		Month:        time.April,
 		IsHebrewYear: false,
 	}
-	events, err := hebcal.HebrewCalendar(&opts)
-
-	assert.Equal(nil, err)
-	assert.Equal(15, len(events))
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"2022-04-02 Rosh Chodesh Nisan",
 		"2022-04-02 Shabbat HaChodesh",
 		"2022-04-09 Shabbat HaGadol",
@@ -47,27 +59,17 @@ func TestHebrewCalendar(t *testing.T) {
 		"2022-04-22 Pesach VII",
 		"2022-04-23 Pesach VIII",
 		"2022-04-28 Yom HaShoah",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
-		actual = append(actual, line)
-	}
-	assert.Equal(expected, actual)
+	})
 }
 
 func TestHebrewCalendarSedrotOnly(t *testing.T) {
-	assert := assert.New(t)
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		NoHolidays:   true,
 		Sedrot:       true,
 		Year:         5783,
 		IsHebrewYear: true,
 	}
-	events, err := hebcal.HebrewCalendar(&opts)
-	assert.Equal(nil, err)
-	assert.Equal(47, len(events))
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"2022-10-01 Parashat Vayeilech",
 		"2022-10-08 Parashat Ha'azinu",
 		"2022-10-22 Parashat Bereshit",
@@ -115,30 +117,19 @@ func TestHebrewCalendarSedrotOnly(t *testing.T) {
 		"2023-08-26 Parashat Ki Teitzei",
 		"2023-09-02 Parashat Ki Tavo",
 		"2023-09-09 Parashat Nitzavim-Vayeilech",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
-		actual = append(actual, line)
-	}
-	assert.Equal(expected, actual)
+	})
 }
 
 func TestHebrewCalendarCandles(t *testing.T) {
-	assert := assert.New(t)
 	loc := zmanim.LookupCity("Chicago")
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		Start:          hdate.New(5782, hdate.Elul, 25),
 		End:            hdate.New(5783, hdate.Tishrei, 8),
 		CandleLighting: true,
 		Location:       loc,
 		HavdalahMins:   50,
 	}
-	events, err := hebcal.HebrewCalendar(&opts)
-
-	assert.Equal(nil, err)
-	assert.Equal(14, len(events))
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"2022-09-23 Candle lighting: 6:28",
 		"2022-09-24 Havdalah (50 min): 7:35",
 		"2022-09-25 Erev Rosh Hashana",
@@ -153,29 +144,18 @@ func TestHebrewCalendarCandles(t *testing.T) {
 		"2022-09-30 Candle lighting: 6:16",
 		"2022-10-01 Shabbat Shuva",
 		"2022-10-01 Havdalah (50 min): 7:23",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		desc := ev.Render("en")
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
-		actual = append(actual, line)
-	}
-	assert.Equal(expected, actual)
+	})
 }
 
 func TestHebrewCalendarChanukahCandles(t *testing.T) {
-	assert := assert.New(t)
 	loc := zmanim.LookupCity("Jerusalem")
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		Start:          hdate.New(5783, hdate.Kislev, 24),
 		End:            hdate.New(5783, hdate.Tevet, 2),
 		CandleLighting: true,
 		Location:       loc,
 	}
-	events, err := hebcal.HebrewCalendar(&opts)
-	assert.Equal(nil, err)
-	assert.Equal(14, len(events))
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"2022-12-18 Chanukah: 1 Candle: 4:56",
 		"2022-12-19 Chanukah: 2 Candles: 4:57",
 		"2022-12-20 Chanukah: 3 Candles: 4:57",
@@ -190,27 +170,15 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 		"2022-12-25 Chanukah: 8 Candles: 5:00",
 		"2022-12-25 Rosh Chodesh Tevet",
 		"2022-12-26 Chanukah: 8th Day",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		desc := ev.Render("en")
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
-		// fmt.Printf("\"%s\",\n", line)
-		actual = append(actual, line)
-	}
-	assert.Equal(expected, actual)
+	})
 }
 
 func TestHebrewCalendarMask(t *testing.T) {
-	assert := assert.New(t)
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		Year: 2020,
 		Mask: event.ROSH_CHODESH | event.SPECIAL_SHABBAT,
 	}
-	events, err := hebcal.HebrewCalendar(&opts)
-	assert.Equal(nil, err)
-	assert.Equal(25, len(events))
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"2020-01-27 Rosh Chodesh Sh'vat",
 		"2020-02-08 Shabbat Shirah",
 		"2020-02-22 Shabbat Shekalim",
@@ -236,14 +204,7 @@ func TestHebrewCalendarMask(t *testing.T) {
 		"2020-10-19 Rosh Chodesh Cheshvan",
 		"2020-11-17 Rosh Chodesh Kislev",
 		"2020-12-16 Rosh Chodesh Tevet",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		desc := ev.Render("en")
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
-		actual = append(actual, line)
-	}
-	assert.Equal(expected, actual)
+	})
 }
 
 func ExampleHebrewCalendar() {
@@ -273,43 +234,32 @@ func ExampleHebrewCalendar() {
 
 func TestHebrewCalendarLocale(t *testing.T) {
 	loc := zmanim.LookupCity("Providence")
-	opts := hebcal.CalOptions{
-		Year:           2022,
+	opts := &hebcal.CalOptions{
 		Sedrot:         true,
 		CandleLighting: true,
 		Location:       loc,
 		HavdalahMins:   50,
+		Start:          hdate.FromGregorian(2022, time.January, 1),
+		End:            hdate.FromGregorian(2022, time.January, 8),
 	}
-	events, _ := hebcal.HebrewCalendar(&opts)
-	actual := make([]string, 6)
-	for i := 0; i < 6; i++ {
-		ev := events[i]
-		dateStr := ev.GetDate().Gregorian().Format("Mon 02-Jan-2006")
-		actual[i] = fmt.Sprintf("%s %s", dateStr, ev.Render("es"))
-	}
-	expected := []string{
-		"Sat 01-Jan-2022 Parashá Vaera",
-		"Sat 01-Jan-2022 Havdalah (50 min): 5:15",
-		"Mon 03-Jan-2022 Rosh Jodesh Sh'vat",
-		"Fri 07-Jan-2022 Iluminación de velas: 4:12",
-		"Sat 08-Jan-2022 Parashá Bo",
-		"Sat 08-Jan-2022 Havdalah (50 min): 5:22",
-	}
-	assert.Equal(t, expected, actual)
+	checkEvents(t, "es", opts, []string{
+		"2022-01-01 Parashá Vaera",
+		"2022-01-01 Havdalah (50 min): 5:15",
+		"2022-01-03 Rosh Jodesh Sh'vat",
+		"2022-01-07 Iluminación de velas: 4:12",
+		"2022-01-08 Parashá Bo",
+		"2022-01-08 Havdalah (50 min): 5:22",
+	})
 }
 
 func TestHebrewCalendarMishnaYomiOnly(t *testing.T) {
-	assert := assert.New(t)
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		Start:      hdate.New(5782, hdate.Kislev, 23),
 		End:        hdate.New(5782, hdate.Kislev, 29),
 		MishnaYomi: true,
 		NoHolidays: true,
 	}
-	events, err := hebcal.HebrewCalendar(&opts)
-	assert.Equal(nil, err)
-	assert.Equal(7, len(events))
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"2021-11-27 Tevul Yom 4:2-3",
 		"2021-11-28 Tevul Yom 4:4-5",
 		"2021-11-29 Tevul Yom 4:6-7",
@@ -317,19 +267,11 @@ func TestHebrewCalendarMishnaYomiOnly(t *testing.T) {
 		"2021-12-01 Yadayim 1:3-4",
 		"2021-12-02 Yadayim 1:5-2:1",
 		"2021-12-03 Yadayim 2:2-3",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		desc := ev.Render("en")
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
-		// fmt.Printf("\"%s\",\n", line)
-		actual = append(actual, line)
-	}
-	assert.Equal(expected, actual)
+	})
 }
 
 func TestNoModern(t *testing.T) {
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		Year:             2022,
 		IL:               true,
 		NoMinorFast:      true,
@@ -337,15 +279,7 @@ func TestNoModern(t *testing.T) {
 		NoRoshChodesh:    true,
 		NoSpecialShabbat: true,
 	}
-	events, _ := hebcal.HebrewCalendar(&opts)
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		desc := ev.Render("en")
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
-		// fmt.Printf("\"%s\",\n", line)
-		actual = append(actual, line)
-	}
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"2022-01-17 Tu BiShvat",
 		"2022-02-15 Purim Katan",
 		"2022-02-16 Shushan Purim Katan",
@@ -393,14 +327,13 @@ func TestNoModern(t *testing.T) {
 		"2022-12-24 Chanukah: 7 Candles",
 		"2022-12-25 Chanukah: 8 Candles",
 		"2022-12-26 Chanukah: 8th Day",
-	}
-	assert.Equal(t, expected, actual)
+	})
 }
 
 func TestDailyZemanim(t *testing.T) {
 	hd := hdate.New(5782, hdate.Kislev, 23)
 	loc := zmanim.LookupCity("Providence")
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		Start:       hd,
 		End:         hd,
 		NoHolidays:  true,
@@ -408,14 +341,7 @@ func TestDailyZemanim(t *testing.T) {
 		Location:    loc,
 		Hour24:      true,
 	}
-	events, _ := hebcal.HebrewCalendar(&opts)
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		desc := ev.Render("en")
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
-		actual = append(actual, line)
-	}
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"2021-11-27 Alot haShachar: 05:21",
 		"2021-11-27 Misheyakir: 05:47",
 		"2021-11-27 Misheyakir Machmir: 05:54",
@@ -431,35 +357,24 @@ func TestDailyZemanim(t *testing.T) {
 		"2021-11-27 Sunset: 16:17",
 		"2021-11-27 Bein HaShemashot: 16:41",
 		"2021-11-27 Tzeit HaKochavim: 17:02",
-	}
-	assert.Equal(t, expected, actual)
+	})
 }
 
 func TestHebrewCalendarYYomi(t *testing.T) {
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		NoHolidays:     true,
 		YerushalmiYomi: true,
 		Start:          hdate.New(5783, hdate.Cheshvan, 18),
 		End:            hdate.New(5783, hdate.Cheshvan, 23),
 	}
-	events, err := hebcal.HebrewCalendar(&opts)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, 6, len(events))
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"2022-11-12 Yerushalmi Niddah 12",
 		"2022-11-13 Yerushalmi Niddah 13",
 		"2022-11-14 Yerushalmi Berakhot 1",
 		"2022-11-15 Yerushalmi Berakhot 2",
 		"2022-11-16 Yerushalmi Berakhot 3",
 		"2022-11-17 Yerushalmi Berakhot 4",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		desc := ev.Render("en")
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
-		actual = append(actual, line)
-	}
-	assert.Equal(t, expected, actual)
+	})
 }
 
 func TestHebrewCalendarSchottenstein(t *testing.T) {
@@ -561,17 +476,12 @@ func TestHebrewCalendarZmanimOnly(t *testing.T) {
 }
 
 func TestHebrewCalendar1752CE(t *testing.T) {
-	assert := assert.New(t)
-	opts := hebcal.CalOptions{
-		Year:           5513,
-		IsHebrewYear:   true,
+	opts := &hebcal.CalOptions{
 		AddHebrewDates: true,
+		Start:          hdate.New(5512, hdate.Elul, 29),
+		End:            hdate.New(5513, hdate.Tishrei, 10),
 	}
-	events0, err := hebcal.HebrewCalendar(&opts)
-	events := events0[:18]
-
-	assert.Equal(nil, err)
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"1752-08-28 29th of Elul, 5512",
 		"1752-08-28 Erev Rosh Hashana",
 		"1752-08-29 1st of Tishrei, 5513",
@@ -590,18 +500,11 @@ func TestHebrewCalendar1752CE(t *testing.T) {
 		"1752-09-17 Erev Yom Kippur",
 		"1752-09-18 10th of Tishrei, 5513",
 		"1752-09-18 Yom Kippur",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
-		actual = append(actual, line)
-	}
-	assert.Equal(expected, actual)
+	})
 }
 
 func TestHebrewCalendarYahrzeit(t *testing.T) {
-	assert := assert.New(t)
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		Start:                   hdate.New(5728, hdate.Tishrei, 1),
 		End:                     hdate.New(5728, hdate.Tishrei, 30),
 		AddHebrewDatesForEvents: true,
@@ -613,23 +516,14 @@ func TestHebrewCalendarYahrzeit(t *testing.T) {
 			{Date: time.Date(1966, 9, 15, 0, 0, 0, 0, time.UTC), Name: "Joe Shmo"},
 		},
 	}
-	events, err := hebcal.HebrewCalendar(&opts)
-	assert.NoError(err)
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"1967-10-05 1st of Tishrei, 5728",
 		"1967-10-05 Joe Shmo",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
-		actual = append(actual, line)
-	}
-	assert.Equal(expected, actual)
+	})
 }
 
 func TestHebrewCalendarInfile(t *testing.T) {
-	assert := assert.New(t)
-	opts := hebcal.CalOptions{
+	opts := &hebcal.CalOptions{
 		Start:                   hdate.New(5728, hdate.Tishrei, 1),
 		End:                     hdate.New(5728, hdate.Tishrei, 30),
 		AddHebrewDatesForEvents: true,
@@ -641,16 +535,8 @@ func TestHebrewCalendarInfile(t *testing.T) {
 			{Month: hdate.Tishrei, Day: 1, Desc: "Ben Ploni"},
 		},
 	}
-	events, err := hebcal.HebrewCalendar(&opts)
-	assert.NoError(err)
-	expected := []string{
+	checkEvents(t, "en", opts, []string{
 		"1967-10-05 1st of Tishrei, 5728",
 		"1967-10-05 Ben Ploni",
-	}
-	actual := make([]string, 0, len(events))
-	for _, ev := range events {
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
-		actual = append(actual, line)
-	}
-	assert.Equal(expected, actual)
+	})
 }
