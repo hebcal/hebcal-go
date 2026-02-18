@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
+
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/zmanim"
@@ -45,8 +46,15 @@ type TimedEvent struct {
 	opts         *CalOptions
 }
 
-func NewTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time.Time,
-	sunsetOffset int, linkedEvent event.CalEvent, opts *CalOptions) TimedEvent {
+func NewTimedEvent(
+	hd hdate.HDate,
+	desc string,
+	flags event.HolidayFlags,
+	t time.Time,
+	sunsetOffset int,
+	linkedEvent event.CalEvent,
+	opts *CalOptions,
+) TimedEvent {
 	if t.IsZero() {
 		return TimedEvent{}
 	}
@@ -99,7 +107,11 @@ func (ev TimedEvent) Basename() string {
 	return ev.Desc
 }
 
-func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev event.CalEvent) TimedEvent {
+func makeCandleEvent(
+	hd hdate.HDate,
+	opts *CalOptions,
+	ev event.CalEvent,
+) TimedEvent {
 	havdalahTitle := false
 	useHavdalahOffset := false
 	dow := hd.Weekday()
@@ -146,7 +158,10 @@ func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev event.CalEvent) TimedE
 	return NewTimedEvent(hd, desc, flags, eventTime, offset, ev, opts)
 }
 
-func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEvent {
+func makeChanukahCandleLighting(
+	ev event.HolidayEvent,
+	opts *CalOptions,
+) TimedEvent {
 	hd := ev.Date
 	dow := hd.Weekday()
 	if dow == time.Friday || dow == time.Saturday {
@@ -174,7 +189,10 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEv
 	}
 }
 
-func makeFastStartEnd(ev event.CalEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
+func makeFastStartEnd(
+	ev event.CalEvent,
+	opts *CalOptions,
+) (TimedEvent, TimedEvent) {
 	year, month, day := ev.GetDate().Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	loc := opts.Location
@@ -218,7 +236,9 @@ func (ev riseSetEvent) Render(locale string) string {
 	set := z.Sunset()
 	riseStr := formatTime(&rise, ev.opts)
 	setStr := formatTime(&set, ev.opts)
-	return fmt.Sprintf("Sunrise: %s; Sunset %s", riseStr, setStr)
+	riseLabel, _ := locales.LookupTranslation("Sunrise", locale)
+	setLabel, _ := locales.LookupTranslation("Sunset", locale)
+	return fmt.Sprintf("%s: %s; %s: %s", riseLabel, riseStr, setLabel, setStr)
 }
 
 func (ev riseSetEvent) GetFlags() event.HolidayFlags {
@@ -242,7 +262,7 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 		desc string
 		t    time.Time
 	}{
-		{"Alot haShachar", z.AlotHaShachar()},
+		{"Alot HaShachar", z.AlotHaShachar()},
 		{"Misheyakir", z.Misheyakir()},
 		{"Misheyakir Machmir", z.MisheyakirMachmir()},
 		{"Sunrise", z.Sunrise()},
@@ -250,7 +270,7 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 		{"Kriat Shema, sof zeman (GRA)", z.SofZmanShma()},
 		{"Tefilah, sof zeman (MGA)", z.SofZmanTfillaMGA()},
 		{"Tefilah, sof zeman (GRA)", z.SofZmanTfilla()},
-		{"Chatzot hayom", z.Chatzot()},
+		{"Chatzot HaYom", z.Chatzot()},
 		{"Mincha Gedolah", z.MinchaGedola()},
 		{"Mincha Ketanah", z.MinchaKetana()},
 		{"Plag HaMincha", z.PlagHaMincha()},
