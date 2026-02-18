@@ -360,6 +360,66 @@ func TestDailyZemanim(t *testing.T) {
 	})
 }
 
+func TestDailyZemanim_He(t *testing.T) {
+	hd := hdate.New(5782, hdate.Kislev, 23)
+	loc := zmanim.LookupCity("Providence")
+	opts := &hebcal.CalOptions{
+		Start:       hd,
+		End:         hd,
+		NoHolidays:  true,
+		DailyZmanim: true,
+		Location:    loc,
+		Hour24:      true,
+	}
+	checkEvents(t, "he", opts, []string{
+		"2021-11-27 עֲלוֹת הַשַּׁחַר: 05:21",
+		"2021-11-27 מִשֶּׁיַּכִּיר: 05:47",
+		"2021-11-27 מִשֶּׁיַּכִּיר מַחְמִיר: 05:54",
+		"2021-11-27 נֵץ הַחַמָּה: 06:49",
+		"2021-11-27 סוֹף זְמַן קְרִיאַת שְׁמַע (מג״א): 08:35",
+		"2021-11-27 סוֹף זְמַן קְרִיאַת שְׁמַע (גְּרָ״א): 09:11",
+		"2021-11-27 סוֹף זְמַן תְּפִלָּה (מג״א): 09:34",
+		"2021-11-27 סוֹף זְמַן תְּפִלָּה (גְּרָ״א): 09:58",
+		"2021-11-27 חֲצוֹת הַיּוֹם: 11:33",
+		"2021-11-27 מִנְחָה גְּדוֹלָה: 11:57",
+		"2021-11-27 מִנְחָה קְטַנָּה: 14:19",
+		"2021-11-27 פְּלַג הַמִּנְחָה: 15:18",
+		"2021-11-27 שְׁקִיעַת הַחַמָּה: 16:17",
+		"2021-11-27 בֵּין הַשְּׁמָשׁוֹת: 16:41",
+		"2021-11-27 צֵאת הַכּוֹכָבִים: 17:02",
+	})
+}
+
+func TestDailyZemanim_Ashkenazi(t *testing.T) {
+	hd := hdate.New(5782, hdate.Kislev, 23)
+	loc := zmanim.LookupCity("Providence")
+	opts := &hebcal.CalOptions{
+		Start:       hd,
+		End:         hd,
+		NoHolidays:  true,
+		DailyZmanim: true,
+		Location:    loc,
+		Hour24:      true,
+	}
+	checkEvents(t, "ashkenazi", opts, []string{
+		"2021-11-27 Alos HaShachar: 05:21",
+		"2021-11-27 Misheyakir: 05:47",
+		"2021-11-27 Misheyakir Machmir: 05:54",
+		"2021-11-27 Sunrise: 06:49",
+		"2021-11-27 Krias Shema, sof zman (MGA): 08:35",
+		"2021-11-27 Krias Shema, sof zman (GRA): 09:11",
+		"2021-11-27 Tefilah, sof zman (MGA): 09:34",
+		"2021-11-27 Tefilah, sof zman (GRA): 09:58",
+		"2021-11-27 Chatzos: 11:33",
+		"2021-11-27 Mincha Gedolah: 11:57",
+		"2021-11-27 Mincha Ketanah: 14:19",
+		"2021-11-27 Plag HaMincha: 15:18",
+		"2021-11-27 Sunset: 16:17",
+		"2021-11-27 Bein HaShemashos: 16:41",
+		"2021-11-27 Tzeis HaKochavim: 17:02",
+	})
+}
+
 func TestHebrewCalendarYYomi(t *testing.T) {
 	opts := &hebcal.CalOptions{
 		NoHolidays:     true,
