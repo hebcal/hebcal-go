@@ -33,6 +33,7 @@ var dict_ashkenazi = map[string]string{
 	"Chanukah Day 8 (on Shabbat)":     "Chanukah Day 8 (on Shabbos)",
 	"Chatzot HaLailah":                "Chatzos HaLailah",
 	"Chatzot hayom":                   "Chatzos",
+	"Chatzot HaYom":                   "Chatzos",
 	"Chukat":                          "Chukas",
 	"Eduyot":                          "Eduyos",
 	"Erev Shavuot":                    "Erev Shavuos",
