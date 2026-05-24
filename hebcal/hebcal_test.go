@@ -521,6 +521,37 @@ func TestYear1(t *testing.T) {
 	assert.Equal(t, 79, len(events))
 }
 
+func TestYearMinus1(t *testing.T) {
+	opts := hebcal.CalOptions{
+		Year: -1,
+	}
+	events, err := hebcal.HebrewCalendar(&opts)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, events)
+	first := events[0].GetDate()
+	last := events[len(events)-1].GetDate()
+	fy, _, _ := first.Greg()
+	ly, _, _ := last.Greg()
+	assert.Equal(t, -1, fy)
+	assert.Equal(t, -1, ly)
+}
+
+func TestYearMinus1NumYears2(t *testing.T) {
+	opts := hebcal.CalOptions{
+		Year:     -1,
+		NumYears: 2,
+	}
+	events, err := hebcal.HebrewCalendar(&opts)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, events)
+	first := events[0].GetDate()
+	last := events[len(events)-1].GetDate()
+	fy, _, _ := first.Greg()
+	ly, _, _ := last.Greg()
+	assert.Equal(t, -1, fy)
+	assert.Equal(t, 1, ly)
+}
+
 func TestHebrewCalendarZmanimOnly(t *testing.T) {
 	assert := assert.New(t)
 	loc := zmanim.LookupCity("Amsterdam")
