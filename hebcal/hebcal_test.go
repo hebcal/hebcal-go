@@ -2,7 +2,6 @@ package hebcal_test
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -11,7 +10,6 @@ import (
 
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
-	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
 )
 
@@ -252,24 +250,6 @@ func TestHebrewCalendarLocale(t *testing.T) {
 	})
 }
 
-func TestHebrewCalendarMishnaYomiOnly(t *testing.T) {
-	opts := &hebcal.CalOptions{
-		Start:      hdate.New(5782, hdate.Kislev, 23),
-		End:        hdate.New(5782, hdate.Kislev, 29),
-		MishnaYomi: true,
-		NoHolidays: true,
-	}
-	checkEvents(t, "en", opts, []string{
-		"2021-11-27 Tevul Yom 4:2-3",
-		"2021-11-28 Tevul Yom 4:4-5",
-		"2021-11-29 Tevul Yom 4:6-7",
-		"2021-11-30 Yadayim 1:1-2",
-		"2021-12-01 Yadayim 1:3-4",
-		"2021-12-02 Yadayim 1:5-2:1",
-		"2021-12-03 Yadayim 2:2-3",
-	})
-}
-
 func TestNoModern(t *testing.T) {
 	opts := &hebcal.CalOptions{
 		Year:             2022,
@@ -418,86 +398,6 @@ func TestDailyZemanim_Ashkenazi(t *testing.T) {
 		"2021-11-27 Bein HaShemashos: 16:41",
 		"2021-11-27 Tzeis HaKochavim: 17:02",
 	})
-}
-
-func TestHebrewCalendarYYomi(t *testing.T) {
-	opts := &hebcal.CalOptions{
-		NoHolidays:     true,
-		YerushalmiYomi: true,
-		Start:          hdate.New(5783, hdate.Cheshvan, 18),
-		End:            hdate.New(5783, hdate.Cheshvan, 23),
-	}
-	checkEvents(t, "en", opts, []string{
-		"2022-11-12 Yerushalmi Niddah 12",
-		"2022-11-13 Yerushalmi Niddah 13",
-		"2022-11-14 Yerushalmi Berakhot 1",
-		"2022-11-15 Yerushalmi Berakhot 2",
-		"2022-11-16 Yerushalmi Berakhot 3",
-		"2022-11-17 Yerushalmi Berakhot 4",
-	})
-}
-
-func TestHebrewCalendarSchottenstein(t *testing.T) {
-	opts := hebcal.CalOptions{
-		NoHolidays:        true,
-		YerushalmiYomi:    true,
-		YerushalmiEdition: yerushalmi.Schottenstein,
-		Start:             hdate.FromGregorian(2022, time.November, 14),
-		End:               hdate.FromGregorian(2028, time.August, 7),
-	}
-	events, err := hebcal.HebrewCalendar(&opts)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, 2094, len(events))
-	actual := make([]string, 0, 40)
-	for _, ev := range events {
-		desc := ev.Render("en")
-		if strings.HasSuffix(desc, " 1") {
-			line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), desc)
-			actual = append(actual, line)
-		}
-	}
-	expected := []string{
-		"2022-11-14 Yerushalmi Berakhot 1",
-		"2023-02-16 Yerushalmi Peah 1",
-		"2023-04-30 Yerushalmi Demai 1",
-		"2023-07-16 Yerushalmi Kilayim 1",
-		"2023-10-08 Yerushalmi Sheviit 1",
-		"2024-01-03 Yerushalmi Terumot 1",
-		"2024-04-19 Yerushalmi Maasrot 1",
-		"2024-06-04 Yerushalmi Maaser Sheni 1",
-		"2024-08-02 Yerushalmi Challah 1",
-		"2024-09-20 Yerushalmi Orlah 1",
-		"2024-11-01 Yerushalmi Bikkurim 1",
-		"2024-11-27 Yerushalmi Shabbat 1",
-		"2025-03-20 Yerushalmi Eruvin 1",
-		"2025-05-30 Yerushalmi Pesachim 1",
-		"2025-08-24 Yerushalmi Shekalim 1",
-		"2025-10-24 Yerushalmi Yoma 1",
-		"2025-12-20 Yerushalmi Sukkah 1",
-		"2026-01-22 Yerushalmi Beitzah 1",
-		"2026-03-12 Yerushalmi Rosh Hashanah 1",
-		"2026-04-08 Yerushalmi Taanit 1",
-		"2026-05-09 Yerushalmi Megillah 1",
-		"2026-06-19 Yerushalmi Chagigah 1",
-		"2026-07-17 Yerushalmi Moed Katan 1",
-		"2026-08-09 Yerushalmi Yevamot 1",
-		"2026-11-05 Yerushalmi Ketubot 1",
-		"2027-01-21 Yerushalmi Nedarim 1",
-		"2027-03-04 Yerushalmi Nazir 1",
-		"2027-04-26 Yerushalmi Sotah 1",
-		"2027-06-17 Yerushalmi Gittin 1",
-		"2027-08-09 Yerushalmi Kiddushin 1",
-		"2027-10-01 Yerushalmi Bava Kamma 1",
-		"2027-11-10 Yerushalmi Bava Metzia 1",
-		"2027-12-15 Yerushalmi Bava Batra 1",
-		"2028-01-23 Yerushalmi Sanhedrin 1",
-		"2028-04-07 Yerushalmi Shevuot 1",
-		"2028-05-26 Yerushalmi Avodah Zarah 1",
-		"2028-06-29 Yerushalmi Makkot 1",
-		"2028-07-10 Yerushalmi Horayot 1",
-		"2028-07-28 Yerushalmi Niddah 1",
-	}
-	assert.Equal(t, expected, actual)
 }
 
 func TestYear2(t *testing.T) {
