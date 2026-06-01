@@ -21,8 +21,10 @@ interfaces.
 
 Hebcal incorporates and uses several related packages:
 
-  - dafyomi: Daf Yomi, a daily regimen of learning the Babylonian
-    Talmud (Bavli).
+  - dailylearning: a plugin registry for daily learning schedules
+    (Daf Yomi, Mishna Yomi, etc.). The schedules themselves live in a
+    separate module, github.com/hebcal/learning, which registers them
+    here; import that module to enable daily learning events.
   - event: an interface for calendar events.
   - greg: converts between Gregorian dates and R.D. (Rata Die)
     day numbers.
@@ -33,13 +35,7 @@ Hebcal incorporates and uses several related packages:
     candle-lighting and havdalah times, and fast start/end times.
   - locales: translations and transliterations of Jewish holiday
     names into several languages.
-  - mishnayomi: calculates the Mishna Yomi, a program of daily
-    learning in which participants study two Mishnayot each day.
   - molad: calculates the time at which the New Moon is born.
-  - nachyomi: calculates Nach Yomi, a daily regimen of learning
-    the books of Nevi'im (Prophets) and Ketuvim (Writings).
   - omer: calculates the Sefirat HaOmer.
   - sedra: weekly Torah reading (Parashat HaShavua).
-  - yerushalmi: Yerushalmi Yomi, a daily regimen of learning the
-    Jerusalem Talmud.
   - zmanim: calculates halachic times.
