@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/locales"
+	locales "github.com/hebcal/po2catalog/generated"
 )
 
 type yearType int

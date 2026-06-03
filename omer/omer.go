@@ -25,7 +25,7 @@ import (
 	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/event"
-	"github.com/hebcal/hebcal-go/locales"
+	locales "github.com/hebcal/po2catalog/generated"
 )
 
 type OmerEvent struct {
@@ -180,7 +180,7 @@ func (ev OmerEvent) TodayIs(locale string) string {
 	if locale == "he" || locale == "he-x-nonikud" {
 		str := todayIsHe(ev.OmerDay)
 		if locale == "he-x-nonikud" {
-			str = locales.HebrewStripNikkud(str)
+			str = hdate.HebrewStripNikkud(str)
 		}
 		return str
 	}
@@ -246,7 +246,7 @@ func (ev OmerEvent) Sefira(locale string) string {
 			prefix = "שֶׁבִּ"
 		}
 		if locale == "he-x-nonikud" {
-			prefix = locales.HebrewStripNikkud(prefix)
+			prefix = hdate.HebrewStripNikkud(prefix)
 		}
 		return dayWithinWeek + " " + prefix + week
 	} else if locale == "translit" {

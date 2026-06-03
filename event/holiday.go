@@ -7,7 +7,7 @@ import (
 
 	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/locales"
+	locales "github.com/hebcal/po2catalog/generated"
 )
 
 // HolidayEvent represents a built-in holiday like Pesach, Purim or Tu BiShvat

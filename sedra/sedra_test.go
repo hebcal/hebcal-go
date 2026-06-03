@@ -8,8 +8,8 @@ import (
 	"github.com/hebcal/hdate"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/sedra"
+	locales "github.com/hebcal/po2catalog/generated"
 )
 
 func TestSedra_Lookup(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/hebcal/gematriya"
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/locales"
+	locales "github.com/hebcal/po2catalog/generated"
 )
 
 type hebrewDateEvent struct {

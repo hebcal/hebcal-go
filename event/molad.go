@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/hebcal/hdate"
-	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/molad"
+	locales "github.com/hebcal/po2catalog/generated"
 )
 
 type moladEvent struct {
@@ -58,7 +58,7 @@ func (ev moladEvent) Render(locale string) string {
 			monthStr, dow,
 			ev.Molad.Hours, ampm, ev.Molad.Minutes, ev.Molad.Chalakim)
 		if locale == "he-x-nonikud" {
-			str = locales.HebrewStripNikkud(str)
+			str = hdate.HebrewStripNikkud(str)
 		}
 		return str
 	}
