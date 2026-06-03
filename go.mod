@@ -9,7 +9,7 @@ require (
 	github.com/hebcal/gematriya v1.0.1
 	github.com/hebcal/greg v1.0.2
 	github.com/hebcal/hdate v1.3.0
-	github.com/hebcal/po2catalog/generated v0.0.0-20260603040028-43e1237a0fbf
+	github.com/hebcal/po2catalog/generated v0.0.0-20260603045347-d5fa437e56ce
 	github.com/nathan-osman/go-sunrise v1.1.0
 )
 
