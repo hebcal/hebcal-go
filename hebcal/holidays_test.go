@@ -364,7 +364,7 @@ func TestGetHolidaysForYearArrayDiasporaAshkenazi(t *testing.T) {
 		"2011-08-29 Yom Kippur Katan Elul",
 		"2011-08-30 Rosh Chodesh Elul",
 		"2011-08-31 Rosh Chodesh Elul",
-		"2011-08-31 Rosh Hashana LaBehemot",
+		"2011-08-31 Rosh Hashana LaBeheimos",
 		"2011-09-24 Leil Selichos",
 		"2011-09-28 Erev Rosh Hashana",
 	}
