@@ -276,6 +276,20 @@ func (z *Zmanim) SofZmanTfilla() time.Time {
 	return z.HourOffset(4)
 }
 
+// SofZmanAchilasChametz is the latest time to eat chametz on Erev Pesach
+// according to the Gra. It is the same as [Zmanim.SofZmanTfilla], sunrise plus 4
+// halachic hours.
+func (z *Zmanim) SofZmanAchilasChametz() time.Time {
+	return z.HourOffset(4)
+}
+
+// SofZmanBiurChametz is the latest time to burn (dispose of) chametz on Erev
+// Pesach according to the Gra: sunrise plus 5 halachic hours, one halachic hour
+// after [Zmanim.SofZmanAchilasChametz].
+func (z *Zmanim) SofZmanBiurChametz() time.Time {
+	return z.HourOffset(5)
+}
+
 func (z *Zmanim) sofZmanMGA(hours float64) time.Time {
 	alot72 := z.SunriseOffset(-72, false)
 	tzeit72 := z.SunsetOffset(72, false)

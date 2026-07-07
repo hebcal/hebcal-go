@@ -201,6 +201,51 @@ func makeFastStartEnd(ev event.CalEvent, opts *CalOptions) (TimedEvent, TimedEve
 	return startEvent, endEvent
 }
 
+// makeErevPesachChametz returns the "Finish eating chametz" (sof zman achilat
+// chametz) and "Biur Chametz" (sof zman biur chametz) events for Erev Pesach.
+// It is modeled on hebcal-es6's makeErevPesachChametzEvents.
+//
+// Sof zman achilat chametz is the same as sof zman tefilla (Gra, sunrise plus 4
+// halachic hours); sof zman biur chametz is one halachic hour later. When Erev
+// Pesach falls on Shabbat, chametz cannot be burned on Shabbat, so the Biur
+// Chametz event is emitted on the Friday before instead (see makeBiurChametz)
+// and is omitted here.
+func makeErevPesachChametz(ev event.CalEvent, opts *CalOptions) []event.CalEvent {
+	hd := ev.GetDate()
+	year, month, day := hd.Greg()
+	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	z := zmanim.New(opts.Location, gregDate)
+	events := make([]event.CalEvent, 0, 2)
+	achilas := z.SofZmanAchilasChametz()
+	if achilas.IsZero() {
+		return events
+	}
+	achilasEv := NewTimedEvent(hd, "Finish eating chametz", 0, achilas, 0, ev, opts)
+	achilasEv.Emoji = "🍞"
+	events = append(events, achilasEv)
+	if hd.Weekday() != time.Saturday {
+		if biurEv := makeBiurChametz(hd, opts); (biurEv != TimedEvent{}) {
+			events = append(events, biurEv)
+		}
+	}
+	return events
+}
+
+// makeBiurChametz returns the "Biur Chametz" (sof zman biur chametz) event for
+// the given day, or an empty TimedEvent if the sun does not rise/set.
+func makeBiurChametz(hd hdate.HDate, opts *CalOptions) TimedEvent {
+	year, month, day := hd.Greg()
+	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	z := zmanim.New(opts.Location, gregDate)
+	biur := z.SofZmanBiurChametz()
+	if biur.IsZero() {
+		return TimedEvent{}
+	}
+	biurEv := NewTimedEvent(hd, "Biur Chametz", 0, biur, 0, nil, opts)
+	biurEv.Emoji = "🔥"
+	return biurEv
+}
+
 type riseSetEvent struct {
 	date hdate.HDate
 	opts *CalOptions
