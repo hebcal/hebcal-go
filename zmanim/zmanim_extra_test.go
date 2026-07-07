@@ -33,6 +33,10 @@ func TestExtraZmanim(t *testing.T) {
 	}
 
 	z := zmanim.New(&loc, dt) // UseElevation defaults to false
+	// The MGA "72 minute" sof zman is measured from sea level, so it is the
+	// same with or without elevation (see the ze assertions below).
+	assertClose(t, "sofZmanShmaMGA", z.SofZmanShmaMGA(), "2024-04-26T08:41:40")
+	assertClose(t, "sofZmanTfillaMGA", z.SofZmanTfillaMGA(), "2024-04-26T10:00:08")
 	assertClose(t, "seaLevelSunrise", z.SeaLevelSunrise(), "2024-04-26T05:58:14")
 	assertClose(t, "seaLevelSunset", z.SeaLevelSunset(), "2024-04-26T19:15:58")
 	assertClose(t, "sofZmanShmaMGA16Point1", z.SofZmanShmaMGA16Point1(), "2024-04-26T08:38:56")
@@ -54,6 +58,10 @@ func TestExtraZmanim(t *testing.T) {
 	ze.UseElevation = true
 	assertClose(t, "minchaGedolaMGA(elev)", ze.MinchaGedolaMGA(), "2024-04-26T13:16:42")
 	assertClose(t, "minchaKetanaMGA(elev)", ze.MinchaKetanaMGA(), "2024-04-26T17:14:21")
+	// The MGA 72-minute sof zman uses sea-level sunrise/sunset, so elevation
+	// must not change it (regression test for the elevation-aware bug).
+	assertClose(t, "sofZmanShmaMGA(elev)", ze.SofZmanShmaMGA(), "2024-04-26T08:41:40")
+	assertClose(t, "sofZmanTfillaMGA(elev)", ze.SofZmanTfillaMGA(), "2024-04-26T10:00:08")
 	// seaLevel variants ignore elevation.
 	assertClose(t, "seaLevelSunrise(elev)", ze.SeaLevelSunrise(), "2024-04-26T05:58:14")
 	assertClose(t, "seaLevelSunset(elev)", ze.SeaLevelSunset(), "2024-04-26T19:15:58")

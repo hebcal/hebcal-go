@@ -291,10 +291,19 @@ func (z *Zmanim) SofZmanBiurChametz() time.Time {
 }
 
 func (z *Zmanim) sofZmanMGA(hours float64) time.Time {
-	alot72 := z.SunriseOffset(-72, false)
-	tzeit72 := z.SunsetOffset(72, false)
-	alot72sec := alot72.Unix()
-	temporalHour := float64(tzeit72.Unix()-alot72sec) / 12.0 // sec in hour
+	// The MGA "72 minute" day is measured from 72 minutes before sea-level
+	// sunrise to 72 minutes after sea-level sunset, regardless of elevation
+	// (matching @hebcal/core, which forces sea level here). Using the
+	// elevation-adjusted sunrise/sunset would shift these times by a minute
+	// or more when UseElevation is set.
+	sunrise := z.SeaLevelSunrise()
+	sunset := z.SeaLevelSunset()
+	if sunrise.IsZero() || sunset.IsZero() {
+		return time.Time{}
+	}
+	alot72sec := sunrise.Add(-72 * time.Minute).Unix()
+	tzeit72sec := sunset.Add(72 * time.Minute).Unix()
+	temporalHour := float64(tzeit72sec-alot72sec) / 12.0 // sec in hour
 	seconds := alot72sec + int64(hours*temporalHour)
 	return time.Unix(seconds, 0).In(z.TimeZone)
 }
