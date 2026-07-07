@@ -16,3 +16,19 @@ func TestNoDuplicateCities(t *testing.T) {
 		m[city.Name] = idx
 	}
 }
+
+func TestCityElevation(t *testing.T) {
+	jerusalem := zmanim.LookupCity("Jerusalem")
+	if jerusalem == nil {
+		t.Fatal("Jerusalem not found")
+	}
+	if jerusalem.Elevation != 786 {
+		t.Errorf("Jerusalem elevation = %d, want 786", jerusalem.Elevation)
+	}
+	// Every city should have a non-negative elevation populated.
+	for _, city := range zmanim.AllCities() {
+		if city.Elevation < 0 {
+			t.Errorf("%s has negative elevation %d", city.Name, city.Elevation)
+		}
+	}
+}

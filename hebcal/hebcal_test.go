@@ -128,20 +128,20 @@ func TestHebrewCalendarCandles(t *testing.T) {
 		HavdalahMins:   50,
 	}
 	checkEvents(t, "en", opts, []string{
-		"2022-09-23 Candle lighting: 6:28",
-		"2022-09-24 Havdalah (50 min): 7:35",
+		"2022-09-23 Candle lighting: 6:27",
+		"2022-09-24 Havdalah (50 min): 7:34",
 		"2022-09-25 Erev Rosh Hashana",
-		"2022-09-25 Candle lighting: 6:25",
+		"2022-09-25 Candle lighting: 6:24",
 		"2022-09-26 Rosh Hashana 5783",
-		"2022-09-26 Candle lighting: 7:32",
+		"2022-09-26 Candle lighting: 7:31",
 		"2022-09-27 Rosh Hashana II",
-		"2022-09-27 Havdalah (50 min): 7:30",
+		"2022-09-27 Havdalah (50 min): 7:29",
 		"2022-09-28 Fast begins: 5:21",
 		"2022-09-28 Tzom Gedaliah",
-		"2022-09-28 Fast ends: 7:11",
-		"2022-09-30 Candle lighting: 6:16",
+		"2022-09-28 Fast ends: 7:10",
+		"2022-09-30 Candle lighting: 6:15",
 		"2022-10-01 Shabbat Shuva",
-		"2022-10-01 Havdalah (50 min): 7:23",
+		"2022-10-01 Havdalah (50 min): 7:22",
 	})
 }
 
@@ -154,7 +154,7 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 		Location:       loc,
 	}
 	checkEvents(t, "en", opts, []string{
-		"2022-12-18 Chanukah: 1 Candle: 4:56",
+		"2022-12-18 Chanukah: 1 Candle: 4:57",
 		"2022-12-19 Chanukah: 2 Candles: 4:57",
 		"2022-12-20 Chanukah: 3 Candles: 4:57",
 		"2022-12-21 Chanukah: 4 Candles: 4:58",
@@ -223,9 +223,9 @@ func ExampleHebrewCalendar() {
 	}
 	// Output:
 	// Sat 01-Jan-2022 Parashat Vaera
-	// Sat 01-Jan-2022 Havdalah (50 min): 5:15
+	// Sat 01-Jan-2022 Havdalah (50 min): 5:16
 	// Mon 03-Jan-2022 Rosh Chodesh Sh'vat
-	// Fri 07-Jan-2022 Candle lighting: 4:12
+	// Fri 07-Jan-2022 Candle lighting: 4:13
 	// Sat 08-Jan-2022 Parashat Bo
 	// Sat 08-Jan-2022 Havdalah (50 min): 5:22
 }
@@ -242,9 +242,9 @@ func TestHebrewCalendarLocale(t *testing.T) {
 	}
 	checkEvents(t, "es", opts, []string{
 		"2022-01-01 Parashá Vaera",
-		"2022-01-01 Havdalah (50 min): 5:15",
+		"2022-01-01 Havdalah (50 min): 5:16",
 		"2022-01-03 Rosh Jodesh Sh'vat",
-		"2022-01-07 Iluminación de velas: 4:12",
+		"2022-01-07 Iluminación de velas: 4:13",
 		"2022-01-08 Parashá Bo",
 		"2022-01-08 Havdalah (50 min): 5:22",
 	})
@@ -331,11 +331,11 @@ func TestDailyZemanim(t *testing.T) {
 		"2021-11-27 Tefilah, sof zeman (MGA): 09:34",
 		"2021-11-27 Tefilah, sof zeman (GRA): 09:58",
 		"2021-11-27 Chatzot HaYom: 11:33",
-		"2021-11-27 Mincha Gedolah: 11:57",
-		"2021-11-27 Mincha Ketanah: 14:19",
-		"2021-11-27 Plag HaMincha: 15:18",
-		"2021-11-27 Sunset: 16:17",
-		"2021-11-27 Bein HaShemashot: 16:41",
+		"2021-11-27 Mincha Gedolah: 11:56",
+		"2021-11-27 Mincha Ketanah: 14:18",
+		"2021-11-27 Plag HaMincha: 15:17",
+		"2021-11-27 Sunset: 16:16",
+		"2021-11-27 Bein HaShemashot: 16:40",
 		"2021-11-27 Tzeit HaKochavim: 17:02",
 	})
 }
@@ -361,11 +361,11 @@ func TestDailyZemanim_He(t *testing.T) {
 		"2021-11-27 סוֹף זְמַן תְּפִלָּה (מג״א): 09:34",
 		"2021-11-27 סוֹף זְמַן תְּפִלָּה (גְּרָ״א): 09:58",
 		"2021-11-27 חֲצוֹת הַיּוֹם: 11:33",
-		"2021-11-27 מִנְחָה גְּדוֹלָה: 11:57",
-		"2021-11-27 מִנְחָה קְטַנָּה: 14:19",
-		"2021-11-27 פְּלַג הַמִּנְחָה: 15:18",
-		"2021-11-27 שְׁקִיעַת הַחַמָּה: 16:17",
-		"2021-11-27 בֵּין הַשְּׁמָשׁוֹת: 16:41",
+		"2021-11-27 מִנְחָה גְּדוֹלָה: 11:56",
+		"2021-11-27 מִנְחָה קְטַנָּה: 14:18",
+		"2021-11-27 פְּלַג הַמִּנְחָה: 15:17",
+		"2021-11-27 שְׁקִיעַת הַחַמָּה: 16:16",
+		"2021-11-27 בֵּין הַשְּׁמָשׁוֹת: 16:40",
 		"2021-11-27 צֵאת הַכּוֹכָבִים: 17:02",
 	})
 }
@@ -391,11 +391,11 @@ func TestDailyZemanim_Ashkenazi(t *testing.T) {
 		"2021-11-27 Tefilah, sof zman (MGA): 09:34",
 		"2021-11-27 Tefilah, sof zman (GRA): 09:58",
 		"2021-11-27 Chatzos: 11:33",
-		"2021-11-27 Mincha Gedolah: 11:57",
-		"2021-11-27 Mincha Ketanah: 14:19",
-		"2021-11-27 Plag HaMincha: 15:18",
-		"2021-11-27 Sunset: 16:17",
-		"2021-11-27 Bein HaShemashos: 16:41",
+		"2021-11-27 Mincha Gedolah: 11:56",
+		"2021-11-27 Mincha Ketanah: 14:18",
+		"2021-11-27 Plag HaMincha: 15:17",
+		"2021-11-27 Sunset: 16:16",
+		"2021-11-27 Bein HaShemashos: 16:40",
 		"2021-11-27 Tzeis HaKochavim: 17:02",
 	})
 }
