@@ -90,6 +90,9 @@ These defaults can be changed using these options:
   - opts.HavdalahDeg - degrees for solar depression for Havdalah.
     Default is 8.5 degrees for 3 small stars. Use 7.083 degress for 3 medium-sized stars.
     Havdalah times are supressed when opts.HavdalahDeg=0.
+  - opts.UseElevation - use the location's elevation for sunrise/sunset-based times
+    (candle-lighting, Havdalah, fast start/end, and the sunset-based daily zmanim).
+    Degree-based zmanim (dawn, tzeit, alot, misheyakir) are never affected by elevation.
 
 If both opts.CandleLighting=true and opts.Location is specified,
 Chanukah candle-lighting times and minor fast start/end times will also be generated.
