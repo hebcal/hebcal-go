@@ -71,7 +71,7 @@ Additional non-default event types can be specified:
   - Yom Kippur Katan (opts.YomKippurKatan)
 
 Candle-lighting and Havdalah times are approximated using latitude and longitude
-specified by the HLocation class. The HLocation class contains a small
+specified by the Location class. The Location class contains a small
 database of cities with their associated geographic information and time-zone information.
 If you ever have any doubts about Hebcal's times, consult your local halachic authority.
 If you enter geographic coordinates above the arctic circle or antarctic circle,
