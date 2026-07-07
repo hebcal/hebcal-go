@@ -122,7 +122,7 @@ var classicCities = []Location{
 	{"Almaty", "KZ", 43.25, 76.91667, 795, tzAsiaAlmaty},
 	{"Amsterdam", "NL", 52.37403, 4.88969, 12, tzEuropeAmsterdam},
 	{"Anaheim", "US", 33.83529, -117.9145, 53, tzAmericaLosAngeles},
-	{"Anchorage", "US", 61.21806, -149.90028, 0, tzAmericaAnchorage},
+	{"Anchorage", "US", 61.21806, -149.90028, 31, tzAmericaAnchorage},
 	{"Arad", "IL", 31.25882, 35.21282, 611, tzAsiaJerusalem},
 	{"Arlington TX", "US", 32.73569, -97.10807, 190, tzAmericaChicago},
 	{"Ashdod", "IL", 31.79213, 34.64966, 27, tzAsiaJerusalem},
