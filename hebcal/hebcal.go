@@ -196,6 +196,13 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
 			}
 		}
+		// When Erev Pesach falls on Shabbat, burning chametz is moved to the
+		// Friday before (13 Nisan), since chametz cannot be burned on Shabbat.
+		if opts.CandleLighting && dow == time.Friday && hd.Month() == hdate.Nisan && hd.Day() == 13 {
+			if biurEv := makeBiurChametz(hd, opts); (biurEv != TimedEvent{}) {
+				events = append(events, biurEv)
+			}
+		}
 		for _, userEv := range userEvents {
 			if abs == userEv.Date.Abs() {
 				events = append(events, userEv)
@@ -504,6 +511,9 @@ func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev e
 	if (!opts.YomKippurKatan && (mask&event.YOM_KIPPUR_KATAN) != 0) ||
 		(opts.NoModern && (mask&event.MODERN_HOLIDAY) != 0) {
 		return events, candlesEv // bail out early
+	}
+	if opts.CandleLighting && ev.Render("en") == "Erev Pesach" {
+		events = append(events, makeErevPesachChametz(ev, opts)...)
 	}
 	isMajorFast := (mask & event.MAJOR_FAST) != 0
 	isMinorFast := (mask & event.MINOR_FAST) != 0
