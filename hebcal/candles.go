@@ -60,6 +60,14 @@ func NewTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time
 	case event.CHANUKAH_CANDLES:
 		emoji = chanukahEmoji
 	}
+	// Round to the nearest minute, matching @hebcal/core's TimedEvent
+	// (this.eventTime = Zmanim.roundTime(eventTime)). SunsetOffset already
+	// yields a whole minute, so in practice this only affects the degree-based
+	// tzeit times (havdalah, fast begin/end, chametz). The ZMANIM daily-times
+	// feature has no @hebcal/core equivalent and keeps its unrounded times.
+	if flags != event.ZMANIM {
+		t = roundToMinute(t)
+	}
 	return TimedEvent{
 		HolidayEvent: event.HolidayEvent{
 			Date:  hd,
@@ -72,6 +80,23 @@ func NewTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time
 		opts:         opts,
 		sunsetOffset: sunsetOffset,
 	}
+}
+
+// roundToMinute rounds t to the nearest minute (>= 30 seconds rounds up),
+// matching @hebcal/core Zmanim.roundTime.
+func roundToMinute(t time.Time) time.Time {
+	if t.IsZero() {
+		return t
+	}
+	if t.Second() == 0 && t.Nanosecond() == 0 {
+		return t
+	}
+	year, month, day := t.Date()
+	hour, min, sec := t.Clock()
+	if sec >= 30 {
+		min++
+	}
+	return time.Date(year, month, day, hour, min, 0, 0, t.Location())
 }
 
 func (ev TimedEvent) GetDate() hdate.HDate {

@@ -364,7 +364,10 @@ func (z *Zmanim) riseSetOffset(t time.Time, offset int, roundTime bool) time.Tim
 	year, month, day := t.Date()
 	hour, min, sec := t.Clock()
 	if roundTime {
-		// For positive offsets only, round up to next minute if needed
+		// For positive offsets only, round up to next minute if needed. This
+		// matches @hebcal/core Zmanim.sunsetOffset: the base time's seconds are
+		// dropped (flooring candle-lighting, a negative offset) and only a
+		// positive offset (Havdalah) rounds up when >= 30s.
 		if offset > 0 && sec >= 30 {
 			offset++
 		}
