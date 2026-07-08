@@ -7,10 +7,10 @@ github.com/hebcal/gematriya v1.0.1 h1:lktI5tX4lxg2o2OIEQXGYiMWxL9VkbfOXa+/kamjrL
 github.com/hebcal/gematriya v1.0.1/go.mod h1:hQJm5ggDgm45RsnaaSrYB387VIBDI0Kcq5wglx7KVpI=
 github.com/hebcal/greg v1.0.2 h1:HprF6W7xuB4FB8pacmqgIlCi6YTte+/WhDlzobgSMK4=
 github.com/hebcal/greg v1.0.2/go.mod h1:HhnDLPDm/dgcrANH5WYN9ol0tlkK/6mJVkWDIYhkKJM=
-github.com/hebcal/hdate v1.2.3 h1:M6DBwA2dUbS8P5kqc2wnZD7TYns85jTcXwvUzDh/KXI=
-github.com/hebcal/hdate v1.2.3/go.mod h1:TgWO5XSsx/FytmKTme0JvDwxOSDZ96B3xrQ4PIBZYXw=
-github.com/hebcal/locales v1.1.0 h1:BVaJZYdW9/QUJYtrBuaMa7zteYii1/OfqUC7Eu5bBT8=
-github.com/hebcal/locales v1.1.0/go.mod h1:KzagA5BjUI9Eh8BxLMmt0J91ByjeeswM54abysBdxXI=
+github.com/hebcal/hdate v1.3.0 h1:Qwt0VBEzLFJd2w6ffyd5GtvuO3uSezHWGzsWMf3NF7o=
+github.com/hebcal/hdate v1.3.0/go.mod h1:TgWO5XSsx/FytmKTme0JvDwxOSDZ96B3xrQ4PIBZYXw=
+github.com/hebcal/locales v1.1.1 h1://HUOJHVlomHRP2eWSQBRlfra6PU9KcOMpQ21fX0Bmk=
+github.com/hebcal/locales v1.1.1/go.mod h1:KzagA5BjUI9Eh8BxLMmt0J91ByjeeswM54abysBdxXI=
 github.com/hebcal/noaa-go v1.0.0 h1:cBWBBUtYkHiPptKjZTJ9LooUxmhn/++35j+HWd7TQv4=
 github.com/hebcal/noaa-go v1.0.0/go.mod h1:Q6VV/PXu+gYXaVtcv9Q61hD7W7DswAunPfY4uHi5f6M=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
