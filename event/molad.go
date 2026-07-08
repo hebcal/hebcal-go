@@ -78,3 +78,7 @@ func (ev moladEvent) GetEmoji() string {
 func (ev moladEvent) Basename() string {
 	return "Molad " + ev.MonthName
 }
+
+func (ev moladEvent) GetCategories() []string {
+	return CategoriesFromFlags(ev.GetFlags())
+}
