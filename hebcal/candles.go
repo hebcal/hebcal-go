@@ -100,6 +100,25 @@ func (ev TimedEvent) Basename() string {
 	return ev.Desc
 }
 
+// GetCategories returns the category and sub-categories for a timed event,
+// keyed by its description, matching TimedEvent.getCategories() in
+// @hebcal/core.
+func (ev TimedEvent) GetCategories() []string {
+	switch ev.Desc {
+	case "Candle lighting":
+		return []string{"candles"}
+	case "Havdalah":
+		return []string{"havdalah"}
+	case "Fast begins", "Fast ends":
+		return []string{"zmanim", "fast"}
+	case "Finish eating chametz":
+		return []string{"zmanim", "achilasChametz"}
+	case "Biur Chametz":
+		return []string{"zmanim", "biurChametz"}
+	}
+	return []string{"unknown"}
+}
+
 // newZmanim builds a Zmanim for the Gregorian date of hd at the options'
 // Location, honoring opts.UseElevation so that sunrise/sunset-based times
 // account for the location's elevation when requested. Degree-based zmanim are
@@ -273,6 +292,10 @@ func (ev riseSetEvent) GetEmoji() string {
 
 func (ev riseSetEvent) Basename() string {
 	return ev.Render("en")
+}
+
+func (ev riseSetEvent) GetCategories() []string {
+	return []string{"zmanim"}
 }
 
 func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
