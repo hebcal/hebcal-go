@@ -9,7 +9,7 @@ require (
 	github.com/hebcal/gematriya v1.0.1
 	github.com/hebcal/greg v1.0.2
 	github.com/hebcal/hdate v1.2.3
-	github.com/hebcal/locales v1.0.0
+	github.com/hebcal/locales v1.1.0
 	github.com/hebcal/noaa-go v1.0.0
 )
 
