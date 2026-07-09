@@ -32,3 +32,25 @@ func TestCityElevation(t *testing.T) {
 		}
 	}
 }
+
+func TestLoadLocation(t *testing.T) {
+	loc, err := zmanim.LoadLocation("America/New_York")
+	if err != nil {
+		t.Fatalf("LoadLocation: %v", err)
+	}
+	if loc.String() != "America/New_York" {
+		t.Errorf("got %q, want America/New_York", loc.String())
+	}
+	// A second call must return the identical cached *time.Location.
+	loc2, err := zmanim.LoadLocation("America/New_York")
+	if err != nil {
+		t.Fatalf("LoadLocation (cached): %v", err)
+	}
+	if loc != loc2 {
+		t.Errorf("expected cached LoadLocation to return the same *time.Location pointer")
+	}
+	// Unknown timezones must still error (and are not cached).
+	if _, err := zmanim.LoadLocation("Not/AZone"); err == nil {
+		t.Error("expected an error for an invalid timezone")
+	}
+}
