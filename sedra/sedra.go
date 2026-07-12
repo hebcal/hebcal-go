@@ -20,7 +20,7 @@ package sedra
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import (
-	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -364,17 +364,22 @@ func (s *Sedra) Lookup(hd hdate.HDate) Parsha {
 }
 
 // FindParshaNum finds the date on which the parsha number (Bereshit=1) is read.
+//
+// It returns an error if num is not a valid parsha number, or if that parsha is
+// not read on its own in this year. The latter happens whenever the parsha is
+// part of a doubled reading: in a year that reads Matot-Masei together, neither
+// Matot nor Masei can be found on its own.
 func (s *Sedra) FindParshaNum(num int) (hdate.HDate, error) {
 	parshaNum := num - 1
 	if parshaNum > 53 || (parshaNum < 0 && !isValidDouble(parshaNum)) {
-		return hdate.HDate{}, errors.New("invalid parsha number " + strconv.Itoa(num))
+		return hdate.HDate{}, fmt.Errorf("invalid parsha number %d", num)
 	}
 	for idx, candidate := range s.theSedraArray {
 		if candidate == parshaNum {
 			return hdate.FromRD(s.firstSaturday + int64(idx*7)), nil
 		}
 	}
-	panic("not found parsha num " + strconv.Itoa(num))
+	return hdate.HDate{}, fmt.Errorf("parsha number %d is not read in year %d", num, s.Year)
 }
 
 // String returns a string representation of the parsha.

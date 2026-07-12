@@ -131,6 +131,28 @@ func ExampleSedra_FindParshaNum() {
 	// Output: 15 Sh'vat 5749
 }
 
+func TestFindParshaNumErrors(t *testing.T) {
+	// 5784 reads Matot-Masei (42-43) as a doubled parsha in the Diaspora, so
+	// neither half can be found on its own. This must return an error rather
+	// than panic.
+	s := sedra.New(5784, false)
+	for _, num := range []int{42, 43} {
+		hd, err := s.FindParshaNum(num)
+		assert.Error(t, err)
+		assert.Equal(t, hdate.HDate{}, hd)
+	}
+	// Beshalach is never doubled, so it is always found.
+	hd, err := s.FindParshaNum(16)
+	assert.NoError(t, err)
+	assert.Equal(t, 5784, hd.Year())
+
+	// Out-of-range parsha numbers are rejected.
+	for _, num := range []int{0, 55, 100} {
+		_, err := s.FindParshaNum(num)
+		assert.Error(t, err)
+	}
+}
+
 func TestSedraYearTypes(t *testing.T) {
 	years := []int{
 		5701,
