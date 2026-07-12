@@ -408,7 +408,7 @@ func TestYear2(t *testing.T) {
 	}
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 127, len(events))
+	assert.Equal(t, 128, len(events))
 }
 
 func TestYear1(t *testing.T) {
@@ -418,7 +418,7 @@ func TestYear1(t *testing.T) {
 	}
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 79, len(events))
+	assert.Equal(t, 80, len(events))
 }
 
 func TestYearMinus1(t *testing.T) {
