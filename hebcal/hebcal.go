@@ -399,10 +399,12 @@ func checkCandleOptions(opts *CalOptions) error {
 		mins = opts.CandleLightingMins
 	}
 	loc := opts.Location
-	if loc.CountryCode == "IL" {
-		offset := israelCityOffset[loc.Name]
-		if offset != 0 && mins == 18 {
+	if loc.CountryCode == "IL" && mins == 18 {
+		offset, ok := israelCityOffset[loc.Name]
+		if ok {
 			mins = offset
+		} else {
+			mins = 20
 		}
 	}
 	opts.CandleLightingMins = -1 * intAbs(mins)
