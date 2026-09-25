@@ -127,7 +127,7 @@ var flagToCategory = []struct {
 // slice is a fresh copy that the caller may modify.
 func CategoriesFromFlags(mask HolidayFlags) []string {
 	for _, fc := range flagToCategory {
-		if mask&fc.flag != 0 {
+		if mask.HasAny(fc.flag) {
 			return append([]string(nil), fc.cats...)
 		}
 	}
