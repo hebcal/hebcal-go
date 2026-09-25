@@ -6,6 +6,70 @@ import (
 	"strings"
 )
 
+// HolidayFlags is a bitmask of event attributes and categories.
+type HolidayFlags uint32
+
+// When adding a flag, also add its name to flagNames below.
+const (
+	// Chag, yontiff, yom tov
+	CHAG HolidayFlags = 1 << iota
+	// Light candles 18 minutes before sundown
+	LIGHT_CANDLES
+	// End of holiday (end of Yom Tov)
+	YOM_TOV_ENDS
+	// Observed only in the Diaspora (chutz l'aretz)
+	CHUL_ONLY
+	// Observed only in Israel
+	IL_ONLY
+	// Light candles in the evening at Tzeit time (3 small stars)
+	LIGHT_CANDLES_TZEIS
+	// Candle-lighting for Chanukah
+	CHANUKAH_CANDLES
+	// Rosh Chodesh, beginning of a new Hebrew month
+	ROSH_CHODESH
+	// Minor fasts like Tzom Tammuz, Ta'anit Esther, ...
+	MINOR_FAST
+	// Shabbat Shekalim, Zachor, ...
+	SPECIAL_SHABBAT
+	// Weekly sedrot on Saturdays
+	PARSHA_HASHAVUA
+	// Daily page of Talmud (Bavli)
+	DAF_YOMI
+	// Days of the Omer
+	OMER_COUNT
+	// Yom HaShoah, Yom HaAtzma'ut, ...
+	MODERN_HOLIDAY
+	// Yom Kippur and Tish'a B'Av
+	MAJOR_FAST
+	// On the Saturday before Rosh Chodesh
+	SHABBAT_MEVARCHIM
+	// Molad
+	MOLAD
+	// Yahrzeit or Hebrew Anniversary
+	USER_EVENT
+	// Daily Hebrew date ("11th of Sivan, 5780")
+	HEBREW_DATE
+	// A holiday that's not major, modern, rosh chodesh, or a fast day
+	MINOR_HOLIDAY
+	// Evening before a major or minor holiday
+	EREV
+	// Chol haMoed, intermediate days of Pesach or Sukkot
+	CHOL_HAMOED
+	// Mishna Yomi
+	MISHNA_YOMI
+	// Yom Kippur Katan, minor day of atonement on the day preceding each Rosh Chodesh
+	YOM_KIPPUR_KATAN
+	// Zemanim, halachic times of day
+	ZMANIM
+	// Daily page of Jerusalem Talmud (Yerushalmi)
+	YERUSHALMI_YOMI
+	// Daily page of Nach (Nevi'im + Ketuvim)
+	NACH_YOMI
+	// Daily learning schedule supplied by a plugin (e.g. 929, Daily Rambam)
+	// via the dailylearning registry, with no dedicated flag of its own.
+	DAILY_LEARNING
+)
+
 // Has reports whether f contains every flag set in flags.
 // For a single flag, e.g. ev.GetFlags().Has(event.CHAG), this is
 // simply "is this flag set". Has(0) is always true.
