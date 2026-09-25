@@ -382,7 +382,7 @@ func TestModernILHolidays(t *testing.T) {
 	events0Israel := hebcal.GetHolidaysForYear(5783, true)
 	eventsIsrael := make([]event.HolidayEvent, 0, 12)
 	for _, ev := range events0Israel {
-		if (ev.Flags & event.MODERN_HOLIDAY) != 0 {
+		if ev.Flags.Has(event.MODERN_HOLIDAY) {
 			eventsIsrael = append(eventsIsrael, ev)
 		}
 	}
@@ -412,7 +412,7 @@ func TestModernILHolidays(t *testing.T) {
 	events0Diaspora := hebcal.GetHolidaysForYear(5783, false)
 	eventsDiaspora := make([]event.HolidayEvent, 0, 12)
 	for _, ev := range events0Diaspora {
-		if (ev.Flags & event.MODERN_HOLIDAY) != 0 {
+		if ev.Flags.Has(event.MODERN_HOLIDAY) {
 			eventsDiaspora = append(eventsDiaspora, ev)
 		}
 	}
