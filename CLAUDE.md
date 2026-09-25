@@ -21,7 +21,7 @@ This is a **library** (no `main`, no `cmd/`), published as `github.com/hebcal/he
 
 ### The event model (`event/`)
 
-Everything the calendar emits satisfies `event.CalEvent`: `GetDate`, `Render(locale)`, `GetFlags`, `GetEmoji`, `Basename`, `GetCategories`. `HolidayFlags` is a bitmask (`event/event.go`) — `CHAG`, `LIGHT_CANDLES`, `YOM_TOV_ENDS`, `CHUL_ONLY`/`IL_ONLY`, `CHANUKAH_CANDLES`, `PARSHA_HASHAVUA`, `DAF_YOMI`, `EREV`, `CHOL_HAMOED`, etc. Flags drive downstream filtering and rendering; adding a flag means touching `getMaskFromOptions` in `hebcal/hebcal.go`.
+Everything the calendar emits satisfies `event.CalEvent`: `GetDate`, `Render(locale)`, `GetFlags`, `GetEmoji`, `Basename`, `GetCategories`. `HolidayFlags` is a bitmask (`event/flags.go`) — `CHAG`, `LIGHT_CANDLES`, `YOM_TOV_ENDS`, `CHUL_ONLY`/`IL_ONLY`, `CHANUKAH_CANDLES`, `PARSHA_HASHAVUA`, `DAF_YOMI`, `EREV`, `CHOL_HAMOED`, etc. Flags drive downstream filtering and rendering; adding a flag means touching `flagNames` (same file, for `String()`) and `getMaskFromOptions` in `hebcal/hebcal.go`.
 
 Concrete event types live in `event/`: `HolidayEvent`, `parshaEvent`, `hebrewDateEvent`, `MevarchimChodeshEvent`, `moladEvent`, user events (yahrzeit/birthday) in `user.go`. URL generation is a separate concern: `event.URL(ev)` dispatches through the optional `URLer` interface (`event/url.go`); only some event types carry a URL, and `gregYearInRange` gates it.
 
