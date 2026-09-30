@@ -179,17 +179,18 @@ func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev event.CalEvent) TimedE
 		havdalahTitle = true
 		flags = event.LIGHT_CANDLES_TZEIS
 	}
-	// if offset is 0 or undefined, we'll use tzeit time
+	// A zero Havdalah offset means tzeit. A zero candle-lighting offset
+	// means sunset itself (CandleLightingAtSunset).
 	offset := opts.CandleLightingMins
 	if useHavdalahOffset {
 		offset = opts.HavdalahMins
 	}
 	z := newZmanim(hd, opts)
 	var eventTime time.Time
-	if offset != 0 {
-		eventTime = z.SunsetOffset(offset, true)
-	} else {
+	if useHavdalahOffset && offset == 0 {
 		eventTime = z.Tzeit(opts.HavdalahDeg)
+	} else {
+		eventTime = z.SunsetOffset(offset, true)
 	}
 	if eventTime.IsZero() {
 		return TimedEvent{} // no sunset

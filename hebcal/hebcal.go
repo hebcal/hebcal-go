@@ -85,6 +85,7 @@ are observable in the night time sky with the naked eye). The default Havdalah
 option (Tzeit Hakochavim) is calculated when the sun is 8.5° below the horizon.
 These defaults can be changed using these options:
   - opts.CandleLightingMins - minutes before sundown to light candles
+  - opts.CandleLightingAtSunset - light candles at sundown itself
   - opts.HavdalahMins - minutes after sundown for Havdalah (typical values are 42, 50, or 72).
     Havdalah times are supressed when opts.HavdalahMins=0.
   - opts.HavdalahDeg - degrees for solar depression for Havdalah.
@@ -417,20 +418,24 @@ func checkCandleOptions(opts *CalOptions) error {
 	if opts.TishaBavEndMins != 0 && opts.TishaBavEndDeg != 0.0 {
 		return errors.New("opts.TishaBavEndMins and opts.TishaBavEndDeg are mutually exclusive")
 	}
-	mins := 18
-	if opts.CandleLightingMins != 0 {
-		mins = opts.CandleLightingMins
-	}
-	loc := opts.Location
-	if loc.CountryCode == "IL" && mins == 18 {
-		offset, ok := israelCityOffset[loc.Name]
-		if ok {
-			mins = offset
-		} else {
-			mins = 20
+	if opts.CandleLightingAtSunset {
+		opts.CandleLightingMins = 0
+	} else {
+		mins := 18
+		if opts.CandleLightingMins != 0 {
+			mins = opts.CandleLightingMins
 		}
+		loc := opts.Location
+		if loc.CountryCode == "IL" && mins == 18 {
+			offset, ok := israelCityOffset[loc.Name]
+			if ok {
+				mins = offset
+			} else {
+				mins = 20
+			}
+		}
+		opts.CandleLightingMins = -1 * intAbs(mins)
 	}
-	opts.CandleLightingMins = -1 * intAbs(mins)
 	if opts.HavdalahMins != 0 {
 		opts.HavdalahMins = intAbs(opts.HavdalahMins)
 	} else if opts.HavdalahDeg != 0.0 {

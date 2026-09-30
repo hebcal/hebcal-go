@@ -78,6 +78,13 @@ type CalOptions struct {
 	UseElevation bool
 	/* minutes before sundown to light candles (default 18) */
 	CandleLightingMins int
+	// CandleLightingAtSunset lights candles at sunset itself, with no offset.
+	// A zero CandleLightingMins cannot say this, because zero means "unset,
+	// use the default" (18 minutes, or the Israeli city's custom). When set,
+	// CandleLightingMins is ignored. Candle-lighting that follows Havdalah
+	// rules (the second night of Yom Tov, Chanukah on Saturday night) is not
+	// affected.
+	CandleLightingAtSunset bool
 	// minutes after sundown for Havdalah (typical values are 42, 50, or 72).
 	// If 0 (the default), calculate Havdalah according to Tzeit Hakochavim -
 	// Nightfall (the point when 3 small stars are observable in the night time sky with
