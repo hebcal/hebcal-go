@@ -102,7 +102,14 @@ Saturday night (see above).
 
 Minor fasts begin at Alot HaShachar (sun is 16.1° below the horizon in the morning) and
 end when 3 medium-sized stars are observable in the night sky (sun is 7.083° below the horizon
-in the evening).
+in the evening), or in Israel 15 minutes after sunset. Tish'a B'Av begins at sunset and
+ends when the sun is 6.45° below the horizon. These defaults can be changed using these
+options, each pair mutually exclusive:
+  - opts.FastStartDeg / opts.FastStartMins - start of minor fasts, in degrees of solar
+    depression or minutes before sunrise
+  - opts.FastEndDeg / opts.FastEndMins - end of minor fasts, in degrees of solar
+    depression or minutes after sunset
+  - opts.TishaBavEndDeg / opts.TishaBavEndMins - end of Tish'a B'Av, likewise
 
 Two options also exist for generating an Event with the Hebrew date:
   - opts.AddHebrewDates - print the Hebrew date for the entire date range
@@ -401,6 +408,15 @@ func checkCandleOptions(opts *CalOptions) error {
 	if opts.HavdalahMins != 0 && opts.HavdalahDeg != 0.0 {
 		return errors.New("opts.HavdalahMins and opts.HavdalahDeg are mutually exclusive")
 	}
+	if opts.FastStartMins != 0 && opts.FastStartDeg != 0.0 {
+		return errors.New("opts.FastStartMins and opts.FastStartDeg are mutually exclusive")
+	}
+	if opts.FastEndMins != 0 && opts.FastEndDeg != 0.0 {
+		return errors.New("opts.FastEndMins and opts.FastEndDeg are mutually exclusive")
+	}
+	if opts.TishaBavEndMins != 0 && opts.TishaBavEndDeg != 0.0 {
+		return errors.New("opts.TishaBavEndMins and opts.TishaBavEndDeg are mutually exclusive")
+	}
 	mins := 18
 	if opts.CandleLightingMins != 0 {
 		mins = opts.CandleLightingMins
@@ -422,6 +438,12 @@ func checkCandleOptions(opts *CalOptions) error {
 	} else {
 		opts.HavdalahDeg = zmanim.Tzeit3SmallStars
 	}
+	opts.FastStartMins = intAbs(opts.FastStartMins)
+	opts.FastStartDeg = math.Abs(opts.FastStartDeg)
+	opts.FastEndMins = intAbs(opts.FastEndMins)
+	opts.FastEndDeg = math.Abs(opts.FastEndDeg)
+	opts.TishaBavEndMins = intAbs(opts.TishaBavEndMins)
+	opts.TishaBavEndDeg = math.Abs(opts.TishaBavEndDeg)
 	return nil
 }
 

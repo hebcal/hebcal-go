@@ -93,6 +93,31 @@ type CalOptions struct {
 	// @hebcal/core's nullable havdalahMins does (where havdalahMins===0 suppresses
 	// Havdalah). Callers that need that behavior set this flag explicitly.
 	SuppressHavdalah bool
+	// degrees for solar depression for the start of minor fasts
+	// (Yom Kippur Katan included). Mutually exclusive with FastStartMins.
+	// If neither is set, minor fasts begin at Alot HaShachar, 16.1 degrees.
+	// Tish'a B'Av begins at sunset the evening before and is not affected.
+	FastStartDeg float64
+	// minutes before sunrise for the start of minor fasts (typical values are
+	// 72 or 90). Mutually exclusive with FastStartDeg.
+	FastStartMins int
+	// degrees for solar depression for the end of minor fasts (Yom Kippur
+	// Katan included). Commonly-used values are 7.083 (3 medium-sized stars)
+	// and 6.45 (Rabbi Yechiel Michel Tucazinsky). Mutually exclusive with
+	// FastEndMins. If neither is set, minor fasts end at 7.083 degrees in the
+	// Diaspora, or 15 minutes after sunset in Israel (Rabbi Deblitzky's
+	// practice). Tish'a B'Av is not affected; see TishaBavEndDeg.
+	FastEndDeg float64
+	// minutes after sunset for the end of minor fasts. Mutually exclusive with
+	// FastEndDeg. Tish'a B'Av is not affected; see TishaBavEndMins.
+	FastEndMins int
+	// degrees for solar depression for the end of Tish'a B'Av. Mutually
+	// exclusive with TishaBavEndMins. If neither is set, Tish'a B'Av ends at
+	// 6.45 degrees (Rabbi Yechiel Michel Tucazinsky), in Israel too.
+	TishaBavEndDeg float64
+	// minutes after sunset for the end of Tish'a B'Av. Mutually exclusive
+	// with TishaBavEndDeg.
+	TishaBavEndMins int
 	/* calculate parashah hashavua on Saturdays */
 	Sedrot bool
 	/* Israeli holiday and sedra schedule */
