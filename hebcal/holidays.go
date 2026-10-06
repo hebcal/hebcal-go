@@ -237,6 +237,10 @@ var staticModernHolidays = []struct {
 	// https://www.gov.il/he/departments/policies/2012_des5234
 	{firstYear: 5773, mm: hdate.Tevet, dd: 21, desc: "Hebrew Language Day",
 		friSatMovetoThu: true},
+	// https://fs.knesset.gov.il/25/law/25_lsr_14184773.pdf
+	// (Published in Sefer HaChukim No. 3567 on 8 Av 5786 / July 22, 2026)
+	{firstYear: 5786, mm: hdate.Tishrei, dd: 24, desc: "Swords of Iron War Memorial Day",
+		chul: true, satPostponeToSun: true},
 }
 
 func tzomGedaliahDate(rh hdate.HDate) hdate.HDate {
