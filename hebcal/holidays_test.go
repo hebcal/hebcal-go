@@ -444,6 +444,36 @@ func TestModernFriSatMovetoThu(t *testing.T) {
 	assert.Equal(t, "2020-10-29", hd2iso(rabinDay.Date))
 }
 
+func TestSwordsOfIronWarMemorialDay(t *testing.T) {
+	const desc = "Swords of Iron War Memorial Day"
+	find := func(year int, il bool) *event.HolidayEvent {
+		for _, ev := range hebcal.GetHolidaysForYear(year, il) {
+			if ev.Desc == desc {
+				return &ev
+			}
+		}
+		return nil
+	}
+	assert.Nil(t, find(5785, true))
+	// 24 Tishrei 5787 falls on a Monday, so it is observed on the day itself
+	ev := find(5787, true)
+	assert.NotNil(t, ev)
+	assert.Equal(t, "24 Tishrei 5787", ev.Date.String())
+	assert.Equal(t, "2026-10-05", hd2iso(ev.Date))
+	assert.Equal(t, event.MODERN_HOLIDAY, ev.Flags)
+	assert.Equal(t, "🇮🇱", ev.GetEmoji())
+	// also observed in the Diaspora
+	ev = find(5787, false)
+	assert.NotNil(t, ev)
+	assert.Equal(t, "2026-10-05", hd2iso(ev.Date))
+	// 24 Tishrei 5789 falls on Shabbat, so it is postponed to Sunday
+	ev = find(5789, true)
+	assert.NotNil(t, ev)
+	assert.Equal(t, "25 Tishrei 5789", ev.Date.String())
+	assert.Equal(t, "2028-10-15", hd2iso(ev.Date))
+	assert.Equal(t, "Sunday", ev.Date.Weekday().String())
+}
+
 func TestBirkatHachamah(t *testing.T) {
 	const birkatHachamah = "Birkat Hachamah"
 	actual := make([]int, 0, 10)
