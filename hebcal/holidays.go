@@ -590,6 +590,30 @@ func getAllHolidaysForYear(year int) []event.HolidayEvent {
 				Flags: event.MINOR_FAST | event.YOM_KIPPUR_KATAN})
 	}
 
+	// Ta'anit BeHaB: Monday, Thursday, Monday after Rosh Chodesh Cheshvan and Iyyar
+	for _, month := range []hdate.HMonth{hdate.Cheshvan, hdate.Iyyar} {
+		rc := hdate.New(year, month, 1)
+		shabbos := hdate.DayOnOrBefore(time.Saturday, rc.Abs()+6)
+		if shabbos == rc.Abs() {
+			shabbos += 7
+		}
+		fastDays := []hdate.HDate{
+			hdate.FromRD(shabbos + 2),
+			hdate.FromRD(shabbos + 5),
+			hdate.FromRD(shabbos + 9),
+		}
+		// Pesach Sheni: move the last fast to 17 Iyyar
+		if month == hdate.Iyyar && fastDays[2].Day() == 14 {
+			fastDays[2] = hdate.New(year, hdate.Iyyar, 17)
+		}
+		for _, hd := range fastDays {
+			events = append(events, event.HolidayEvent{
+				Date:  hd,
+				Desc:  "Ta'anit BeHaB",
+				Flags: event.MINOR_FAST | event.BEHAB})
+		}
+	}
+
 	sedra := sedra.New(year, false)
 	beshalachHd, _ := sedra.FindParshaNum(16)
 	events = append(events,

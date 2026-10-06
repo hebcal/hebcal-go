@@ -45,13 +45,14 @@ func TestHolidayFlagsString(t *testing.T) {
 	assert.Equal("CHAG", event.CHAG.String())
 	assert.Equal("CHAG|LIGHT_CANDLES", (event.LIGHT_CANDLES | event.CHAG).String())
 	assert.Equal("DAILY_LEARNING", event.DAILY_LEARNING.String())
+	assert.Equal("MINOR_FAST|BEHAB", (event.MINOR_FAST | event.BEHAB).String())
 	assert.Equal("EREV|0x80000000", (event.EREV | 1<<31).String())
 	assert.Equal("MAJOR_FAST", fmt.Sprintf("%v", event.MAJOR_FAST))
 }
 
-// Every flag through DAILY_LEARNING (currently the last one) must have a name.
+// Every flag through BEHAB (currently the last one) must have a name.
 func TestHolidayFlagsStringCoversAllFlags(t *testing.T) {
-	last := bits.TrailingZeros32(uint32(event.DAILY_LEARNING))
+	last := bits.TrailingZeros32(uint32(event.BEHAB))
 	for i := 0; i <= last; i++ {
 		s := (event.HolidayFlags(1) << i).String()
 		assert.NotContains(t, s, "0x", "bit %d has no name", i)
