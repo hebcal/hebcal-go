@@ -69,6 +69,7 @@ Additional non-default event types can be specified:
   - Shabbat Mevarchim HaChodesh on Saturday before Rosh Chodesh (opts.ShabbatMevarchim)
   - Molad announcement on Saturday before Rosh Chodesh (opts.Molad)
   - Yom Kippur Katan (opts.YomKippurKatan)
+  - BeHaB fast days (opts.BeHaB)
 
 Candle-lighting and Havdalah times are approximated using latitude and longitude
 specified by the Location class. The Location class contains a small
@@ -493,6 +494,9 @@ func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 		if m.Has(event.YOM_KIPPUR_KATAN) {
 			opts.YomKippurKatan = true
 		}
+		if m.Has(event.BEHAB) {
+			opts.BeHaB = true
+		}
 		if m.Has(event.YERUSHALMI_YOMI) {
 			opts.YerushalmiYomi = true
 		}
@@ -552,6 +556,9 @@ func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 	if opts.YomKippurKatan {
 		mask |= event.YOM_KIPPUR_KATAN
 	}
+	if opts.BeHaB {
+		mask |= event.BEHAB
+	}
 	return mask
 }
 
@@ -567,6 +574,7 @@ func makeMevarchimEvent(ev event.HolidayEvent) event.MevarchimChodeshEvent {
 func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev event.CalEvent, opts *CalOptions) ([]event.CalEvent, TimedEvent) {
 	mask := ev.GetFlags()
 	if (!opts.YomKippurKatan && mask.Has(event.YOM_KIPPUR_KATAN)) ||
+		(!opts.BeHaB && mask.Has(event.BEHAB)) ||
 		(opts.NoModern && mask.Has(event.MODERN_HOLIDAY)) {
 		return events, candlesEv // bail out early
 	}
@@ -603,7 +611,8 @@ func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev e
 				ev = makeMevarchimEvent(he)
 			}
 		}
-		if opts.YomKippurKatan && mask.Has(event.YOM_KIPPUR_KATAN) {
+		if (opts.YomKippurKatan && mask.Has(event.YOM_KIPPUR_KATAN)) ||
+			(opts.BeHaB && mask.Has(event.BEHAB)) {
 			events = append(events, ev)
 		} else if !opts.NoHolidays {
 			events = append(events, ev)

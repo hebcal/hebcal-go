@@ -177,6 +177,11 @@ type CalOptions struct {
 	//
 	// See https://en.wikipedia.org/wiki/Yom_Kippur_Katan#Practices
 	YomKippurKatan bool
+	// include BeHaB fast days (default false): the Monday, Thursday and
+	// Monday after Pesach (in Iyyar) and after Sukkot (in Cheshvan).
+	// When the final Monday of Iyyar is 14 Iyyar (Pesach Sheni), that fast
+	// is moved to 17 Iyyar.
+	BeHaB bool
 	// Whether to use 24-hour time (as opposed to 12-hour time) for
 	// TimedEvent.Render().
 	Hour24 bool

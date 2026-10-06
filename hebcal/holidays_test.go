@@ -13,7 +13,7 @@ import (
 
 func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 	events := hebcal.GetHolidaysForYear(5771, false)
-	assert.Equal(t, 110, len(events))
+	assert.Equal(t, 116, len(events))
 
 	expected := []string{
 		"2010-09-09 Rosh Hashana 5771",
@@ -35,6 +35,9 @@ func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 		"2010-10-02 Shabbat Mevarchim Chodesh Cheshvan",
 		"2010-10-08 Rosh Chodesh Cheshvan",
 		"2010-10-09 Rosh Chodesh Cheshvan",
+		"2010-10-18 Ta'anit BeHaB",
+		"2010-10-21 Ta'anit BeHaB",
+		"2010-10-25 Ta'anit BeHaB",
 		"2010-11-04 Sigd",
 		"2010-11-04 Yom Kippur Katan Kislev",
 		"2010-11-06 Shabbat Mevarchim Chodesh Kislev",
@@ -95,8 +98,11 @@ func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 		"2011-05-02 Yom HaShoah",
 		"2011-05-04 Rosh Chodesh Iyyar",
 		"2011-05-05 Rosh Chodesh Iyyar",
+		"2011-05-09 Ta'anit BeHaB",
 		"2011-05-09 Yom HaZikaron",
 		"2011-05-10 Yom HaAtzma'ut",
+		"2011-05-12 Ta'anit BeHaB",
+		"2011-05-16 Ta'anit BeHaB",
 		"2011-05-18 Pesach Sheni",
 		"2011-05-22 Lag BaOmer",
 		"2011-05-28 Shabbat Mevarchim Chodesh Sivan",
@@ -139,7 +145,7 @@ func TestGetHolidaysForYearArrayDiaspora(t *testing.T) {
 
 func TestGetHolidaysForYearArrayIL(t *testing.T) {
 	events := hebcal.GetHolidaysForYear(5720, true)
-	assert.Equal(t, 99, len(events))
+	assert.Equal(t, 105, len(events))
 
 	expected := []string{
 		"1959-10-03 Rosh Hashana 5720",
@@ -160,6 +166,9 @@ func TestGetHolidaysForYearArrayIL(t *testing.T) {
 		"1959-10-31 Shabbat Mevarchim Chodesh Cheshvan",
 		"1959-11-01 Rosh Chodesh Cheshvan",
 		"1959-11-02 Rosh Chodesh Cheshvan",
+		"1959-11-09 Ta'anit BeHaB",
+		"1959-11-12 Ta'anit BeHaB",
+		"1959-11-16 Ta'anit BeHaB",
 		"1959-11-28 Shabbat Mevarchim Chodesh Kislev",
 		"1959-11-30 Yom Kippur Katan Kislev",
 		"1959-12-01 Rosh Chodesh Kislev",
@@ -213,7 +222,10 @@ func TestGetHolidaysForYearArrayIL(t *testing.T) {
 		"1960-04-27 Rosh Chodesh Iyyar",
 		"1960-04-28 Rosh Chodesh Iyyar",
 		"1960-05-01 Yom HaZikaron",
+		"1960-05-02 Ta'anit BeHaB",
 		"1960-05-02 Yom HaAtzma'ut",
+		"1960-05-05 Ta'anit BeHaB",
+		"1960-05-09 Ta'anit BeHaB",
 		"1960-05-11 Pesach Sheni",
 		"1960-05-15 Lag BaOmer",
 		"1960-05-21 Shabbat Mevarchim Chodesh Sivan",
@@ -254,7 +266,7 @@ func TestGetHolidaysForYearArrayIL(t *testing.T) {
 
 func TestGetHolidaysForYearArrayDiasporaAshkenazi(t *testing.T) {
 	events := hebcal.GetHolidaysForYear(5771, false)
-	assert.Equal(t, 110, len(events))
+	assert.Equal(t, 116, len(events))
 
 	expected := []string{
 		"2010-09-09 Rosh Hashana 5771",
@@ -276,6 +288,9 @@ func TestGetHolidaysForYearArrayDiasporaAshkenazi(t *testing.T) {
 		"2010-10-02 Shabbos Mevorchim Chodesh Cheshvan",
 		"2010-10-08 Rosh Chodesh Cheshvan",
 		"2010-10-09 Rosh Chodesh Cheshvan",
+		"2010-10-18 Ta’anis BeHaB",
+		"2010-10-21 Ta’anis BeHaB",
+		"2010-10-25 Ta’anis BeHaB",
 		"2010-11-04 Sigd",
 		"2010-11-04 Yom Kippur Katan Kislev",
 		"2010-11-06 Shabbos Mevorchim Chodesh Kislev",
@@ -336,8 +351,11 @@ func TestGetHolidaysForYearArrayDiasporaAshkenazi(t *testing.T) {
 		"2011-05-02 Yom HaShoah",
 		"2011-05-04 Rosh Chodesh Iyyar",
 		"2011-05-05 Rosh Chodesh Iyyar",
+		"2011-05-09 Ta’anis BeHaB",
 		"2011-05-09 Yom HaZikaron",
 		"2011-05-10 Yom HaAtzma'ut",
+		"2011-05-12 Ta’anis BeHaB",
+		"2011-05-16 Ta’anis BeHaB",
 		"2011-05-18 Pesach Sheni",
 		"2011-05-22 Lag BaOmer",
 		"2011-05-28 Shabbos Mevorchim Chodesh Sivan",
@@ -614,17 +632,17 @@ func TestHolidayEmoji(t *testing.T) {
 
 func TestHolidaysEarlyYears(t *testing.T) {
 	events := hebcal.GetHolidaysForYear(3763, false)
-	assert.Equal(t, 98, len(events))
-	events = hebcal.GetHolidaysForYear(3762, false)
 	assert.Equal(t, 104, len(events))
+	events = hebcal.GetHolidaysForYear(3762, false)
+	assert.Equal(t, 110, len(events))
 	events = hebcal.GetHolidaysForYear(3761, false)
-	assert.Equal(t, 99, len(events))
-	events = hebcal.GetHolidaysForYear(3760, false)
 	assert.Equal(t, 105, len(events))
+	events = hebcal.GetHolidaysForYear(3760, false)
+	assert.Equal(t, 111, len(events))
 	events = hebcal.GetHolidaysForYear(2, false)
-	assert.Equal(t, 99, len(events))
+	assert.Equal(t, 105, len(events))
 	events = hebcal.GetHolidaysForYear(1, false)
-	assert.Equal(t, 99, len(events))
+	assert.Equal(t, 105, len(events))
 }
 
 func TestSigdMovedToThursday(t *testing.T) {
@@ -655,4 +673,47 @@ func TestGetHolidaysFor1752CE(t *testing.T) {
 		"1752-09-18 Yom Kippur",
 	}
 	assert.Equal(t, expected, actual)
+}
+
+func TestBeHaB(t *testing.T) {
+	assert := assert.New(t)
+	// omitted by default
+	events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{Year: 5784, IsHebrewYear: true})
+	assert.NoError(err)
+	for _, ev := range events {
+		assert.NotEqual("Ta'anit BeHaB", ev.Render("en"))
+	}
+
+	check := func(opts *hebcal.CalOptions, want []string) {
+		t.Helper()
+		events, err := hebcal.HebrewCalendar(opts)
+		assert.NoError(err)
+		var got []string
+		for _, ev := range events {
+			got = append(got, ev.GetDate().Gregorian().Format("2006-01-02")+" "+ev.Render("en"))
+			assert.Equal(event.MINOR_FAST|event.BEHAB, ev.GetFlags())
+			assert.Equal([]string{"holiday", "fast"}, ev.GetCategories())
+		}
+		assert.Equal(want, got)
+	}
+	want5784 := []string{
+		"2023-10-23 Ta'anit BeHaB",
+		"2023-10-26 Ta'anit BeHaB",
+		"2023-10-30 Ta'anit BeHaB",
+		"2024-05-13 Ta'anit BeHaB",
+		"2024-05-16 Ta'anit BeHaB",
+		"2024-05-20 Ta'anit BeHaB",
+	}
+	check(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5784, IsHebrewYear: true}, want5784)
+	check(&hebcal.CalOptions{Mask: event.BEHAB, Year: 5784, IsHebrewYear: true}, want5784)
+	// Pesach Sheni (14 Iyyar) is skipped
+	check(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5785, IsHebrewYear: true,
+		Start: hdate.New(5785, hdate.Iyyar, 1), End: hdate.New(5785, hdate.Iyyar, 29)}, []string{
+		"2025-05-05 Ta'anit BeHaB",
+		"2025-05-08 Ta'anit BeHaB",
+		"2025-05-15 Ta'anit BeHaB",
+	})
+	events, _ = hebcal.HebrewCalendar(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5784, IsHebrewYear: true})
+	assert.Equal("תַּעֲנִית בה״ב", events[0].Render("he"))
+	assert.Equal("Ta’anis BeHaB", events[0].Render("ashkenazi"))
 }
