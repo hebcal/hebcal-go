@@ -37,8 +37,8 @@ func chametzEvents(t *testing.T, gregYear int, locale string) []string {
 func TestErevPesachChametz(t *testing.T) {
 	assert := assert.New(t)
 	expected := []string{
-		"Fri 2022-04-15 🍞 Finish eating chametz: 10:37",
-		"Fri 2022-04-15 🔥 Biur Chametz: 11:44",
+		"Fri 2022-04-15 🍞 Finish eating chametz: 10:37am",
+		"Fri 2022-04-15 🔥 Biur Chametz: 11:44am",
 	}
 	assert.Equal(expected, chametzEvents(t, 2022, "en"))
 }
@@ -49,8 +49,8 @@ func TestErevPesachChametz(t *testing.T) {
 func TestErevPesachChametzOnShabbat(t *testing.T) {
 	assert := assert.New(t)
 	expected := []string{
-		"Fri 2021-03-26 🔥 Biur Chametz: 11:54",
-		"Sat 2021-03-27 🍞 Finish eating chametz: 10:51",
+		"Fri 2021-03-26 🔥 Biur Chametz: 11:54am",
+		"Sat 2021-03-27 🍞 Finish eating chametz: 10:51am",
 	}
 	assert.Equal(expected, chametzEvents(t, 2021, "en"))
 }
@@ -59,8 +59,8 @@ func TestErevPesachChametzOnShabbat(t *testing.T) {
 func TestErevPesachChametzHebrew(t *testing.T) {
 	assert := assert.New(t)
 	expected := []string{
-		"Fri 2022-04-15 🍞 סוֹף זְמַן אֲכִילַת חָמֵץ: 10:37",
-		"Fri 2022-04-15 🔥 בִּעוּר חָמֵץ: 11:44",
+		"Fri 2022-04-15 🍞 סוֹף זְמַן אֲכִילַת חָמֵץ: 10:37am",
+		"Fri 2022-04-15 🔥 בִּעוּר חָמֵץ: 11:44am",
 	}
 	assert.Equal(expected, chametzEvents(t, 2022, "he"))
 }

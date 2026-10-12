@@ -28,14 +28,10 @@ import (
 	"github.com/hebcal/locales"
 )
 
-// formatTime renders t as 24-hour "15:04", or as 12-hour time with the AM/PM
-// suffix stripped.
+// formatTime renders t as 24-hour "15:04" or 12-hour "3:04pm", as chosen by
+// ReformatTimeStr.
 func formatTime(t time.Time, opts *CalOptions) string {
-	if opts.Hour24 {
-		return t.Format("15:04")
-	}
-	kitchen := t.Format(time.Kitchen)
-	return kitchen[:len(kitchen)-2]
+	return ReformatTimeStr(t.Format("15:04"), "pm", opts)
 }
 
 // TimedEvent is used for Candle-lighting, Havdalah, and fast start/end

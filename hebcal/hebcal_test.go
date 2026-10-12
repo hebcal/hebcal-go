@@ -128,20 +128,20 @@ func TestHebrewCalendarCandles(t *testing.T) {
 		HavdalahMins:   50,
 	}
 	checkEvents(t, "en", opts, []string{
-		"2022-09-23 Candle lighting: 6:27",
-		"2022-09-24 Havdalah (50 min): 7:34",
+		"2022-09-23 Candle lighting: 6:27pm",
+		"2022-09-24 Havdalah (50 min): 7:34pm",
 		"2022-09-25 Erev Rosh Hashana",
-		"2022-09-25 Candle lighting: 6:24",
+		"2022-09-25 Candle lighting: 6:24pm",
 		"2022-09-26 Rosh Hashana 5783",
-		"2022-09-26 Candle lighting: 7:31",
+		"2022-09-26 Candle lighting: 7:31pm",
 		"2022-09-27 Rosh Hashana II",
-		"2022-09-27 Havdalah (50 min): 7:29",
-		"2022-09-28 Fast begins: 5:22",
+		"2022-09-27 Havdalah (50 min): 7:29pm",
+		"2022-09-28 Fast begins: 5:22am",
 		"2022-09-28 Tzom Gedaliah",
-		"2022-09-28 Fast ends: 7:11",
-		"2022-09-30 Candle lighting: 6:15",
+		"2022-09-28 Fast ends: 7:11pm",
+		"2022-09-30 Candle lighting: 6:15pm",
 		"2022-10-01 Shabbat Shuva",
-		"2022-10-01 Havdalah (50 min): 7:22",
+		"2022-10-01 Havdalah (50 min): 7:22pm",
 	})
 }
 
@@ -201,18 +201,18 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 		Location:       loc,
 	}
 	checkEvents(t, "en", opts, []string{
-		"2022-12-18 Chanukah: 1 Candle: 4:57",
-		"2022-12-19 Chanukah: 2 Candles: 4:57",
-		"2022-12-20 Chanukah: 3 Candles: 4:57",
-		"2022-12-21 Chanukah: 4 Candles: 4:58",
-		"2022-12-22 Chanukah: 5 Candles: 4:58",
-		"2022-12-23 Chanukah: 6 Candles: 4:00",
-		"2022-12-23 Candle lighting: 4:00",
+		"2022-12-18 Chanukah: 1 Candle: 16:57",
+		"2022-12-19 Chanukah: 2 Candles: 16:57",
+		"2022-12-20 Chanukah: 3 Candles: 16:57",
+		"2022-12-21 Chanukah: 4 Candles: 16:58",
+		"2022-12-22 Chanukah: 5 Candles: 16:58",
+		"2022-12-23 Chanukah: 6 Candles: 16:00",
+		"2022-12-23 Candle lighting: 16:00",
 		"2022-12-24 Chag HaBanot",
-		"2022-12-24 Chanukah: 7 Candles: 5:21",
+		"2022-12-24 Chanukah: 7 Candles: 17:21",
 		"2022-12-24 Rosh Chodesh Tevet",
-		"2022-12-24 Havdalah: 5:21",
-		"2022-12-25 Chanukah: 8 Candles: 5:00",
+		"2022-12-24 Havdalah: 17:21",
+		"2022-12-25 Chanukah: 8 Candles: 17:00",
 		"2022-12-25 Rosh Chodesh Tevet",
 		"2022-12-26 Chanukah: 8th Day",
 	})
@@ -270,11 +270,11 @@ func ExampleHebrewCalendar() {
 	}
 	// Output:
 	// Sat 01-Jan-2022 Parashat Vaera
-	// Sat 01-Jan-2022 Havdalah (50 min): 5:16
+	// Sat 01-Jan-2022 Havdalah (50 min): 5:16pm
 	// Mon 03-Jan-2022 Rosh Chodesh Sh'vat
-	// Fri 07-Jan-2022 Candle lighting: 4:13
+	// Fri 07-Jan-2022 Candle lighting: 4:13pm
 	// Sat 08-Jan-2022 Parashat Bo
-	// Sat 08-Jan-2022 Havdalah (50 min): 5:22
+	// Sat 08-Jan-2022 Havdalah (50 min): 5:22pm
 }
 
 func TestHebrewCalendarLocale(t *testing.T) {
@@ -289,11 +289,11 @@ func TestHebrewCalendarLocale(t *testing.T) {
 	}
 	checkEvents(t, "es", opts, []string{
 		"2022-01-01 Parashá Vaera",
-		"2022-01-01 Havdalah (50 min): 5:16",
+		"2022-01-01 Havdalah (50 min): 5:16pm",
 		"2022-01-03 Rosh Jodesh Sh'vat",
-		"2022-01-07 Iluminación de velas: 4:13",
+		"2022-01-07 Iluminación de velas: 4:13pm",
 		"2022-01-08 Parashá Bo",
-		"2022-01-08 Havdalah (50 min): 5:22",
+		"2022-01-08 Havdalah (50 min): 5:22pm",
 	})
 }
 

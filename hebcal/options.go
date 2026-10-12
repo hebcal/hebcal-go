@@ -186,9 +186,18 @@ type CalOptions struct {
 	// halfway between one molad and the next (the Maharil's opinion).
 	// Requires Location. See KiddushLevanaEvent.
 	KiddushLevanaMaharil bool
-	// Whether to use 24-hour time (as opposed to 12-hour time) for
-	// TimedEvent.Render().
+	// Clock format for TimedEvent.Render(), the molad announcement and the
+	// Kiddush Levana memo. By default it follows the location's country (or
+	// Israel when IL is set and there is no location, else the United States):
+	// 12-hour time with an "am"/"pm" suffix (e.g. "5:19am", "7:42pm") in
+	// countries that conventionally use it, 24-hour "15:04" elsewhere.
+	// See ReformatTimeStr.
+	//
+	// Hour24 forces 24-hour time everywhere.
 	Hour24 bool
+	// Hour12 forces 12-hour time with an am/pm suffix everywhere. Hour24 wins
+	// if both are set.
+	Hour12 bool
 
 	//	-------- Begin: CLI legacy compatibility options  --------
 	//  These options are primarily here for the command-line interface.

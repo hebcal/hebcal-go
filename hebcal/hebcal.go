@@ -307,11 +307,8 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
 			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 			molad := molad.New(hd.Year(), nextMonth)
-			cc := ""
-			if opts.Location != nil {
-				cc = opts.Location.CountryCode
-			}
-			events = append(events, event.NewMoladEvent(hd, molad, nextMonthName, cc))
+			events = append(events, event.NewMoladEventHour12(hd, molad, nextMonthName,
+				clockCountry(opts), hour12Override(opts)))
 		}
 		if (opts.AddHebrewDates && (!opts.WeeklyAbbreviated || dow == firstWeekday)) ||
 			((opts.AddHebrewDates || opts.AddHebrewDatesForEvents) && prevEventsLength != len(events)) {

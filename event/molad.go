@@ -14,6 +14,7 @@ type moladEvent struct {
 	Molad       molad.Molad
 	MonthName   string
 	CountryCode string // used to pick a 12- or 24-hour clock for the announcement
+	Hour12      *bool  // overrides CountryCode when non-nil; see ReformatTimeStr
 }
 
 // NewMoladEvent constructs a molad announcement event. countryCode selects the
@@ -29,34 +30,17 @@ func NewMoladEvent(date hdate.HDate, m molad.Molad, monthName string, countryCod
 	}
 }
 
-// hour12Countries lists the ISO country codes that use a 12-hour clock, matching
-// the hour12cc table in @hebcal/core reformatTimeStr.
-var hour12Countries = map[string]bool{
-	"US": true, "CA": true, "BR": true, "AU": true, "NZ": true, "DO": true,
-	"PR": true, "GR": true, "IN": true, "KR": true, "NP": true, "ZA": true,
-}
-
-// moladTimeStr formats the molad's wall-clock time, matching @hebcal/core
-// reformatTimeStr(`${hour}:${pad2(min)}`, "pm", options): 12-hour with an
-// am/pm suffix in 12-hour countries, 24-hour otherwise.
-func moladTimeStr(hour, minute int, cc string) string {
-	if cc == "" {
-		cc = "US"
+// NewMoladEventHour12 is like NewMoladEvent, but a non-nil hour12 overrides
+// the country's clock convention: true always renders 12-hour time with an
+// am/pm suffix, false always renders 24-hour time.
+func NewMoladEventHour12(date hdate.HDate, m molad.Molad, monthName string, countryCode string, hour12 *bool) CalEvent {
+	return moladEvent{
+		Date:        date,
+		Molad:       m,
+		MonthName:   monthName,
+		CountryCode: countryCode,
+		Hour12:      hour12,
 	}
-	if !hour12Countries[cc] {
-		return fmt.Sprintf("%d:%02d", hour, minute)
-	}
-	suffix := "am"
-	h := hour
-	if hour >= 12 {
-		suffix = "pm"
-		if hour > 12 {
-			h = hour - 12
-		}
-	} else if hour == 0 {
-		h = 12
-	}
-	return fmt.Sprintf("%d:%02d%s", h, minute, suffix)
 }
 
 // smartApostrophe converts a straight apostrophe to a typographic one (e.g.
@@ -109,7 +93,7 @@ func (ev moladEvent) Render(locale string) string {
 	}
 	month := smartApostrophe(monthStr)
 	dow := ev.Molad.Date.Weekday().String()
-	timeStr := moladTimeStr(ev.Molad.Hours, ev.Molad.Minutes, ev.CountryCode)
+	timeStr := ReformatTimeStr(fmt.Sprintf("%d:%02d", ev.Molad.Hours, ev.Molad.Minutes), "pm", ev.CountryCode, ev.Hour12)
 	result := fmt.Sprintf("Molad %s: %s, %s", month, dow, timeStr)
 	if ev.Molad.Chalakim != 0 {
 		result += fmt.Sprintf(" and %d chalakim", ev.Molad.Chalakim)

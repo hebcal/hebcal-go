@@ -76,10 +76,7 @@ func (ev KiddushLevanaEvent) Memo(locale string) string {
 	for i, zman := range times {
 		label, _ := locales.LookupTranslation(zman.label, locale)
 		t := zman.t.In(tz)
-		timeStr := t.Format("3:04pm")
-		if ev.opts.Hour24 {
-			timeStr = t.Format("15:04")
-		}
+		timeStr := formatTime(t, ev.opts)
 		lines[i] = label + ": " + t.Format("Mon, Jan 2, 2006") + ", " + timeStr
 	}
 	return strings.Join(lines, "\n")
