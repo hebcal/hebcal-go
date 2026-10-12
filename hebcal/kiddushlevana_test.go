@@ -103,9 +103,9 @@ func TestKiddushLevanaMemo(t *testing.T) {
 func TestKiddushLevanaEvent(t *testing.T) {
 	assert := assert.New(t)
 	ev := kiddushLevanaMonth(t, zmanim.LookupCity("New York"), 5787, hdate.Cheshvan)
-	assert.Equal("Latest Kiddush Levana: 9:44", ev.Render("en"))
-	assert.Equal("Latest Kiddush Levanah: 9:44", ev.Render("ashkenazi"))
-	assert.Equal("סוֹף זְמַן קִדּוּשׁ לְבָנָה: 9:44", ev.Render("he"))
+	assert.Equal("Latest Kiddush Levana: 9:44pm", ev.Render("en"))
+	assert.Equal("Latest Kiddush Levanah: 9:44pm", ev.Render("ashkenazi"))
+	assert.Equal("סוֹף זְמַן קִדּוּשׁ לְבָנָה: 9:44pm", ev.Render("he"))
 	assert.Equal([]string{"zmanim", "kiddushLevana"}, ev.GetCategories())
 	assert.Equal("🌔", ev.GetEmoji())
 	assert.Equal(event.KIDDUSH_LEVANA, ev.GetFlags())

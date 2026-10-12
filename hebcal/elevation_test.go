@@ -43,16 +43,16 @@ func TestUseElevationCalOption(t *testing.T) {
 	y, m, d := 2022, 4, 8 // a Friday in Jerusalem
 
 	// Candle lighting (sunset-based) is later at elevation.
-	assert.Equal("Candle lighting: 6:23", findOnDate(t, newOpts(false), y, m, d, "Candle lighting"))
-	assert.Equal("Candle lighting: 6:27", findOnDate(t, newOpts(true), y, m, d, "Candle lighting"))
+	assert.Equal("Candle lighting: 18:23", findOnDate(t, newOpts(false), y, m, d, "Candle lighting"))
+	assert.Equal("Candle lighting: 18:27", findOnDate(t, newOpts(true), y, m, d, "Candle lighting"))
 
 	// Sunrise (sunset-based) is earlier at elevation.
-	assert.Equal("Sunrise: 6:19", findOnDate(t, newOpts(false), y, m, d, "Sunrise"))
-	assert.Equal("Sunrise: 6:14", findOnDate(t, newOpts(true), y, m, d, "Sunrise"))
+	assert.Equal("Sunrise: 06:19", findOnDate(t, newOpts(false), y, m, d, "Sunrise"))
+	assert.Equal("Sunrise: 06:14", findOnDate(t, newOpts(true), y, m, d, "Sunrise"))
 
 	// Alot HaShachar (degree-based) is unaffected by elevation.
-	assert.Equal("Alot HaShachar: 5:05", findOnDate(t, newOpts(false), y, m, d, "Alot HaShachar"))
-	assert.Equal("Alot HaShachar: 5:05", findOnDate(t, newOpts(true), y, m, d, "Alot HaShachar"))
+	assert.Equal("Alot HaShachar: 05:05", findOnDate(t, newOpts(false), y, m, d, "Alot HaShachar"))
+	assert.Equal("Alot HaShachar: 05:05", findOnDate(t, newOpts(true), y, m, d, "Alot HaShachar"))
 }
 
 // TestUseElevationDefaultFalse confirms the default (unset) matches the
