@@ -20,6 +20,7 @@ package hebcal
 import (
 	"errors"
 	"math"
+	"sort"
 	"time"
 
 	"github.com/hebcal/greg"
@@ -202,6 +203,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		}
 		dow := hd.Weekday()
 		prevEventsLength := len(events)
+		sortByTime := false
 		if opts.SunriseSunset && (!opts.WeeklyAbbreviated || dow == firstWeekday) {
 			events = append(events, riseSetEvent{date: hd, opts: opts})
 		}
@@ -212,10 +214,27 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			}
 		}
 		var candlesEv TimedEvent
+		// On Shabbat, events tied to the morning Torah reading and announcements
+		// in synagogue come first: the parsha (above), special Shabbatot such
+		// as Shabbat Shekalim, then the Molad and Shabbat Mevarchim
+		var moladEv event.CalEvent
+		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
+			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
+			molad := molad.New(hd.Year(), nextMonth)
+			moladEv = event.NewMoladEventHour12(hd, molad, nextMonthName,
+				clockCountry(opts), hour12Override(opts))
+		}
 		for _, holidayEv := range holidaysYear {
 			if hd == holidayEv.Date {
+				if moladEv != nil && timeOfDay(holidayEv) > timeOfDayMorning {
+					events = append(events, moladEv)
+					moladEv = nil
+				}
 				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
 			}
+		}
+		if moladEv != nil {
+			events = append(events, moladEv)
 		}
 		// When Erev Pesach falls on Shabbat, burning chametz is moved to the
 		// Friday before (13 Nisan), since chametz cannot be burned on Shabbat.
@@ -270,18 +289,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			if opts.DailyZmanim {
 				zmanEvents := dailyZemanim(hd, opts)
 				events = append(events, zmanEvents...)
-			}
-		}
-		if opts.KiddushLevanaMaharil && hd.Day() >= 9 && hd.Day() <= 17 {
-			// The event usually falls between the 11th and the 16th, but may be
-			// moved back to candle-lighting before a Shabbat or Yom Tov
-			monthKey := hyear*100 + int(hd.Month())
-			if monthKey != klMonthKey {
-				klMonthKey = monthKey
-				klEv, klOk = makeKiddushLevanaEvent(hyear, hd.Month(), opts)
-			}
-			if klOk && klEv.Date == hd {
-				events = append(events, klEv)
+				sortByTime = true
 			}
 		}
 		if (candlesEv == TimedEvent{}) && opts.CandleLighting && (dow == time.Friday || dow == time.Saturday) {
@@ -304,11 +312,20 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		if (candlesEv != TimedEvent{}) {
 			events = append(events, candlesEv)
 		}
-		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
-			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
-			molad := molad.New(hd.Year(), nextMonth)
-			events = append(events, event.NewMoladEventHour12(hd, molad, nextMonthName,
-				clockCountry(opts), hour12Override(opts)))
+		if opts.KiddushLevanaMaharil && hd.Day() >= 9 && hd.Day() <= 17 {
+			// The event usually falls between the 11th and the 16th, but may be
+			// moved back to candle-lighting before a Shabbat or Yom Tov
+			monthKey := hyear*100 + int(hd.Month())
+			if monthKey != klMonthKey {
+				klMonthKey = monthKey
+				klEv, klOk = makeKiddushLevanaEvent(hyear, hd.Month(), opts)
+			}
+			if klOk && klEv.Date == hd {
+				events = insertTimedEvent(events, prevEventsLength, klEv, klEv.EventTime)
+			}
+		}
+		if sortByTime {
+			sortTimedEvents(events[prevEventsLength:])
 		}
 		if (opts.AddHebrewDates && (!opts.WeeklyAbbreviated || dow == firstWeekday)) ||
 			((opts.AddHebrewDates || opts.AddHebrewDatesForEvents) && prevEventsLength != len(events)) {
@@ -607,6 +624,48 @@ func makeMevarchimEvent(ev event.HolidayEvent) event.MevarchimChodeshEvent {
 	nextName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 	m := molad.New(hd.Year(), nextMonth)
 	return event.NewMevarchimChodeshEvent(hd, nextName, m)
+}
+
+// eventTime returns the time of a timed event, or false for other events.
+func eventTime(ev event.CalEvent) (time.Time, bool) {
+	switch e := ev.(type) {
+	case TimedEvent:
+		return e.EventTime, true
+	case KiddushLevanaEvent:
+		return e.EventTime, true
+	}
+	return time.Time{}, false
+}
+
+// insertTimedEvent inserts ev into today's events (those at index start and
+// beyond) just before the first timed event that occurs later than t, or
+// appends it. Unlike other timed events, Latest Kiddush Levana may fall at
+// dawn, at candle-lighting or late at night, so its position can't be fixed.
+func insertTimedEvent(events []event.CalEvent, start int, ev event.CalEvent, t time.Time) []event.CalEvent {
+	for i := start; i < len(events); i++ {
+		if other, ok := eventTime(events[i]); ok && other.After(t) {
+			events = append(events, nil)
+			copy(events[i+1:], events[i:])
+			events[i] = ev
+			return events
+		}
+	}
+	return append(events, ev)
+}
+
+// sortTimedEvents orders one day's events with the untimed ones first, in
+// their original order, followed by the timed ones in chronological order.
+// Used with opts.DailyZmanim, whose list of zmanim would otherwise separate
+// candle-lighting, fast start/end and so on from their place in the day.
+func sortTimedEvents(events []event.CalEvent) {
+	sort.SliceStable(events, func(i, j int) bool {
+		ti, okI := eventTime(events[i])
+		tj, okJ := eventTime(events[j])
+		if okI != okJ {
+			return okJ
+		}
+		return okI && ti.Before(tj)
+	})
 }
 
 func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev event.CalEvent, opts *CalOptions) ([]event.CalEvent, TimedEvent) {

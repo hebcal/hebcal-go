@@ -42,12 +42,12 @@ func TestHebrewCalendar(t *testing.T) {
 		IsHebrewYear: false,
 	}
 	checkEvents(t, "en", opts, []string{
-		"2022-04-02 Rosh Chodesh Nisan",
 		"2022-04-02 Shabbat HaChodesh",
+		"2022-04-02 Rosh Chodesh Nisan",
 		"2022-04-09 Shabbat HaGadol",
 		"2022-04-11 Yom HaAliyah",
-		"2022-04-15 Erev Pesach",
 		"2022-04-15 Ta'anit Bechorot",
+		"2022-04-15 Erev Pesach",
 		"2022-04-16 Pesach I",
 		"2022-04-17 Pesach II",
 		"2022-04-18 Pesach III (CH''M)",
@@ -209,11 +209,11 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 		"2022-12-23 Chanukah: 6 Candles: 16:00",
 		"2022-12-23 Candle lighting: 16:00",
 		"2022-12-24 Chag HaBanot",
-		"2022-12-24 Chanukah: 7 Candles: 17:21",
 		"2022-12-24 Rosh Chodesh Tevet",
+		"2022-12-24 Chanukah: 7 Candles: 17:21",
 		"2022-12-24 Havdalah: 17:21",
-		"2022-12-25 Chanukah: 8 Candles: 17:00",
 		"2022-12-25 Rosh Chodesh Tevet",
+		"2022-12-25 Chanukah: 8 Candles: 17:00",
 		"2022-12-26 Chanukah: 8th Day",
 	})
 }
@@ -384,6 +384,70 @@ func TestDailyZemanim(t *testing.T) {
 		"2021-11-27 Sunset: 16:16",
 		"2021-11-27 Bein HaShemashot: 16:40",
 		"2021-11-27 Tzeit HaKochavim: 17:02",
+	})
+}
+
+func TestDailyZemanimSortedByTime(t *testing.T) {
+	hd := hdate.New(5780, hdate.Adar1, 13)
+	opts := &hebcal.CalOptions{
+		Start:                hd,
+		End:                  hd,
+		CandleLighting:       true,
+		DailyZmanim:          true,
+		KiddushLevanaMaharil: true,
+		Location:             zmanim.LookupCity("Boston"),
+		Hour24:               true,
+	}
+	checkEvents(t, "en", opts, []string{
+		"2020-03-09 Ta'anit Esther",
+		"2020-03-09 Erev Purim",
+		"2020-03-09 Latest Kiddush Levana: 05:42",
+		"2020-03-09 Alot HaShachar: 05:42",
+		"2020-03-09 Fast begins: 05:43",
+		"2020-03-09 Misheyakir: 06:07",
+		"2020-03-09 Misheyakir Machmir: 06:14",
+		"2020-03-09 Sunrise: 07:05",
+		"2020-03-09 Kriat Shema, sof zeman (MGA): 09:24",
+		"2020-03-09 Kriat Shema, sof zeman (GRA): 10:00",
+		"2020-03-09 Tefilah, sof zeman (MGA): 10:34",
+		"2020-03-09 Tefilah, sof zeman (GRA): 10:58",
+		"2020-03-09 Chatzot HaYom: 12:54",
+		"2020-03-09 Mincha Gedolah: 13:24",
+		"2020-03-09 Mincha Ketanah: 16:18",
+		"2020-03-09 Plag HaMincha: 17:31",
+		"2020-03-09 Sunset: 18:44",
+		"2020-03-09 Bein HaShemashot: 19:04",
+		"2020-03-09 Fast ends: 19:18",
+		"2020-03-09 Tzeit HaKochavim: 19:25",
+	})
+}
+
+func TestShabbatOrder(t *testing.T) {
+	boston := zmanim.LookupCity("Boston")
+	opts := func(hd hdate.HDate) *hebcal.CalOptions {
+		return &hebcal.CalOptions{
+			Start:            hd,
+			End:              hd,
+			CandleLighting:   true,
+			Sedrot:           true,
+			Molad:            true,
+			ShabbatMevarchim: true,
+			Location:         boston,
+		}
+	}
+	checkEvents(t, "en", opts(hdate.New(5781, hdate.Kislev, 26)), []string{
+		"2020-12-12 Parashat Vayeshev",
+		"2020-12-12 Molad Tevet: Tuesday, 4:51am and 2 chalakim",
+		"2020-12-12 Shabbat Mevarchim Chodesh Tevet",
+		"2020-12-12 Chanukah: 3 Candles: 4:59pm",
+		"2020-12-12 Havdalah: 4:59pm",
+	})
+	checkEvents(t, "en", opts(hdate.New(5781, hdate.Adar1, 29)), []string{
+		"2021-03-13 Parashat Vayakhel-Pekudei",
+		"2021-03-13 Shabbat HaChodesh",
+		"2021-03-13 Molad Nisan: Saturday, 7:03pm and 5 chalakim",
+		"2021-03-13 Shabbat Mevarchim Chodesh Nisan",
+		"2021-03-13 Havdalah: 6:30pm",
 	})
 }
 

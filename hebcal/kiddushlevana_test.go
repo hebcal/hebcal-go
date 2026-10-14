@@ -199,3 +199,37 @@ func TestKiddushLevanaIgnoresCandleOnlyOptions(t *testing.T) {
 	}))
 	assert.EqualError(t, err, "opts.HavdalahMins and opts.HavdalahDeg are mutually exclusive")
 }
+
+func TestKiddushLevanaSortedByTime(t *testing.T) {
+	boston := zmanim.LookupCity("Boston")
+	render := func(start, end hdate.HDate) []string {
+		events, err := HebrewCalendar(&CalOptions{
+			Start:                start,
+			End:                  end,
+			Location:             boston,
+			CandleLighting:       true,
+			KiddushLevanaMaharil: true,
+		})
+		require.NoError(t, err)
+		result := make([]string, len(events))
+		for i, ev := range events {
+			result[i] = ev.GetDate().String() + " " + ev.Render("en")
+		}
+		return result
+	}
+	// late at night, after Havdalah
+	assert.Equal(t, []string{
+		"12 Adar I 5787 Candle lighting: 5:03pm",
+		"13 Adar I 5787 Havdalah: 6:05pm",
+		"13 Adar I 5787 Latest Kiddush Levana: 11:40pm",
+		"14 Adar I 5787 Purim Katan",
+	}, render(hdate.New(5787, hdate.Adar1, 12), hdate.New(5787, hdate.Adar1, 14)))
+	// at dawn, before the fast begins
+	assert.Equal(t, []string{
+		"13 Adar 5780 Latest Kiddush Levana: 5:42am",
+		"13 Adar 5780 Fast begins: 5:43am",
+		"13 Adar 5780 Ta'anit Esther",
+		"13 Adar 5780 Fast ends: 7:18pm",
+		"13 Adar 5780 Erev Purim",
+	}, render(hdate.New(5780, hdate.Adar1, 13), hdate.New(5780, hdate.Adar1, 13)))
+}
