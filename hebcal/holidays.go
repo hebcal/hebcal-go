@@ -275,8 +275,8 @@ const (
 
 // timeOfDay returns the approximate time of day of a holiday, used to order
 // holidays on the same date:
-//   - morning: special Shabbatot (tied to the Torah or Haftarah reading), fast
-//     days (which begin at dawn) and Birkat Hachamah (recited at sunrise)
+//   - morning: special Shabbatot (tied to the Torah or Haftarah reading), minor
+//     fasts (which begin at dawn) and Birkat Hachamah (recited at sunrise)
 //   - Shabbat Mevarchim, announced in synagogue after the Torah reading
 //   - day: everything else
 //   - evening: Erev holidays, Chanukah candle-lighting and Leil Selichot
@@ -287,7 +287,7 @@ func timeOfDay(ev event.HolidayEvent) int {
 	switch {
 	case f&(event.EREV|event.CHANUKAH_CANDLES) != 0 || ev.Desc == "Leil Selichot":
 		return timeOfDayEvening
-	case f&(event.SPECIAL_SHABBAT|event.MINOR_FAST|event.MAJOR_FAST) != 0 || ev.Desc == "Birkat Hachamah":
+	case f&(event.SPECIAL_SHABBAT|event.MINOR_FAST) != 0 || ev.Desc == "Birkat Hachamah":
 		return timeOfDayMorning
 	case f&event.SHABBAT_MEVARCHIM != 0:
 		return timeOfDayMevarchim
