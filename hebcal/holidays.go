@@ -269,7 +269,8 @@ func taanitBechorotDate(pesach hdate.HDate) hdate.HDate {
 // sortHolidays orders events by date. Events on the same day keep the order
 // in which they were added, except that an Erev event added first moves
 // behind the next event added (e.g. Ta'anit Esther, then Erev Purim), and
-// Shabbat Mevarchim goes last. This matches @hebcal/core, which builds its
+// Shabbat Mevarchim goes last, or before Chanukah candle-lighting since it is
+// announced in the morning. This matches @hebcal/core, which builds its
 // holiday list this way and emits Shabbat Mevarchim after the day's holidays.
 func sortHolidays(events []event.HolidayEvent) {
 	sort.SliceStable(events, func(i, j int) bool {
@@ -292,7 +293,15 @@ func sortHolidays(events []event.HolidayEvent) {
 					day = append(day, ev)
 				}
 			}
-			copy(events[i:j], append(day, mevarchim...))
+			k := len(day)
+			for n, ev := range day {
+				if ev.Flags.Has(event.CHANUKAH_CANDLES) {
+					k = n
+					break
+				}
+			}
+			day = append(day[:k], append(mevarchim, day[k:]...)...)
+			copy(events[i:j], day)
 		}
 		i = j
 	}
