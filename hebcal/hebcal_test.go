@@ -209,11 +209,11 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 		"2022-12-23 Chanukah: 6 Candles: 16:00",
 		"2022-12-23 Candle lighting: 16:00",
 		"2022-12-24 Chag HaBanot",
-		"2022-12-24 Chanukah: 7 Candles: 17:21",
 		"2022-12-24 Rosh Chodesh Tevet",
+		"2022-12-24 Chanukah: 7 Candles: 17:21",
 		"2022-12-24 Havdalah: 17:21",
-		"2022-12-25 Chanukah: 8 Candles: 17:00",
 		"2022-12-25 Rosh Chodesh Tevet",
+		"2022-12-25 Chanukah: 8 Candles: 17:00",
 		"2022-12-26 Chanukah: 8th Day",
 	})
 }

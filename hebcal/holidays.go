@@ -266,45 +266,45 @@ func taanitBechorotDate(pesach hdate.HDate) hdate.HDate {
 	return hdate.New(pesach.Year(), hdate.Nisan, 14)
 }
 
-// sortHolidays orders events by date. Events on the same day keep the order
-// in which they were added, except that an Erev event added first moves
-// behind the next event added (e.g. Ta'anit Esther, then Erev Purim), and
-// Shabbat Mevarchim goes last, or before Chanukah candle-lighting since it is
-// announced in the morning. This matches @hebcal/core, which builds its
-// holiday list this way and emits Shabbat Mevarchim after the day's holidays.
+const (
+	timeOfDayMorning = iota
+	timeOfDayMevarchim
+	timeOfDayDay
+	timeOfDayEvening
+)
+
+// timeOfDay returns the approximate time of day of a holiday, used to order
+// holidays on the same date:
+//   - morning: special Shabbatot (tied to the Torah or Haftarah reading), fast
+//     days (which begin at dawn) and Birkat Hachamah (recited at sunrise)
+//   - Shabbat Mevarchim, announced in synagogue after the Torah reading
+//   - day: everything else
+//   - evening: Erev holidays, Chanukah candle-lighting and Leil Selichot
+//
+// This matches timeOfDay in @hebcal/core.
+func timeOfDay(ev event.HolidayEvent) int {
+	f := ev.Flags
+	switch {
+	case f&(event.EREV|event.CHANUKAH_CANDLES) != 0 || ev.Desc == "Leil Selichot":
+		return timeOfDayEvening
+	case f&(event.SPECIAL_SHABBAT|event.MINOR_FAST|event.MAJOR_FAST) != 0 || ev.Desc == "Birkat Hachamah":
+		return timeOfDayMorning
+	case f&event.SHABBAT_MEVARCHIM != 0:
+		return timeOfDayMevarchim
+	}
+	return timeOfDayDay
+}
+
+// sortHolidays orders events by date, then by timeOfDay. Events on the same
+// date and at the same time of day keep the order in which they were added.
 func sortHolidays(events []event.HolidayEvent) {
 	sort.SliceStable(events, func(i, j int) bool {
-		return events[i].Date.Abs() < events[j].Date.Abs()
+		abs1, abs2 := events[i].Date.Abs(), events[j].Date.Abs()
+		if abs1 != abs2 {
+			return abs1 < abs2
+		}
+		return timeOfDay(events[i]) < timeOfDay(events[j])
 	})
-	for i := 0; i < len(events); {
-		j := i + 1
-		for j < len(events) && events[j].Date == events[i].Date {
-			j++
-		}
-		if j-i > 1 {
-			day := make([]event.HolidayEvent, 0, j-i)
-			var mevarchim []event.HolidayEvent
-			for _, ev := range events[i:j] {
-				if ev.Flags.Has(event.SHABBAT_MEVARCHIM) {
-					mevarchim = append(mevarchim, ev)
-				} else if len(day) > 0 && day[0].Flags.Has(event.EREV) {
-					day = append([]event.HolidayEvent{ev}, day...)
-				} else {
-					day = append(day, ev)
-				}
-			}
-			k := len(day)
-			for n, ev := range day {
-				if ev.Flags.Has(event.CHANUKAH_CANDLES) {
-					k = n
-					break
-				}
-			}
-			day = append(day[:k], append(mevarchim, day[k:]...)...)
-			copy(events[i:j], day)
-		}
-		i = j
-	}
 }
 
 func nextMonthName(year int, month hdate.HMonth) (string, hdate.HMonth) {

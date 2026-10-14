@@ -214,35 +214,27 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			}
 		}
 		var candlesEv TimedEvent
-		var dayHolidays []event.HolidayEvent
-		for _, holidayEv := range holidaysYear {
-			if hd == holidayEv.Date {
-				dayHolidays = append(dayHolidays, holidayEv)
-			}
-		}
 		// On Shabbat, events tied to the morning Torah reading and announcements
 		// in synagogue come first: the parsha (above), special Shabbatot such
 		// as Shabbat Shekalim, then the Molad and Shabbat Mevarchim
-		for _, holidayEv := range dayHolidays {
-			if holidayEv.Flags.Has(event.SPECIAL_SHABBAT) {
-				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
-			}
-		}
+		var moladEv event.CalEvent
 		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
 			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 			molad := molad.New(hd.Year(), nextMonth)
-			events = append(events, event.NewMoladEventHour12(hd, molad, nextMonthName,
-				clockCountry(opts), hour12Override(opts)))
+			moladEv = event.NewMoladEventHour12(hd, molad, nextMonthName,
+				clockCountry(opts), hour12Override(opts))
 		}
-		for _, holidayEv := range dayHolidays {
-			if holidayEv.Flags.Has(event.SHABBAT_MEVARCHIM) {
+		for _, holidayEv := range holidaysYear {
+			if hd == holidayEv.Date {
+				if moladEv != nil && timeOfDay(holidayEv) > timeOfDayMorning {
+					events = append(events, moladEv)
+					moladEv = nil
+				}
 				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
 			}
 		}
-		for _, holidayEv := range dayHolidays {
-			if !holidayEv.Flags.Has(event.SPECIAL_SHABBAT) && !holidayEv.Flags.Has(event.SHABBAT_MEVARCHIM) {
-				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
-			}
+		if moladEv != nil {
+			events = append(events, moladEv)
 		}
 		// When Erev Pesach falls on Shabbat, burning chametz is moved to the
 		// Friday before (13 Nisan), since chametz cannot be burned on Shabbat.
