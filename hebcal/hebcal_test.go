@@ -422,6 +422,35 @@ func TestDailyZemanimSortedByTime(t *testing.T) {
 	})
 }
 
+func TestShabbatOrder(t *testing.T) {
+	boston := zmanim.LookupCity("Boston")
+	opts := func(hd hdate.HDate) *hebcal.CalOptions {
+		return &hebcal.CalOptions{
+			Start:            hd,
+			End:              hd,
+			CandleLighting:   true,
+			Sedrot:           true,
+			Molad:            true,
+			ShabbatMevarchim: true,
+			Location:         boston,
+		}
+	}
+	checkEvents(t, "en", opts(hdate.New(5781, hdate.Kislev, 26)), []string{
+		"2020-12-12 Parashat Vayeshev",
+		"2020-12-12 Molad Tevet: Tuesday, 4:51am and 2 chalakim",
+		"2020-12-12 Shabbat Mevarchim Chodesh Tevet",
+		"2020-12-12 Chanukah: 3 Candles: 4:59pm",
+		"2020-12-12 Havdalah: 4:59pm",
+	})
+	checkEvents(t, "en", opts(hdate.New(5781, hdate.Adar1, 29)), []string{
+		"2021-03-13 Parashat Vayakhel-Pekudei",
+		"2021-03-13 Shabbat HaChodesh",
+		"2021-03-13 Molad Nisan: Saturday, 7:03pm and 5 chalakim",
+		"2021-03-13 Shabbat Mevarchim Chodesh Nisan",
+		"2021-03-13 Havdalah: 6:30pm",
+	})
+}
+
 func TestDailyZemanim_He(t *testing.T) {
 	hd := hdate.New(5782, hdate.Kislev, 23)
 	loc := zmanim.LookupCity("Providence")

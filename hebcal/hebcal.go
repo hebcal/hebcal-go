@@ -214,8 +214,33 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			}
 		}
 		var candlesEv TimedEvent
+		var dayHolidays []event.HolidayEvent
 		for _, holidayEv := range holidaysYear {
 			if hd == holidayEv.Date {
+				dayHolidays = append(dayHolidays, holidayEv)
+			}
+		}
+		// On Shabbat, events tied to the morning Torah reading and announcements
+		// in synagogue come first: the parsha (above), special Shabbatot such
+		// as Shabbat Shekalim, then the Molad and Shabbat Mevarchim
+		for _, holidayEv := range dayHolidays {
+			if holidayEv.Flags.Has(event.SPECIAL_SHABBAT) {
+				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
+			}
+		}
+		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
+			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
+			molad := molad.New(hd.Year(), nextMonth)
+			events = append(events, event.NewMoladEventHour12(hd, molad, nextMonthName,
+				clockCountry(opts), hour12Override(opts)))
+		}
+		for _, holidayEv := range dayHolidays {
+			if holidayEv.Flags.Has(event.SHABBAT_MEVARCHIM) {
+				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
+			}
+		}
+		for _, holidayEv := range dayHolidays {
+			if !holidayEv.Flags.Has(event.SPECIAL_SHABBAT) && !holidayEv.Flags.Has(event.SHABBAT_MEVARCHIM) {
 				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
 			}
 		}
@@ -309,12 +334,6 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		}
 		if sortByTime {
 			sortTimedEvents(events[prevEventsLength:])
-		}
-		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
-			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
-			molad := molad.New(hd.Year(), nextMonth)
-			events = append(events, event.NewMoladEventHour12(hd, molad, nextMonthName,
-				clockCountry(opts), hour12Override(opts)))
 		}
 		if (opts.AddHebrewDates && (!opts.WeeklyAbbreviated || dow == firstWeekday)) ||
 			((opts.AddHebrewDates || opts.AddHebrewDatesForEvents) && prevEventsLength != len(events)) {
