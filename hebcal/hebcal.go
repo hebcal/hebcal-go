@@ -20,6 +20,7 @@ package hebcal
 import (
 	"errors"
 	"math"
+	"sort"
 	"time"
 
 	"github.com/hebcal/greg"
@@ -202,6 +203,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		}
 		dow := hd.Weekday()
 		prevEventsLength := len(events)
+		sortByTime := false
 		if opts.SunriseSunset && (!opts.WeeklyAbbreviated || dow == firstWeekday) {
 			events = append(events, riseSetEvent{date: hd, opts: opts})
 		}
@@ -270,6 +272,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			if opts.DailyZmanim {
 				zmanEvents := dailyZemanim(hd, opts)
 				events = append(events, zmanEvents...)
+				sortByTime = true
 			}
 		}
 		if (candlesEv == TimedEvent{}) && opts.CandleLighting && (dow == time.Friday || dow == time.Saturday) {
@@ -303,6 +306,9 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			if klOk && klEv.Date == hd {
 				events = insertTimedEvent(events, prevEventsLength, klEv, klEv.EventTime)
 			}
+		}
+		if sortByTime {
+			sortTimedEvents(events[prevEventsLength:])
 		}
 		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
 			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
@@ -609,22 +615,24 @@ func makeMevarchimEvent(ev event.HolidayEvent) event.MevarchimChodeshEvent {
 	return event.NewMevarchimChodeshEvent(hd, nextName, m)
 }
 
+// eventTime returns the time of a timed event, or false for other events.
+func eventTime(ev event.CalEvent) (time.Time, bool) {
+	switch e := ev.(type) {
+	case TimedEvent:
+		return e.EventTime, true
+	case KiddushLevanaEvent:
+		return e.EventTime, true
+	}
+	return time.Time{}, false
+}
+
 // insertTimedEvent inserts ev into today's events (those at index start and
 // beyond) just before the first timed event that occurs later than t, or
 // appends it. Unlike other timed events, Latest Kiddush Levana may fall at
 // dawn, at candle-lighting or late at night, so its position can't be fixed.
 func insertTimedEvent(events []event.CalEvent, start int, ev event.CalEvent, t time.Time) []event.CalEvent {
 	for i := start; i < len(events); i++ {
-		var other time.Time
-		switch e := events[i].(type) {
-		case TimedEvent:
-			other = e.EventTime
-		case KiddushLevanaEvent:
-			other = e.EventTime
-		default:
-			continue
-		}
-		if other.After(t) {
+		if other, ok := eventTime(events[i]); ok && other.After(t) {
 			events = append(events, nil)
 			copy(events[i+1:], events[i:])
 			events[i] = ev
@@ -632,6 +640,21 @@ func insertTimedEvent(events []event.CalEvent, start int, ev event.CalEvent, t t
 		}
 	}
 	return append(events, ev)
+}
+
+// sortTimedEvents orders one day's events with the untimed ones first, in
+// their original order, followed by the timed ones in chronological order.
+// Used with opts.DailyZmanim, whose list of zmanim would otherwise separate
+// candle-lighting, fast start/end and so on from their place in the day.
+func sortTimedEvents(events []event.CalEvent) {
+	sort.SliceStable(events, func(i, j int) bool {
+		ti, okI := eventTime(events[i])
+		tj, okJ := eventTime(events[j])
+		if okI != okJ {
+			return okJ
+		}
+		return okI && ti.Before(tj)
+	})
 }
 
 func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev event.CalEvent, opts *CalOptions) ([]event.CalEvent, TimedEvent) {

@@ -387,6 +387,41 @@ func TestDailyZemanim(t *testing.T) {
 	})
 }
 
+func TestDailyZemanimSortedByTime(t *testing.T) {
+	hd := hdate.New(5780, hdate.Adar1, 13)
+	opts := &hebcal.CalOptions{
+		Start:                hd,
+		End:                  hd,
+		CandleLighting:       true,
+		DailyZmanim:          true,
+		KiddushLevanaMaharil: true,
+		Location:             zmanim.LookupCity("Boston"),
+		Hour24:               true,
+	}
+	checkEvents(t, "en", opts, []string{
+		"2020-03-09 Ta'anit Esther",
+		"2020-03-09 Erev Purim",
+		"2020-03-09 Latest Kiddush Levana: 05:42",
+		"2020-03-09 Alot HaShachar: 05:42",
+		"2020-03-09 Fast begins: 05:43",
+		"2020-03-09 Misheyakir: 06:07",
+		"2020-03-09 Misheyakir Machmir: 06:14",
+		"2020-03-09 Sunrise: 07:05",
+		"2020-03-09 Kriat Shema, sof zeman (MGA): 09:24",
+		"2020-03-09 Kriat Shema, sof zeman (GRA): 10:00",
+		"2020-03-09 Tefilah, sof zeman (MGA): 10:34",
+		"2020-03-09 Tefilah, sof zeman (GRA): 10:58",
+		"2020-03-09 Chatzot HaYom: 12:54",
+		"2020-03-09 Mincha Gedolah: 13:24",
+		"2020-03-09 Mincha Ketanah: 16:18",
+		"2020-03-09 Plag HaMincha: 17:31",
+		"2020-03-09 Sunset: 18:44",
+		"2020-03-09 Bein HaShemashot: 19:04",
+		"2020-03-09 Fast ends: 19:18",
+		"2020-03-09 Tzeit HaKochavim: 19:25",
+	})
+}
+
 func TestDailyZemanim_He(t *testing.T) {
 	hd := hdate.New(5782, hdate.Kislev, 23)
 	loc := zmanim.LookupCity("Providence")
