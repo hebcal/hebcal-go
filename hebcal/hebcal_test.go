@@ -42,12 +42,12 @@ func TestHebrewCalendar(t *testing.T) {
 		IsHebrewYear: false,
 	}
 	checkEvents(t, "en", opts, []string{
-		"2022-04-02 Rosh Chodesh Nisan",
 		"2022-04-02 Shabbat HaChodesh",
+		"2022-04-02 Rosh Chodesh Nisan",
 		"2022-04-09 Shabbat HaGadol",
 		"2022-04-11 Yom HaAliyah",
-		"2022-04-15 Erev Pesach",
 		"2022-04-15 Ta'anit Bechorot",
+		"2022-04-15 Erev Pesach",
 		"2022-04-16 Pesach I",
 		"2022-04-17 Pesach II",
 		"2022-04-18 Pesach III (CH''M)",

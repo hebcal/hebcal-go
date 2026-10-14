@@ -226,10 +226,10 @@ func TestKiddushLevanaSortedByTime(t *testing.T) {
 	}, render(hdate.New(5787, hdate.Adar1, 12), hdate.New(5787, hdate.Adar1, 14)))
 	// at dawn, before the fast begins
 	assert.Equal(t, []string{
-		"13 Adar 5780 Erev Purim",
 		"13 Adar 5780 Latest Kiddush Levana: 5:42am",
 		"13 Adar 5780 Fast begins: 5:43am",
 		"13 Adar 5780 Ta'anit Esther",
 		"13 Adar 5780 Fast ends: 7:18pm",
+		"13 Adar 5780 Erev Purim",
 	}, render(hdate.New(5780, hdate.Adar1, 13), hdate.New(5780, hdate.Adar1, 13)))
 }

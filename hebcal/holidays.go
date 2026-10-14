@@ -266,21 +266,36 @@ func taanitBechorotDate(pesach hdate.HDate) hdate.HDate {
 	return hdate.New(pesach.Year(), hdate.Nisan, 14)
 }
 
-type byDate []event.HolidayEvent
-
-func (s byDate) Len() int {
-	return len(s)
-}
-func (s byDate) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s byDate) Less(i, j int) bool {
-	abs1 := s[i].Date.Abs()
-	abs2 := s[j].Date.Abs()
-	if abs1 == abs2 {
-		return s[i].Desc < s[j].Desc
+// sortHolidays orders events by date. Events on the same day keep the order
+// in which they were added, except that an Erev event added first moves
+// behind the next event added (e.g. Ta'anit Esther, then Erev Purim), and
+// Shabbat Mevarchim goes last. This matches @hebcal/core, which builds its
+// holiday list this way and emits Shabbat Mevarchim after the day's holidays.
+func sortHolidays(events []event.HolidayEvent) {
+	sort.SliceStable(events, func(i, j int) bool {
+		return events[i].Date.Abs() < events[j].Date.Abs()
+	})
+	for i := 0; i < len(events); {
+		j := i + 1
+		for j < len(events) && events[j].Date == events[i].Date {
+			j++
+		}
+		if j-i > 1 {
+			day := make([]event.HolidayEvent, 0, j-i)
+			var mevarchim []event.HolidayEvent
+			for _, ev := range events[i:j] {
+				if ev.Flags.Has(event.SHABBAT_MEVARCHIM) {
+					mevarchim = append(mevarchim, ev)
+				} else if len(day) > 0 && day[0].Flags.Has(event.EREV) {
+					day = append([]event.HolidayEvent{ev}, day...)
+				} else {
+					day = append(day, ev)
+				}
+			}
+			copy(events[i:j], append(day, mevarchim...))
+		}
+		i = j
 	}
-	return abs1 < abs2
 }
 
 func nextMonthName(year int, month hdate.HMonth) (string, hdate.HMonth) {
@@ -370,6 +385,18 @@ func getAllHolidaysForYear(year int) []event.HolidayEvent {
 			Flags: event.MINOR_HOLIDAY,
 			Emoji: "🎭️"})
 	}
+	var chanukah7 hdate.HDate
+	if hdate.ShortKislev(year) {
+		chanukah7 = hdate.New(year, hdate.Tevet, 1)
+	} else {
+		chanukah7 = hdate.New(year, hdate.Kislev, 30)
+	}
+	// On the 1st day of Rosh Chodesh Tevet
+	events = append(events,
+		event.HolidayEvent{
+			Date:  chanukah7,
+			Desc:  "Chag HaBanot",
+			Flags: event.MINOR_HOLIDAY})
 	for candles := 2; candles <= 6; candles++ {
 		events = append(events, event.HolidayEvent{
 			Date:        hdate.New(year, hdate.Kislev, 23+candles),
@@ -377,12 +404,6 @@ func getAllHolidaysForYear(year int) []event.HolidayEvent {
 			Flags:       event.MINOR_HOLIDAY | event.CHANUKAH_CANDLES,
 			Emoji:       chanukahEmoji,
 			ChanukahDay: candles - 1})
-	}
-	var chanukah7 hdate.HDate
-	if hdate.ShortKislev(year) {
-		chanukah7 = hdate.New(year, hdate.Tevet, 1)
-	} else {
-		chanukah7 = hdate.New(year, hdate.Kislev, 30)
 	}
 	chanukah8 := chanukah7.Next()
 	events = append(events,
@@ -404,13 +425,6 @@ func getAllHolidaysForYear(year int) []event.HolidayEvent {
 			Flags:       event.MINOR_HOLIDAY,
 			Emoji:       chanukahEmoji,
 			ChanukahDay: 8})
-
-	// On the 1st day of Rosh Chodesh Tevet
-	events = append(events,
-		event.HolidayEvent{
-			Date:  chanukah7,
-			Desc:  "Chag HaBanot",
-			Flags: event.MINOR_HOLIDAY})
 
 	// Tisha BAv and the 3 weeks
 	var tamuz17 = hdate.New(year, hdate.Tamuz, 17)
@@ -633,7 +647,7 @@ func getAllHolidaysForYear(year int) []event.HolidayEvent {
 				Emoji: "☀️"})
 	}
 
-	sort.Sort(byDate(events))
+	sortHolidays(events)
 	return events
 }
 
