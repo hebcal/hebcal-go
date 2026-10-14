@@ -266,23 +266,24 @@ func taanitBechorotDate(pesach hdate.HDate) hdate.HDate {
 	return hdate.New(pesach.Year(), hdate.Nisan, 14)
 }
 
+// Ranks returned by TimeOfDay, in the order events appear within a day.
 const (
-	timeOfDayDawn = iota
-	timeOfDayMorning
-	timeOfDayMevarchim
-	timeOfDayDay
-	timeOfDayMidday
-	timeOfDayLearning
-	timeOfDayEvening
-	timeOfDayNight
+	TimeOfDayDawn = iota
+	TimeOfDayMorning
+	TimeOfDayMevarchim
+	TimeOfDayDay
+	TimeOfDayMidday
+	TimeOfDayLearning
+	TimeOfDayEvening
+	TimeOfDayNight
 )
 
 const learningFlags = event.DAILY_LEARNING | event.DAF_YOMI | event.MISHNA_YOMI |
 	event.NACH_YOMI | event.YERUSHALMI_YOMI
 
-// timeOfDay returns the approximate time of day of a holiday, used to order
-// holidays on the same date. See eventTimeOfDay for the full list.
-func timeOfDay(ev event.HolidayEvent) int {
+// holidayTimeOfDay returns the approximate time of day of a holiday, used to order
+// holidays on the same date. See TimeOfDay for the full list.
+func holidayTimeOfDay(ev event.HolidayEvent) int {
 	return untimedTimeOfDay(ev.Flags, ev.Desc)
 }
 
@@ -291,16 +292,16 @@ func timeOfDay(ev event.HolidayEvent) int {
 func untimedTimeOfDay(f event.HolidayFlags, desc string) int {
 	switch {
 	case f&(event.EREV|event.CHANUKAH_CANDLES) != 0 || desc == "Leil Selichot":
-		return timeOfDayEvening
+		return TimeOfDayEvening
 	case f&(event.PARSHA_HASHAVUA|event.SPECIAL_SHABBAT|event.MINOR_FAST) != 0 ||
 		desc == "Birkat Hachamah":
-		return timeOfDayMorning
+		return TimeOfDayMorning
 	case f&(event.SHABBAT_MEVARCHIM|event.MOLAD) != 0:
-		return timeOfDayMevarchim
+		return TimeOfDayMevarchim
 	case f&learningFlags != 0:
-		return timeOfDayLearning
+		return TimeOfDayLearning
 	}
-	return timeOfDayDay
+	return TimeOfDayDay
 }
 
 // timedTimeOfDay ranks an event that occurs at clock time t.
@@ -308,23 +309,25 @@ func timedTimeOfDay(f event.HolidayFlags, desc string, t time.Time) int {
 	switch {
 	case f&event.CHANUKAH_CANDLES != 0:
 		// Chanukah candle-lighting sits with the evening holidays
-		return timeOfDayEvening
+		return TimeOfDayEvening
 	case desc == "Finish eating chametz" || desc == "Biur Chametz":
-		return timeOfDayMidday
+		return TimeOfDayMidday
 	case desc == "Fast begins" || f&event.KIDDUSH_LEVANA != 0:
 		// A minor fast begins at dawn, but Tish'a B'Av at sunset the day
 		// before. Latest Kiddush Levana is either before dawn or after
 		// nightfall.
 		if t.Hour() < 12 {
-			return timeOfDayDawn
+			return TimeOfDayDawn
 		}
 	}
-	return timeOfDayNight
+	return TimeOfDayNight
 }
 
-// eventTimeOfDay returns the approximate time of day of an event, used to
-// order the events on one date. Events of equal rank keep the order in which
-// they were created, and timed events of equal rank are ordered by time.
+// TimeOfDay returns the approximate time of day of an event, used to order
+// the events on one date. HebrewCalendar sorts each day's events by it:
+// events of equal rank keep the order in which they were created, and timed
+// events of equal rank are ordered by time. A caller merging events of its
+// own into a calendar can use it to find their place.
 //   - dawn: Fast begins for a minor fast, and a Latest Kiddush Levana before
 //     noon (which is never later than alot hashachar)
 //   - morning: the parsha, special Shabbatot (tied to the Torah or Haftarah
@@ -338,21 +341,21 @@ func timedTimeOfDay(f event.HolidayFlags, desc string, t time.Time) int {
 //   - evening: Erev holidays, Chanukah candle-lighting and Leil Selichot
 //   - night: other timed events such as candle-lighting, Havdalah, Fast ends
 //     and a Latest Kiddush Levana after noon
-func eventTimeOfDay(ev event.CalEvent) int {
+func TimeOfDay(ev event.CalEvent) int {
 	switch e := ev.(type) {
 	case TimedEvent:
 		return timedTimeOfDay(e.Flags, e.Desc, e.EventTime)
 	case KiddushLevanaEvent:
 		return timedTimeOfDay(e.Flags, e.Desc, e.EventTime)
 	case event.HolidayEvent:
-		return timeOfDay(e)
+		return holidayTimeOfDay(e)
 	case riseSetEvent:
-		return timeOfDayDawn
+		return TimeOfDayDawn
 	}
 	return untimedTimeOfDay(ev.GetFlags(), "")
 }
 
-// sortHolidays orders events by date, then by timeOfDay. Events on the same
+// sortHolidays orders events by date, then by holidayTimeOfDay. Events on the same
 // date and at the same time of day keep the order in which they were added.
 func sortHolidays(events []event.HolidayEvent) {
 	sort.SliceStable(events, func(i, j int) bool {
@@ -360,7 +363,7 @@ func sortHolidays(events []event.HolidayEvent) {
 		if abs1 != abs2 {
 			return abs1 < abs2
 		}
-		return timeOfDay(events[i]) < timeOfDay(events[j])
+		return holidayTimeOfDay(events[i]) < holidayTimeOfDay(events[j])
 	})
 }
 

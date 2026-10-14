@@ -627,7 +627,7 @@ func eventTime(ev event.CalEvent) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-// sortByTimeOfDay orders one day's events by eventTimeOfDay. The sort is
+// sortByTimeOfDay orders one day's events by TimeOfDay. The sort is
 // stable, so events of equal rank keep the order in which they were added
 // (e.g. the parsha before a special Shabbat); timed events of equal rank are
 // ordered by time.
@@ -636,7 +636,7 @@ func sortByTimeOfDay(events []event.CalEvent) {
 		return
 	}
 	sort.SliceStable(events, func(i, j int) bool {
-		ri, rj := eventTimeOfDay(events[i]), eventTimeOfDay(events[j])
+		ri, rj := TimeOfDay(events[i]), TimeOfDay(events[j])
 		if ri != rj {
 			return ri < rj
 		}

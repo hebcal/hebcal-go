@@ -86,3 +86,12 @@ func TestTimeOfDayErevTishaBav(t *testing.T) {
 		"Havdalah (42 min): 9:16pm",
 	}, renderDayByTimeOfDay(t, 2022, time.August, 6))
 }
+
+func TestTimeOfDayExported(t *testing.T) {
+	hd := hdate.New(5787, hdate.Tishrei, 14)
+	assert.Equal(t, TimeOfDayLearning,
+		TimeOfDay(event.HolidayEvent{Date: hd, Desc: "Psalms 1", Flags: event.DAILY_LEARNING}))
+	assert.Equal(t, TimeOfDayEvening,
+		TimeOfDay(event.HolidayEvent{Date: hd, Desc: "Erev Sukkot", Flags: event.EREV | event.LIGHT_CANDLES}))
+	assert.Equal(t, TimeOfDayDay, TimeOfDay(event.UserEvent{Date: hd, Desc: "Birthday"}))
+}
