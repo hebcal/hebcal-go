@@ -267,32 +267,89 @@ func taanitBechorotDate(pesach hdate.HDate) hdate.HDate {
 }
 
 const (
-	timeOfDayMorning = iota
+	timeOfDayDawn = iota
+	timeOfDayMorning
 	timeOfDayMevarchim
 	timeOfDayDay
+	timeOfDayMidday
+	timeOfDayLearning
 	timeOfDayEvening
+	timeOfDayNight
 )
 
+const learningFlags = event.DAILY_LEARNING | event.DAF_YOMI | event.MISHNA_YOMI |
+	event.NACH_YOMI | event.YERUSHALMI_YOMI
+
 // timeOfDay returns the approximate time of day of a holiday, used to order
-// holidays on the same date:
-//   - morning: special Shabbatot (tied to the Torah or Haftarah reading), minor
-//     fasts (which begin at dawn) and Birkat Hachamah (recited at sunrise)
-//   - Shabbat Mevarchim, announced in synagogue after the Torah reading
-//   - day: everything else
-//   - evening: Erev holidays, Chanukah candle-lighting and Leil Selichot
-//
-// This matches timeOfDay in @hebcal/core.
+// holidays on the same date. See eventTimeOfDay for the full list.
 func timeOfDay(ev event.HolidayEvent) int {
-	f := ev.Flags
+	return untimedTimeOfDay(ev.Flags, ev.Desc)
+}
+
+// untimedTimeOfDay ranks an event that has no clock time by its flags and
+// untranslated description.
+func untimedTimeOfDay(f event.HolidayFlags, desc string) int {
 	switch {
-	case f&(event.EREV|event.CHANUKAH_CANDLES) != 0 || ev.Desc == "Leil Selichot":
+	case f&(event.EREV|event.CHANUKAH_CANDLES) != 0 || desc == "Leil Selichot":
 		return timeOfDayEvening
-	case f&(event.SPECIAL_SHABBAT|event.MINOR_FAST) != 0 || ev.Desc == "Birkat Hachamah":
+	case f&(event.PARSHA_HASHAVUA|event.SPECIAL_SHABBAT|event.MINOR_FAST) != 0 ||
+		desc == "Birkat Hachamah":
 		return timeOfDayMorning
-	case f&event.SHABBAT_MEVARCHIM != 0:
+	case f&(event.SHABBAT_MEVARCHIM|event.MOLAD) != 0:
 		return timeOfDayMevarchim
+	case f&learningFlags != 0:
+		return timeOfDayLearning
 	}
 	return timeOfDayDay
+}
+
+// timedTimeOfDay ranks an event that occurs at clock time t.
+func timedTimeOfDay(f event.HolidayFlags, desc string, t time.Time) int {
+	switch {
+	case f&event.CHANUKAH_CANDLES != 0:
+		// Chanukah candle-lighting sits with the evening holidays
+		return timeOfDayEvening
+	case desc == "Finish eating chametz" || desc == "Biur Chametz":
+		return timeOfDayMidday
+	case desc == "Fast begins" || f&event.KIDDUSH_LEVANA != 0:
+		// A minor fast begins at dawn, but Tish'a B'Av at sunset the day
+		// before. Latest Kiddush Levana is either before dawn or after
+		// nightfall.
+		if t.Hour() < 12 {
+			return timeOfDayDawn
+		}
+	}
+	return timeOfDayNight
+}
+
+// eventTimeOfDay returns the approximate time of day of an event, used to
+// order the events on one date. Events of equal rank keep the order in which
+// they were created, and timed events of equal rank are ordered by time.
+//   - dawn: Fast begins for a minor fast, and a Latest Kiddush Levana before
+//     noon (which is never later than alot hashachar)
+//   - morning: the parsha, special Shabbatot (tied to the Torah or Haftarah
+//     reading), minor fasts (which begin at dawn) and Birkat Hachamah
+//     (recited at sunrise)
+//   - the Molad and Shabbat Mevarchim, announced in synagogue after the Torah
+//     reading
+//   - day: everything else, including the Omer count and user events
+//   - midday: the deadlines for eating and burning chametz
+//   - daily learning
+//   - evening: Erev holidays, Chanukah candle-lighting and Leil Selichot
+//   - night: other timed events such as candle-lighting, Havdalah, Fast ends
+//     and a Latest Kiddush Levana after noon
+func eventTimeOfDay(ev event.CalEvent) int {
+	switch e := ev.(type) {
+	case TimedEvent:
+		return timedTimeOfDay(e.Flags, e.Desc, e.EventTime)
+	case KiddushLevanaEvent:
+		return timedTimeOfDay(e.Flags, e.Desc, e.EventTime)
+	case event.HolidayEvent:
+		return timeOfDay(e)
+	case riseSetEvent:
+		return timeOfDayDawn
+	}
+	return untimedTimeOfDay(ev.GetFlags(), "")
 }
 
 // sortHolidays orders events by date, then by timeOfDay. Events on the same
