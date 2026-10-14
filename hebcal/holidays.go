@@ -291,14 +291,14 @@ func holidayTimeOfDay(ev event.HolidayEvent) int {
 // untranslated description.
 func untimedTimeOfDay(f event.HolidayFlags, desc string) int {
 	switch {
-	case f&(event.EREV|event.CHANUKAH_CANDLES) != 0 || desc == "Leil Selichot":
+	case f.HasAny(event.EREV|event.CHANUKAH_CANDLES) || desc == "Leil Selichot":
 		return TimeOfDayEvening
-	case f&(event.PARSHA_HASHAVUA|event.SPECIAL_SHABBAT|event.MINOR_FAST) != 0 ||
+	case f.HasAny(event.PARSHA_HASHAVUA|event.SPECIAL_SHABBAT|event.MINOR_FAST) ||
 		desc == "Birkat Hachamah":
 		return TimeOfDayMorning
-	case f&(event.SHABBAT_MEVARCHIM|event.MOLAD) != 0:
+	case f.HasAny(event.SHABBAT_MEVARCHIM | event.MOLAD):
 		return TimeOfDayMevarchim
-	case f&learningFlags != 0:
+	case f.HasAny(learningFlags):
 		return TimeOfDayLearning
 	}
 	return TimeOfDayDay
@@ -307,12 +307,12 @@ func untimedTimeOfDay(f event.HolidayFlags, desc string) int {
 // timedTimeOfDay ranks an event that occurs at clock time t.
 func timedTimeOfDay(f event.HolidayFlags, desc string, t time.Time) int {
 	switch {
-	case f&event.CHANUKAH_CANDLES != 0:
+	case f.Has(event.CHANUKAH_CANDLES):
 		// Chanukah candle-lighting sits with the evening holidays
 		return TimeOfDayEvening
 	case desc == "Finish eating chametz" || desc == "Biur Chametz":
 		return TimeOfDayMidday
-	case desc == "Fast begins" || f&event.KIDDUSH_LEVANA != 0:
+	case desc == "Fast begins" || f.Has(event.KIDDUSH_LEVANA):
 		// A minor fast begins at dawn, but Tish'a B'Av at sunset the day
 		// before. Latest Kiddush Levana is either before dawn or after
 		// nightfall.
