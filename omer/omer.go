@@ -69,6 +69,20 @@ func (ev OmerEvent) Render(locale string) string {
 	return strconv.Itoa(ev.OmerDay) + ". " + dayOfTheOmer
 }
 
+// RenderBrief returns the day of the Omer without an ordinal, e.g.
+// "Omer day 22" or "עוֹמֶר יוֹם 22".
+func (ev OmerEvent) RenderBrief(locale string) string {
+	return translate("Omer", locale) + " " + translate("day", locale) + " " + strconv.Itoa(ev.OmerDay)
+}
+
+// translate looks up s in locale, falling back to s itself.
+func translate(s, locale string) string {
+	if t, ok := locales.LookupTranslation(s, locale); ok && t != "" {
+		return t
+	}
+	return s
+}
+
 func (ev OmerEvent) GetFlags() event.HolidayFlags {
 	return event.OMER_COUNT
 }

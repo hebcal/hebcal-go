@@ -159,3 +159,10 @@ func ExampleOmerEvent_TodayIs() {
 	// הַיוֹם שְׁלוֹשָׁה עָשָׂר יוֹם, שְׁהֵם שָׁבוּעַ אֶחָד וְשִׁשָׁה יָמִים לָעוֹמֶר
 	// היום שלושה עשר יום, שהם שבוע אחד וששה ימים לעומר
 }
+
+func TestRenderBrief(t *testing.T) {
+	ev := omer.NewOmerEvent(hdate.New(5786, hdate.Iyyar, 7), 22)
+	assert.Equal(t, "22nd day of the Omer", ev.Render("en"))
+	assert.Equal(t, "Omer day 22", ev.RenderBrief("en"))
+	assert.Equal(t, "עוֹמֶר יוֹם 22", ev.RenderBrief("he"))
+}

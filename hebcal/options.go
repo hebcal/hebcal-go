@@ -186,6 +186,11 @@ type CalOptions struct {
 	// halfway between one molad and the next (the Maharil's opinion).
 	// Requires Location. See KiddushLevanaEvent.
 	KiddushLevanaMaharil bool
+	// include Yizkor (default false), the memorial prayer recited on Yom
+	// Kippur, Shmini Atzeret, the last day of Pesach (Pesach VIII, or
+	// Pesach VII in Israel) and the last day of Shavuot (Shavuot II, or
+	// Shavuot in Israel). See YizkorEvent.
+	Yizkor bool
 	// Clock format for TimedEvent.Render(), the molad announcement and the
 	// Kiddush Levana memo. By default it follows the location's country (or
 	// Israel when IL is set and there is no location, else the United States):

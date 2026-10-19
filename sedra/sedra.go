@@ -291,9 +291,50 @@ type Parsha struct {
 	// Matot-Masei it would be {42, 43}
 	Num []int
 
-	// Chag is true if this is a regular parasha HaShavua Torah reading,
-	// false if it's a special holiday reading
+	// Chag is true if a holiday reading replaces the weekly parsha, in which
+	// case Name holds the one name of that reading (e.g. "Pesach Shabbat Chol
+	// ha-Moed") and Num is empty.
 	Chag bool
+}
+
+// chagReading names the holiday reading on a Shabbat that has no weekly
+// parsha.
+func chagReading(sat hdate.HDate, il bool) string {
+	d := sat.Day()
+	switch sat.Month() {
+	case hdate.Tishrei:
+		switch {
+		case d <= 2:
+			return "Rosh Hashana"
+		case d == 10:
+			return "Yom Kippur"
+		case d == 15 || d == 16:
+			return "Sukkot"
+		case d < 22:
+			return "Sukkot Shabbat Chol ha-Moed"
+		default:
+			return "Shmini Atzeret"
+		}
+	case hdate.Nisan:
+		switch {
+		case d == 15:
+			if il {
+				return "Pesach"
+			}
+			return "Pesach I"
+		case d == 16 && !il:
+			return "Pesach II"
+		case d < 21:
+			return "Pesach Shabbat Chol ha-Moed"
+		case d == 21:
+			return "Pesach VII"
+		default:
+			return "Pesach VIII"
+		}
+	case hdate.Sivan:
+		return "Shavuot"
+	}
+	return ""
 }
 
 // New constructs a Sedra for the entire Hebrew year.
@@ -346,7 +387,7 @@ func (s *Sedra) LookupByRD(rataDie int64) Parsha {
 	case idx >= 0:
 		return Parsha{Name: []string{parshiot[idx]}, Num: []int{idx + 1}, Chag: false}
 	case idx == -1:
-		return Parsha{Chag: true}
+		return Parsha{Name: []string{chagReading(hdate.FromRD(abs), s.IL)}, Chag: true}
 	default:
 		p1 := undoubled(idx)
 		p2 := p1 + 1

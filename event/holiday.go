@@ -57,6 +57,16 @@ func (ev HolidayEvent) Render(locale string) string {
 	return str
 }
 
+// RenderBrief returns the same as Render except for Yom Kippur Katan, which
+// drops the month it precedes ("Yom Kippur Katan Tevet" => "Yom Kippur Katan").
+func (ev HolidayEvent) RenderBrief(locale string) string {
+	if ev.Flags.Has(YOM_KIPPUR_KATAN) {
+		s, _ := locales.LookupTranslation("Yom Kippur Katan", locale)
+		return s
+	}
+	return ev.Render(locale)
+}
+
 func (ev HolidayEvent) GetFlags() HolidayFlags {
 	return ev.Flags
 }

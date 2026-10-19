@@ -71,6 +71,7 @@ Additional non-default event types can be specified:
   - Molad announcement on Saturday before Rosh Chodesh (opts.Molad)
   - Yom Kippur Katan (opts.YomKippurKatan)
   - BeHaB fast days (opts.BeHaB)
+  - Yizkor (opts.Yizkor; see YizkorEvent)
   - Latest time for Kiddush Levana, according to the Maharil
     (opts.KiddushLevanaMaharil, requires opts.Location; see KiddushLevanaEvent)
 
@@ -231,6 +232,9 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			if biurEv := makeBiurChametz(hd, opts); (biurEv != TimedEvent{}) {
 				events = append(events, biurEv)
 			}
+		}
+		if opts.Yizkor && isYizkorDay(hd, il) {
+			events = append(events, newYizkorEvent(hd, holidaysYear))
 		}
 		for _, userEv := range userEvents {
 			if abs == userEv.Date.Abs() {
@@ -542,6 +546,9 @@ func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 		if m.Has(event.KIDDUSH_LEVANA) {
 			opts.KiddushLevanaMaharil = true
 		}
+		if m.Has(event.YIZKOR) {
+			opts.Yizkor = true
+		}
 		return m
 	}
 	var mask event.HolidayFlags
@@ -603,6 +610,9 @@ func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 	}
 	if opts.KiddushLevanaMaharil {
 		mask |= event.KIDDUSH_LEVANA
+	}
+	if opts.Yizkor {
+		mask |= event.YIZKOR
 	}
 	return mask
 }

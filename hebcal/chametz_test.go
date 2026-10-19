@@ -76,3 +76,20 @@ func TestErevPesachChametzRequiresCandleLighting(t *testing.T) {
 		assert.NotContains(strings.ToLower(ev.Render("en")), "chametz")
 	}
 }
+
+// The chametz deadlines are not part of Erev Pesach the way a fast's start and
+// end belong to the fast, so they link to no event.
+func TestChametzNotLinked(t *testing.T) {
+	opts := &hebcal.CalOptions{Year: 2022, Location: zmanim.LookupCity("Chicago"), CandleLighting: true}
+	events, err := hebcal.HebrewCalendar(opts)
+	assert.NoError(t, err)
+	n := 0
+	for _, ev := range events {
+		if te, ok := ev.(hebcal.TimedEvent); ok &&
+			(te.Desc == "Finish eating chametz" || te.Desc == "Biur Chametz") {
+			assert.Nil(t, te.LinkedEvent, te.Desc)
+			n++
+		}
+	}
+	assert.Equal(t, 2, n)
+}

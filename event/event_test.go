@@ -24,8 +24,33 @@ func TestHebrewDateEvent(t *testing.T) {
 	assert.Equal(t, "3 Sivan 5781", ev.Basename())
 	assert.Equal(t, "3rd of Sivan, 5781", ev.Render("en"))
 	assert.Equal(t, "ג׳ סִיוָן תשפ״א", ev.Render("he"))
-	assert.Equal(t, "3 Sziván 5781", ev.Render("hu"))
+	assert.Equal(t, "3. Sziván, 5781", ev.Render("hu"))
+	assert.Equal(t, "3º Sivan, 5781", ev.Render("es"))
 	assert.Equal(t, "ג׳ סיון תשפ״א", ev.Render("he-x-NoNikud"))
+	assert.Equal(t, "3rd of Sivan", event.RenderBrief(ev, "en"))
+	assert.Equal(t, "ג׳ סִיוָן", event.RenderBrief(ev, "he"))
+	assert.Equal(t, "3. Сиван", event.RenderBrief(ev, "ru"))
+	// the first day of the year keeps its year
+	ev = event.NewHebrewDateEvent(hdate.New(5787, hdate.Tishrei, 1))
+	assert.Equal(t, "1st of Tishrei, 5787", event.RenderBrief(ev, "en"))
+	// typographic apostrophe, one-m Tamuz, catalog month names
+	assert.Equal(t, "1st of Sh’vat, 5786", event.NewHebrewDateEvent(hdate.New(5786, hdate.Shvat, 1)).Render("en"))
+	assert.Equal(t, "17th of Tamuz", event.RenderBrief(event.NewHebrewDateEvent(hdate.New(5786, hdate.Tamuz, 17)), "en"))
+	assert.Equal(t, "10th of Teves", event.RenderBrief(event.NewHebrewDateEvent(hdate.New(5786, hdate.Tevet, 10)), "ashkenazi"))
+}
+
+func TestRenderBrief(t *testing.T) {
+	ykk := event.HolidayEvent{Date: hdate.New(5786, hdate.Kislev, 29), Desc: "Yom Kippur Katan Tevet",
+		Flags: event.MINOR_FAST | event.YOM_KIPPUR_KATAN}
+	assert.Equal(t, "Yom Kippur Katan Tevet", ykk.Render("en"))
+	assert.Equal(t, "Yom Kippur Katan", event.RenderBrief(ykk, "en"))
+	assert.Equal(t, "יוֹם כִּפּוּר קָטָן", event.RenderBrief(ykk, "he"))
+	// an event with no brief form renders in full
+	purim := event.HolidayEvent{Date: hdate.New(5786, hdate.Adar1, 14), Desc: "Purim", Flags: event.MINOR_HOLIDAY}
+	assert.Equal(t, "Purim", event.RenderBrief(purim, "en"))
+	parsha := event.NewParshaEvent(hdate.New(5786, hdate.Cheshvan, 5),
+		sedra.Parsha{Name: []string{"Noach"}, Num: []int{2}}, false)
+	assert.Equal(t, "Parashat Noach", event.RenderBrief(parsha, "en"))
 }
 
 func TestParshaEvent_Render(t *testing.T) {
