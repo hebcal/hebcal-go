@@ -16,7 +16,7 @@ func TestSedra_Lookup(t *testing.T) {
 	assert := assert.New(t)
 	sedraYear := sedra.New(5749, false)
 	assert.Equal(
-		sedra.Parsha{Chag: true},
+		sedra.Parsha{Name: []string{"Sukkot Shabbat Chol ha-Moed"}, Chag: true},
 		sedraYear.Lookup(hdate.FromGregorian(1988, time.October, 1)))
 	assert.Equal(
 		sedra.Parsha{Name: []string{"Chayei Sara"}, Num: []int{5}, Chag: false},
@@ -51,7 +51,7 @@ func TestSedraAshkenazi(t *testing.T) {
 		"Vayeilech",
 		"Vayeilech",
 		"Ha'azinu",
-		"",
+		"Sukkos Shabbos Chol ha-Moed",
 		"Bereshis",
 		"Noach",
 		"Lech-Lecha",
@@ -80,14 +80,14 @@ func TestSedraAshkenazi(t *testing.T) {
 		"Shmini",
 		"Tazria",
 		"Metzora",
-		"",
+		"Pesach Shabbos Chol ha-Moed",
 		"Achrei Mos",
 		"Kedoshim",
 		"Emor",
 		"Behar",
 		"Bechukosai",
 		"Bamidbar",
-		"",
+		"Shavuos",
 		"Nasso",
 		"Beha’aloscha",
 		"Sh'lach",

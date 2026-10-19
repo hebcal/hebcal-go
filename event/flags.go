@@ -72,6 +72,9 @@ const (
 	BEHAB
 	// Latest time for Kiddush Levana, according to the Maharil
 	KIDDUSH_LEVANA
+	// Yizkor, the memorial prayer recited on Yom Kippur, Shmini Atzeret, the
+	// last day of Pesach and the last day of Shavuot
+	YIZKOR
 )
 
 // Has reports whether f contains every flag set in flags.
@@ -130,6 +133,7 @@ var flagNames = [...]string{
 	"DAILY_LEARNING",
 	"BEHAB",
 	"KIDDUSH_LEVANA",
+	"YIZKOR",
 }
 
 // String returns the names of the flags set in f joined by "|",

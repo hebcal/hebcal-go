@@ -37,6 +37,23 @@ type CalEvent interface {
 	GetCategories() []string
 }
 
+// BriefRenderer is implemented by events that have a shorter description than
+// Render's, for places with little room: a timed event without its time
+// ("Candle lighting"), a Hebrew date without its year ("15th of Cheshvan"),
+// "Omer day 22", or a daily-learning reading without its series name.
+type BriefRenderer interface {
+	RenderBrief(locale string) string
+}
+
+// RenderBrief returns ev's brief description if it has one, and Render's
+// otherwise.
+func RenderBrief(ev CalEvent, locale string) string {
+	if b, ok := ev.(BriefRenderer); ok {
+		return b.RenderBrief(locale)
+	}
+	return ev.Render(locale)
+}
+
 // flagToCategory maps an event flag to its category and sub-categories, in
 // priority order (the first matching flag wins). It mirrors the flagToCategory
 // table in @hebcal/core.
@@ -57,6 +74,7 @@ var flagToCategory = []struct {
 	{SHABBAT_MEVARCHIM, []string{"mevarchim"}},
 	{SPECIAL_SHABBAT, []string{"holiday", "shabbat"}},
 	{USER_EVENT, []string{"user"}},
+	{YIZKOR, []string{"yizkor"}},
 }
 
 // CategoriesFromFlags returns the category and sub-categories implied by an

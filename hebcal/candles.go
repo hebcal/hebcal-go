@@ -101,13 +101,19 @@ func (ev TimedEvent) GetDate() hdate.HDate {
 }
 
 func (ev TimedEvent) Render(locale string) string {
+	timeStr := formatTime(ev.EventTime, ev.opts)
+	return fmt.Sprintf("%s: %s", ev.RenderBrief(locale), timeStr)
+}
+
+// RenderBrief returns the translated description without its time, e.g.
+// "Candle lighting" or "Havdalah (50 min)".
+func (ev TimedEvent) RenderBrief(locale string) string {
 	desc, _ := locales.LookupTranslation(ev.Desc, locale)
 	if ev.Desc == "Havdalah" && ev.sunsetOffset != 0 {
 		minStr, _ := locales.LookupTranslation("min", locale)
 		desc = fmt.Sprintf("%s (%d %s)", desc, ev.sunsetOffset, minStr)
 	}
-	timeStr := formatTime(ev.EventTime, ev.opts)
-	return fmt.Sprintf("%s: %s", desc, timeStr)
+	return desc
 }
 
 func (ev TimedEvent) GetFlags() event.HolidayFlags {
@@ -313,7 +319,7 @@ func makeErevPesachChametz(ev event.CalEvent, opts *CalOptions) []event.CalEvent
 	if achilas.IsZero() {
 		return events
 	}
-	achilasEv := NewTimedEvent(hd, "Finish eating chametz", 0, achilas, 0, ev, opts)
+	achilasEv := NewTimedEvent(hd, "Finish eating chametz", 0, achilas, 0, nil, opts)
 	achilasEv.Emoji = "🍞"
 	events = append(events, achilasEv)
 	if hd.Weekday() != time.Saturday {
