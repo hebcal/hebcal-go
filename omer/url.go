@@ -9,7 +9,7 @@ import "fmt"
 // range return "" rather than a link that would 404.
 func (ev OmerEvent) URL() string {
 	hy := ev.Date.Year()
-	if hy < 5000 || hy > 6759 {
+	if hy < 5513 || hy > 6260 {
 		return ""
 	}
 	return fmt.Sprintf("https://www.hebcal.com/omer/%d/%d", hy, ev.OmerDay)
