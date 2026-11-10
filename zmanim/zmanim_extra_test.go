@@ -79,3 +79,57 @@ func TestExtraZmanimPolar(t *testing.T) {
 		t.Errorf("expected zero SofZmanShmaMGA16Point1 in polar summer, got %v", got)
 	}
 }
+
+// In a polar night nothing is computed from sunrise or sunset, and a time that
+// does not occur has to come back as the zero time -- not as an offset from it.
+// MinchaGedolaMGA and MinchaKetanaMGA once returned 0001-01-01T00:06 and 00:42.
+func TestPolarNightTimesAreZeroNotYearOne(t *testing.T) {
+	loc := zmanim.NewLocation("North Pole", "", 90, 0, 0, "UTC")
+	z := zmanim.New(&loc, time.Date(2026, time.November, 12, 12, 0, 0, 0, time.UTC))
+	times := map[string]func() time.Time{
+		"AlosBaalHatanya":          z.AlosBaalHatanya,
+		"AlotHaShachar":            z.AlotHaShachar,
+		"BeinHashmashos":           z.BeinHashmashos,
+		"Chatzot":                  z.Chatzot,
+		"ChatzotNight":             z.ChatzotNight,
+		"Dawn":                     z.Dawn,
+		"Dusk":                     z.Dusk,
+		"MinchaGedola":             z.MinchaGedola,
+		"MinchaGedolaBaalHatanya":  z.MinchaGedolaBaalHatanya,
+		"MinchaGedolaMGA":          z.MinchaGedolaMGA,
+		"MinchaKetana":             z.MinchaKetana,
+		"MinchaKetanaBaalHatanya":  z.MinchaKetanaBaalHatanya,
+		"MinchaKetanaMGA":          z.MinchaKetanaMGA,
+		"Misheyakir":               z.Misheyakir,
+		"MisheyakirMachmir":        z.MisheyakirMachmir,
+		"PlagHaMincha":             z.PlagHaMincha,
+		"PlagHaminchaBaalHatanya":  z.PlagHaminchaBaalHatanya,
+		"SeaLevelSunrise":          z.SeaLevelSunrise,
+		"SeaLevelSunset":           z.SeaLevelSunset,
+		"SofZmanAchilasChametz":    z.SofZmanAchilasChametz,
+		"SofZmanBiurChametz":       z.SofZmanBiurChametz,
+		"SofZmanShma":              z.SofZmanShma,
+		"SofZmanShmaBaalHatanya":   z.SofZmanShmaBaalHatanya,
+		"SofZmanShmaMGA":           z.SofZmanShmaMGA,
+		"SofZmanShmaMGA16Point1":   z.SofZmanShmaMGA16Point1,
+		"SofZmanShmaMGA19Point8":   z.SofZmanShmaMGA19Point8,
+		"SofZmanTfilaBaalHatanya":  z.SofZmanTfilaBaalHatanya,
+		"SofZmanTfilla":            z.SofZmanTfilla,
+		"SofZmanTfillaMGA":         z.SofZmanTfillaMGA,
+		"SofZmanTfillaMGA16Point1": z.SofZmanTfillaMGA16Point1,
+		"SofZmanTfillaMGA19Point8": z.SofZmanTfillaMGA19Point8,
+		"Sunrise":                  z.Sunrise,
+		"Sunset":                   z.Sunset,
+		"TzaisBaalHatanya":         z.TzaisBaalHatanya,
+		"Tzeit(8.5)":               func() time.Time { return z.Tzeit(8.5) },
+		"SunsetOffset(72)":         func() time.Time { return z.SunsetOffset(72, true) },
+	}
+	for name, fn := range times {
+		if got := fn(); !got.IsZero() && got.Year() < 2000 {
+			t.Errorf("%s = %v, want the zero time", name, got)
+		}
+	}
+	if !z.Sunrise().IsZero() {
+		t.Fatal("expected no sunrise at the North Pole in November")
+	}
+}
