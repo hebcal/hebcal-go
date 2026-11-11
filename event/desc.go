@@ -1,7 +1,5 @@
 package event
 
-import "strings"
-
 // Descer is implemented by events that can report their untranslated
 // description, the stable identifier @hebcal/core calls getDesc(): "Erev
 // Pesach", "Parashat Bereshit", "Omer 7", "29 Elul 5786", "Molad Cheshvan
@@ -57,7 +55,7 @@ func (ev HolidayEvent) Memo(locale string) string {
 		return ""
 	}
 	return "Minor Day of Atonement on the day preceeding Rosh Chodesh " +
-		strings.ReplaceAll(ev.Desc[len(yomKippurKatanPrefix):], "'", "’")
+		SmartApostrophe(ev.Desc[len(yomKippurKatanPrefix):])
 }
 
 const yomKippurKatanPrefix = "Yom Kippur Katan "

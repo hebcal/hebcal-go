@@ -31,7 +31,7 @@ func (ev HolidayEvent) GetDate() hdate.HDate {
 // except Hebrew, which writes it in gematriya ("רֹאשׁ הַשָּׁנָה תשפ״ז"). This
 // deliberately differs from @hebcal/core, which writes a number in Hebrew too.
 func (ev HolidayEvent) Render(locale string) string {
-	return smartApostrophe(ev.render(locale))
+	return SmartApostrophe(ev.render(locale))
 }
 
 func (ev HolidayEvent) render(locale string) string {
@@ -72,7 +72,7 @@ func (ev HolidayEvent) render(locale string) string {
 func (ev HolidayEvent) RenderBrief(locale string) string {
 	if ev.Flags.Has(YOM_KIPPUR_KATAN) {
 		s, _ := locales.LookupTranslation("Yom Kippur Katan", locale)
-		return smartApostrophe(s)
+		return SmartApostrophe(s)
 	}
 	return ev.Render(locale)
 }

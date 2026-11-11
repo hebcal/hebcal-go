@@ -55,7 +55,7 @@ func renderHebrewDate(hd hdate.HDate, locale string, showYear bool) string {
 	default:
 		nth = strconv.Itoa(day) + "."
 	}
-	s := nth + of + " " + strings.ReplaceAll(month, "'", "’")
+	s := nth + of + " " + SmartApostrophe(month)
 	if showYear {
 		s += ", " + strconv.Itoa(hd.Year())
 	}
