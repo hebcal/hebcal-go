@@ -310,9 +310,9 @@ func TestGetHolidaysForYearArrayDiasporaAshkenazi(t *testing.T) {
 		"2010-12-08 Chanukah: 8 Candles",
 		"2010-12-09 Chanukah: 8th Day",
 		"2010-12-17 Asara B’Teves",
-		"2011-01-01 Shabbos Mevorchim Chodesh Sh'vat",
-		"2011-01-05 Yom Kippur Katan Sh'vat",
-		"2011-01-06 Rosh Chodesh Sh'vat",
+		"2011-01-01 Shabbos Mevorchim Chodesh Sh’vat",
+		"2011-01-05 Yom Kippur Katan Sh’vat",
+		"2011-01-06 Rosh Chodesh Sh’vat",
 		"2011-01-15 Shabbos Shirah",
 		"2011-01-20 Tu BiShvat",
 		"2011-01-29 Shabbos Mevorchim Chodesh Adar I",
@@ -341,10 +341,10 @@ func TestGetHolidaysForYearArrayDiasporaAshkenazi(t *testing.T) {
 		"2011-04-18 Erev Pesach",
 		"2011-04-19 Pesach I",
 		"2011-04-20 Pesach II",
-		"2011-04-21 Pesach III (CH''M)",
-		"2011-04-22 Pesach IV (CH''M)",
-		"2011-04-23 Pesach V (CH''M)",
-		"2011-04-24 Pesach VI (CH''M)",
+		"2011-04-21 Pesach III (CH’’M)",
+		"2011-04-22 Pesach IV (CH’’M)",
+		"2011-04-23 Pesach V (CH’’M)",
+		"2011-04-24 Pesach VI (CH’’M)",
 		"2011-04-25 Pesach VII",
 		"2011-04-26 Pesach VIII",
 		"2011-04-30 Shabbos Mevorchim Chodesh Iyyar",
@@ -353,7 +353,7 @@ func TestGetHolidaysForYearArrayDiasporaAshkenazi(t *testing.T) {
 		"2011-05-05 Rosh Chodesh Iyyar",
 		"2011-05-09 Ta’anis BeHaB",
 		"2011-05-09 Yom HaZikaron",
-		"2011-05-10 Yom HaAtzma'ut",
+		"2011-05-10 Yom HaAtzma’ut",
 		"2011-05-12 Ta’anis BeHaB",
 		"2011-05-16 Ta’anis BeHaB",
 		"2011-05-18 Pesach Sheni",
@@ -374,10 +374,10 @@ func TestGetHolidaysForYearArrayDiasporaAshkenazi(t *testing.T) {
 		"2011-07-31 Yom Kippur Katan Av",
 		"2011-08-01 Rosh Chodesh Av",
 		"2011-08-06 Shabbos Chazon",
-		"2011-08-08 Erev Tish'a B'Av",
-		"2011-08-09 Tish'a B'Av",
+		"2011-08-08 Erev Tish’a B’Av",
+		"2011-08-09 Tish’a B’Av",
 		"2011-08-13 Shabbos Nachamu",
-		"2011-08-15 Tu B'Av",
+		"2011-08-15 Tu B’Av",
 		"2011-08-27 Shabbos Mevorchim Chodesh Elul",
 		"2011-08-29 Yom Kippur Katan Elul",
 		"2011-08-30 Rosh Chodesh Elul",
@@ -681,7 +681,7 @@ func TestBeHaB(t *testing.T) {
 	events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{Year: 5784, IsHebrewYear: true})
 	assert.NoError(err)
 	for _, ev := range events {
-		assert.NotEqual("Ta'anit BeHaB", ev.Render("en"))
+		assert.NotEqual("Ta’anit BeHaB", ev.Render("en"))
 	}
 
 	check := func(opts *hebcal.CalOptions, want []string) {
@@ -697,21 +697,21 @@ func TestBeHaB(t *testing.T) {
 		assert.Equal(want, got)
 	}
 	want5784 := []string{
-		"2023-10-23 Ta'anit BeHaB",
-		"2023-10-26 Ta'anit BeHaB",
-		"2023-10-30 Ta'anit BeHaB",
-		"2024-05-13 Ta'anit BeHaB",
-		"2024-05-16 Ta'anit BeHaB",
-		"2024-05-20 Ta'anit BeHaB",
+		"2023-10-23 Ta’anit BeHaB",
+		"2023-10-26 Ta’anit BeHaB",
+		"2023-10-30 Ta’anit BeHaB",
+		"2024-05-13 Ta’anit BeHaB",
+		"2024-05-16 Ta’anit BeHaB",
+		"2024-05-20 Ta’anit BeHaB",
 	}
 	check(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5784, IsHebrewYear: true}, want5784)
 	check(&hebcal.CalOptions{Mask: event.BEHAB, Year: 5784, IsHebrewYear: true}, want5784)
 	// Pesach Sheni (14 Iyyar) is skipped
 	check(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5785, IsHebrewYear: true,
 		Start: hdate.New(5785, hdate.Iyyar, 1), End: hdate.New(5785, hdate.Iyyar, 29)}, []string{
-		"2025-05-05 Ta'anit BeHaB",
-		"2025-05-08 Ta'anit BeHaB",
-		"2025-05-15 Ta'anit BeHaB",
+		"2025-05-05 Ta’anit BeHaB",
+		"2025-05-08 Ta’anit BeHaB",
+		"2025-05-15 Ta’anit BeHaB",
 	})
 	events, _ = hebcal.HebrewCalendar(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5784, IsHebrewYear: true})
 	assert.Equal("תַּעֲנִית בה״ב", events[0].Render("he"))

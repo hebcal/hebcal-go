@@ -42,8 +42,8 @@ func TestCandleParshaLink(t *testing.T) {
 		if te.LinkedEvent == nil {
 			t.Fatal("Candle lighting has no LinkedEvent")
 		}
-		if got := te.LinkedEvent.Render("en"); got != "Parashat Sh'lach" {
-			t.Errorf("candle LinkedEvent.Render = %q, want Parashat Sh'lach", got)
+		if got := te.LinkedEvent.Render("en"); got != "Parashat Sh’lach" {
+			t.Errorf("candle LinkedEvent.Render = %q, want Parashat Sh’lach", got)
 		}
 	}
 	if !found {

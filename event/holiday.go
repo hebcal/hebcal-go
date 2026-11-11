@@ -24,7 +24,17 @@ func (ev HolidayEvent) GetDate() hdate.HDate {
 	return ev.Date
 }
 
+// Render returns the translated description, with typographic apostrophes
+// ("Rosh Chodesh Sh’vat", "Sukkot III (CH’’M)").
+//
+// Rosh Hashana carries the Hebrew year, written as a number in every locale
+// except Hebrew, which writes it in gematriya ("רֹאשׁ הַשָּׁנָה תשפ״ז"). This
+// deliberately differs from @hebcal/core, which writes a number in Hebrew too.
 func (ev HolidayEvent) Render(locale string) string {
+	return smartApostrophe(ev.render(locale))
+}
+
+func (ev HolidayEvent) render(locale string) string {
 	switch {
 	case ev.Flags.Has(ROSH_CHODESH):
 		rchStr, _ := locales.LookupTranslation("Rosh Chodesh", locale)
@@ -62,7 +72,7 @@ func (ev HolidayEvent) Render(locale string) string {
 func (ev HolidayEvent) RenderBrief(locale string) string {
 	if ev.Flags.Has(YOM_KIPPUR_KATAN) {
 		s, _ := locales.LookupTranslation("Yom Kippur Katan", locale)
-		return s
+		return smartApostrophe(s)
 	}
 	return ev.Render(locale)
 }

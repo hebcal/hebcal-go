@@ -9,12 +9,14 @@ import (
 	"github.com/hebcal/locales"
 )
 
-type moladEvent struct {
-	Date        hdate.HDate
-	Molad       molad.Molad
-	MonthName   string
-	CountryCode string // used to pick a 12- or 24-hour clock for the announcement
-	Hour12      *bool  // overrides CountryCode when non-nil; see ReformatTimeStr
+// MoladEvent is the announcement of the molad (new moon) of the coming Hebrew
+// month, made on the Shabbat before Rosh Chodesh.
+type MoladEvent struct {
+	Date        hdate.HDate // the Shabbat on which the molad is announced
+	Molad       molad.Molad // the molad of the coming month
+	MonthName   string      // untranslated name of the coming month
+	CountryCode string      // used to pick a 12- or 24-hour clock for the announcement
+	Hour12      *bool       // overrides CountryCode when non-nil; see ReformatTimeStr
 }
 
 // NewMoladEvent constructs a molad announcement event. countryCode selects the
@@ -22,7 +24,7 @@ type moladEvent struct {
 // United States and other 12-hour countries, 24-hour elsewhere); pass "" for
 // the default (12-hour), matching @hebcal/core.
 func NewMoladEvent(date hdate.HDate, m molad.Molad, monthName string, countryCode string) CalEvent {
-	return moladEvent{
+	return MoladEvent{
 		Date:        date,
 		Molad:       m,
 		MonthName:   monthName,
@@ -34,7 +36,7 @@ func NewMoladEvent(date hdate.HDate, m molad.Molad, monthName string, countryCod
 // the country's clock convention: true always renders 12-hour time with an
 // am/pm suffix, false always renders 24-hour time.
 func NewMoladEventHour12(date hdate.HDate, m molad.Molad, monthName string, countryCode string, hour12 *bool) CalEvent {
-	return moladEvent{
+	return MoladEvent{
 		Date:        date,
 		Molad:       m,
 		MonthName:   monthName,
@@ -49,7 +51,7 @@ func smartApostrophe(s string) string {
 	return strings.ReplaceAll(s, "'", "’")
 }
 
-func (ev moladEvent) GetDate() hdate.HDate {
+func (ev MoladEvent) GetDate() hdate.HDate {
 	return ev.Date
 }
 
@@ -57,62 +59,94 @@ var heDayNames = []string{
 	"רִאשׁוֹן", "שֵׁנִי", "שְׁלִישִׁי", "רְבִיעִי", "חֲמִישִׁי", "שִׁישִּׁי", "שַׁבָּת",
 }
 
+var frDayNames = []string{
+	"Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi",
+}
+
 const night = "בַּלַּ֥יְלָה"
 const morning = "בַּבֹּקֶר"
 const afternoon = "בַּצׇּהֳרַיִים"
 const evening = "בָּעֶרֶב"
 
-func (ev moladEvent) Render(locale string) string {
-	monthStr, _ := locales.LookupTranslation(ev.MonthName, locale)
+func gettext(key, locale string) string {
+	s, _ := locales.LookupTranslation(key, locale)
+	return s
+}
+
+// Render returns the announcement, e.g. "Molad Cheshvan: Sunday, 9:43am and 2
+// chalakim", or the Hebrew sentence "מוֹלָד הָלְּבָנָה חֶשְׁוָן יִהְיֶה בַּיּוֹם
+// רִאשׁוֹן בשָׁבוּעַ, …".
+func (ev MoladEvent) Render(locale string) string {
+	return RenderMolad(ev.Molad, ev.MonthName, locale, ev.CountryCode, ev.Hour12)
+}
+
+// RenderMolad renders the announcement of molad m of the month monthName
+// (untranslated) in locale. In non-Hebrew locales the time is 12- or 24-hour
+// as countryCode and hour12 choose (see ReformatTimeStr); the weekday is
+// French for "fr" and English otherwise, as in @hebcal/core.
+func RenderMolad(m molad.Molad, monthName, locale, countryCode string, hour12 *bool) string {
+	monthStr := gettext(monthName, locale)
+	moladStr := gettext("Molad", locale)
+	chalakimStr := gettext("chalakim", locale)
 	locale = strings.ToLower(locale)
 	if locale == "he" || locale == "he-x-nonikud" {
-		dow := heDayNames[ev.Molad.Date.Weekday()]
+		dow := heDayNames[m.Date.Weekday()]
 		var ampm string
-		if ev.Molad.Hours < 5 {
+		if m.Hours < 5 {
 			ampm = night
-		} else if ev.Molad.Hours < 12 {
+		} else if m.Hours < 12 {
 			ampm = morning
-		} else if ev.Molad.Hours < 17 {
+		} else if m.Hours < 17 {
 			ampm = afternoon
-		} else if ev.Molad.Hours < 21 {
+		} else if m.Hours < 21 {
 			ampm = evening
 		} else {
 			ampm = night
 		}
-		str := fmt.Sprintf("מוֹלָד הָלְּבָנָה %s יִהְיֶה בַּיּוֹם %s בשָׁבוּעַ, "+
-			"בְּשָׁעָה %d %s, ו-%d דַּקּוֹת",
-			monthStr, dow,
-			ev.Molad.Hours, ampm, ev.Molad.Minutes)
-		if ev.Molad.Chalakim != 0 {
-			str += fmt.Sprintf(" ו-%d חֲלָקִים", ev.Molad.Chalakim)
+		str := fmt.Sprintf("%s %s יִהְיֶה בַּיּוֹם %s בשָׁבוּעַ, "+
+			"בְּשָׁעָה %d %s, ו-%d %s",
+			moladStr, monthStr, dow,
+			m.Hours, ampm, m.Minutes, gettext("min", locale))
+		if m.Chalakim != 0 {
+			str += fmt.Sprintf(" ו-%d %s", m.Chalakim, chalakimStr)
 		}
 		if locale == "he-x-nonikud" {
 			str = locales.HebrewStripNikkud(str)
 		}
 		return str
 	}
-	month := smartApostrophe(monthStr)
-	dow := ev.Molad.Date.Weekday().String()
-	timeStr := ReformatTimeStr(fmt.Sprintf("%d:%02d", ev.Molad.Hours, ev.Molad.Minutes), "pm", ev.CountryCode, ev.Hour12)
-	result := fmt.Sprintf("Molad %s: %s, %s", month, dow, timeStr)
-	if ev.Molad.Chalakim != 0 {
-		result += fmt.Sprintf(" and %d chalakim", ev.Molad.Chalakim)
+	dow := m.Date.Weekday().String()
+	if locale == "fr" {
+		dow = frDayNames[m.Date.Weekday()]
+	}
+	timeStr := ReformatTimeStr(fmt.Sprintf("%d:%02d", m.Hours, m.Minutes), "pm", countryCode, hour12)
+	result := fmt.Sprintf("%s %s: %s, %s", moladStr, smartApostrophe(monthStr), dow, timeStr)
+	if m.Chalakim != 0 {
+		result += fmt.Sprintf(" %s %d %s", gettext("and", locale), m.Chalakim, chalakimStr)
 	}
 	return result
 }
 
-func (ev moladEvent) GetFlags() HolidayFlags {
+func (ev MoladEvent) GetFlags() HolidayFlags {
 	return MOLAD
 }
 
-func (ev moladEvent) GetEmoji() string {
+func (ev MoladEvent) GetEmoji() string {
 	return ""
 }
 
-func (ev moladEvent) Basename() string {
-	return "Molad " + ev.MonthName
+// Basename returns the untranslated description with the Hebrew year, e.g.
+// "Molad Cheshvan 5787".
+func (ev MoladEvent) Basename() string {
+	return ev.GetDesc()
 }
 
-func (ev moladEvent) GetCategories() []string {
+// GetDesc returns the untranslated description with the Hebrew year, e.g.
+// "Molad Cheshvan 5787".
+func (ev MoladEvent) GetDesc() string {
+	return fmt.Sprintf("Molad %s %d", ev.MonthName, ev.Date.Year())
+}
+
+func (ev MoladEvent) GetCategories() []string {
 	return CategoriesFromFlags(ev.GetFlags())
 }

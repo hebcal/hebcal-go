@@ -76,6 +76,7 @@ func (ev YizkorEvent) Render(locale string) string {
 func (ev YizkorEvent) GetFlags() event.HolidayFlags { return event.YIZKOR }
 func (ev YizkorEvent) GetEmoji() string             { return "🕯️" }
 func (ev YizkorEvent) Basename() string             { return "Yizkor" }
+func (ev YizkorEvent) GetDesc() string              { return "Yizkor" }
 
 // GetCategories returns ["yizkor"].
 func (ev YizkorEvent) GetCategories() []string { return event.CategoriesFromFlags(event.YIZKOR) }
