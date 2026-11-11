@@ -237,3 +237,9 @@ func TestParshaEvent_Extra(t *testing.T) {
 	assert.Equal(t, "Noach", ev.Basename())
 	assert.Equal(t, []string{"parashat"}, ev.GetCategories())
 }
+
+func TestSmartApostrophe(t *testing.T) {
+	assert.Equal(t, "Sh’vat", event.SmartApostrophe("Sh'vat"))
+	assert.Equal(t, "Tish’a B’Av", event.SmartApostrophe("Tish'a B'Av"))
+	assert.Equal(t, "Sivan", event.SmartApostrophe("Sivan"))
+}

@@ -45,12 +45,6 @@ func NewMoladEventHour12(date hdate.HDate, m molad.Molad, monthName string, coun
 	}
 }
 
-// smartApostrophe converts a straight apostrophe to a typographic one (e.g.
-// "Sh'vat" => "Sh’vat"), matching @hebcal/core.
-func smartApostrophe(s string) string {
-	return strings.ReplaceAll(s, "'", "’")
-}
-
 func (ev MoladEvent) GetDate() hdate.HDate {
 	return ev.Date
 }
@@ -120,7 +114,7 @@ func RenderMolad(m molad.Molad, monthName, locale, countryCode string, hour12 *b
 		dow = frDayNames[m.Date.Weekday()]
 	}
 	timeStr := ReformatTimeStr(fmt.Sprintf("%d:%02d", m.Hours, m.Minutes), "pm", countryCode, hour12)
-	result := fmt.Sprintf("%s %s: %s, %s", moladStr, smartApostrophe(monthStr), dow, timeStr)
+	result := fmt.Sprintf("%s %s: %s, %s", moladStr, SmartApostrophe(monthStr), dow, timeStr)
 	if m.Chalakim != 0 {
 		result += fmt.Sprintf(" %s %d %s", gettext("and", locale), m.Chalakim, chalakimStr)
 	}

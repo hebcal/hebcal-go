@@ -56,7 +56,7 @@ func (ev MevarchimChodeshEvent) Basename() string {
 func (ev MevarchimChodeshEvent) Render(locale string) string {
 	prefix, _ := locales.LookupTranslation(mevarchimChodeshPrefix, locale)
 	month, _ := locales.LookupTranslation(ev.MonthName, locale)
-	return smartApostrophe(prefix + " " + month)
+	return SmartApostrophe(prefix + " " + month)
 }
 
 // Memo returns the announcement of the molad, e.g. "Molad Sivan: Friday,

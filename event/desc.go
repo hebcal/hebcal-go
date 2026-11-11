@@ -47,13 +47,15 @@ func (ev MevarchimChodeshEvent) GetDesc() string { return ev.Basename() }
 func (ev parshaEvent) GetDesc() string { return "Parashat " + ev.Basename() }
 
 // Memo returns the meaning of Yom Kippur Katan, untranslated, e.g. "Minor Day
-// of Atonement on the day preceeding Rosh Chodesh Sivan" (sic). Other
-// holidays have no memo of their own.
+// of Atonement on the day preceeding Rosh Chodesh Sivan" (sic). The month
+// name carries a typographic apostrophe, as in a rendered title ("Sh’vat").
+// Other holidays have no memo of their own.
 func (ev HolidayEvent) Memo(locale string) string {
 	if !ev.Flags.Has(YOM_KIPPUR_KATAN) || len(ev.Desc) <= len(yomKippurKatanPrefix) {
 		return ""
 	}
-	return "Minor Day of Atonement on the day preceeding Rosh Chodesh " + ev.Desc[len(yomKippurKatanPrefix):]
+	return "Minor Day of Atonement on the day preceeding Rosh Chodesh " +
+		SmartApostrophe(ev.Desc[len(yomKippurKatanPrefix):])
 }
 
 const yomKippurKatanPrefix = "Yom Kippur Katan "
