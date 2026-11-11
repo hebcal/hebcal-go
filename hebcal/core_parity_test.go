@@ -161,3 +161,17 @@ func TestDescAndBasename(t *testing.T) {
 		assert.Equal(t, "Molad Kislev 5787", event.Desc(m[0]))
 	}
 }
+
+func TestYomKippurKatanMemoSmartApostrophe(t *testing.T) {
+	evs, err := hebcal.HebrewCalendar(&hebcal.CalOptions{
+		Start:          hdate.New(5786, hdate.Tevet, 1),
+		End:            hdate.New(5786, hdate.Shvat, 30),
+		YomKippurKatan: true,
+		NoHolidays:     true,
+	})
+	assert.NoError(t, err)
+	ykk := find(evs, "Yom Kippur Katan Sh'vat")
+	if assert.NotNil(t, ykk) {
+		assert.Equal(t, "Minor Day of Atonement on the day preceeding Rosh Chodesh Sh’vat", event.Memo(ykk, "en"))
+	}
+}
