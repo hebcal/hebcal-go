@@ -13,7 +13,7 @@ There is no Makefile. Standard Go tooling:
 - Coverage: `go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out`
 - Vet / format check: `go vet ./...` and `gofmt -l .` (CI-adjacent hygiene; keep `gofmt -l .` empty)
 
-CI (`.github/workflows/go.yml`) builds and tests on Go 1.17; `go.mod` declares Go 1.18. CodeQL runs on push/PR to `main`.
+CI (`.github/workflows/go.yml`) builds and tests with the Go version `go.mod` declares (`go-version-file`), currently 1.18 -- keep code buildable on that version. CodeQL runs on push/PR to `main`.
 
 ## Architecture
 
