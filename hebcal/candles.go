@@ -213,6 +213,7 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEv
 			return timedEv // no sunset
 		}
 		timedEv.Desc = ev.Desc
+		timedEv.Emoji = ev.Emoji
 		timedEv.ChanukahDay = ev.ChanukahDay
 		return timedEv
 	}

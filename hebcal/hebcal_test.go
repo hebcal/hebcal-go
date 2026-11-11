@@ -642,3 +642,53 @@ func TestHebrewCalendarInfile(t *testing.T) {
 		"1967-10-05 Ben Ploni",
 	})
 }
+
+func TestShabbatMevarchimWithNoHolidays(t *testing.T) {
+	opts := &hebcal.CalOptions{
+		Start:            hdate.New(5787, hdate.Tishrei, 1),
+		End:              hdate.New(5787, hdate.Kislev, 30),
+		NoHolidays:       true,
+		ShabbatMevarchim: true,
+	}
+	events, err := hebcal.HebrewCalendar(opts)
+	assert.NoError(t, err)
+	var actual []string
+	for _, ev := range events {
+		actual = append(actual, hd2iso(ev.GetDate())+" "+ev.Render("en"))
+		_, ok := ev.(event.MevarchimChodeshEvent)
+		assert.True(t, ok, "%T", ev)
+	}
+	assert.Equal(t, []string{
+		"2026-10-10 Shabbat Mevarchim Chodesh Cheshvan",
+		"2026-11-07 Shabbat Mevarchim Chodesh Kislev",
+		"2026-12-05 Shabbat Mevarchim Chodesh Tevet",
+	}, actual)
+}
+
+func TestChanukahEmojiKeycap(t *testing.T) {
+	opts := &hebcal.CalOptions{
+		Start:          hdate.New(5783, hdate.Kislev, 24),
+		End:            hdate.New(5783, hdate.Tevet, 3),
+		CandleLighting: true,
+		Location:       zmanim.LookupCity("Jerusalem"),
+	}
+	events, err := hebcal.HebrewCalendar(opts)
+	assert.NoError(t, err)
+	actual := map[string]string{}
+	for _, ev := range events {
+		if ev.GetFlags().Has(event.CHANUKAH_CANDLES) || ev.Render("en") == "Chanukah: 8th Day" {
+			actual[ev.Render("en")] = ev.GetEmoji()
+		}
+	}
+	assert.Equal(t, map[string]string{
+		"Chanukah: 1 Candle: 16:57":  "🕎1️⃣",
+		"Chanukah: 2 Candles: 16:57": "🕎2️⃣",
+		"Chanukah: 3 Candles: 16:57": "🕎3️⃣",
+		"Chanukah: 4 Candles: 16:58": "🕎4️⃣",
+		"Chanukah: 5 Candles: 16:58": "🕎5️⃣",
+		"Chanukah: 6 Candles: 16:00": "🕎6️⃣", // Friday
+		"Chanukah: 7 Candles: 17:21": "🕎7️⃣", // Saturday
+		"Chanukah: 8 Candles: 17:00": "🕎8️⃣",
+		"Chanukah: 8th Day":          "🕎",
+	}, actual)
+}

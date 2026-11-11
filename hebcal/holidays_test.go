@@ -553,9 +553,9 @@ func TestPurimMeshulash(t *testing.T) {
 func TestHolidayEmoji(t *testing.T) {
 	expectedEmoji := map[string]string{
 		"Asara B'Tevet":                   "✡️",
-		"Chanukah: 1 Candle":              "🕎",
-		"Chanukah: 3 Candles":             "🕎",
-		"Chanukah: 8 Candles":             "🕎",
+		"Chanukah: 1 Candle":              "🕎1️⃣",
+		"Chanukah: 3 Candles":             "🕎3️⃣",
+		"Chanukah: 8 Candles":             "🕎8️⃣",
 		"Chanukah: 8th Day":               "🕎",
 		"Lag BaOmer":                      "🔥",
 		"Leil Selichot":                   "🕍",

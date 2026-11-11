@@ -38,6 +38,13 @@ type holiday struct {
 }
 
 const chanukahEmoji = "🕎"
+
+// chanukahCandlesEmoji is the menorah followed by the night's candle count
+// as a keycap digit ("🕎3️⃣"), the emoji of each night of Chanukah.
+func chanukahCandlesEmoji(candles int) string {
+	return chanukahEmoji + strconv.Itoa(candles) + "\uFE0F\u20E3"
+}
+
 const sukkotEmoji = "🌿🍋"
 
 var staticHolidays = []holiday{
@@ -109,7 +116,7 @@ var staticHolidays = []holiday{
 		emoji: sukkotEmoji},
 	{mm: hdate.Kislev, dd: 24, desc: "Chanukah: 1 Candle",
 		flags: event.EREV | event.MINOR_HOLIDAY | event.CHANUKAH_CANDLES,
-		emoji: chanukahEmoji},
+		emoji: chanukahEmoji + "1\uFE0F\u20E3"},
 	{mm: hdate.Tevet, dd: 10, desc: "Asara B'Tevet",
 		flags: event.MINOR_FAST},
 	{mm: hdate.Shvat, dd: 15, desc: "Tu BiShvat",
@@ -471,7 +478,7 @@ func getAllHolidaysForYear(year int) []event.HolidayEvent {
 			Date:        hdate.New(year, hdate.Kislev, 23+candles),
 			Desc:        "Chanukah: " + strconv.Itoa(candles) + " Candles",
 			Flags:       event.MINOR_HOLIDAY | event.CHANUKAH_CANDLES,
-			Emoji:       chanukahEmoji,
+			Emoji:       chanukahCandlesEmoji(candles),
 			ChanukahDay: candles - 1})
 	}
 	chanukah8 := chanukah7.Next()
@@ -480,13 +487,13 @@ func getAllHolidaysForYear(year int) []event.HolidayEvent {
 			Date:        chanukah7,
 			Desc:        "Chanukah: 7 Candles",
 			Flags:       event.MINOR_HOLIDAY | event.CHANUKAH_CANDLES,
-			Emoji:       chanukahEmoji,
+			Emoji:       chanukahCandlesEmoji(7),
 			ChanukahDay: 6},
 		event.HolidayEvent{
 			Date:        chanukah8,
 			Desc:        "Chanukah: 8 Candles",
 			Flags:       event.MINOR_HOLIDAY | event.CHANUKAH_CANDLES,
-			Emoji:       chanukahEmoji,
+			Emoji:       chanukahCandlesEmoji(8),
 			ChanukahDay: 7},
 		event.HolidayEvent{
 			Date:        chanukah8.Next(),

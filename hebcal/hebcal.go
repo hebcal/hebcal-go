@@ -704,15 +704,19 @@ func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev e
 				candlesEv = makeCandleEvent(hd, opts, ev)
 			}
 		}
-		if mask.Has(event.SHABBAT_MEVARCHIM) && !opts.NoHolidays {
+		isMevarchim := mask.Has(event.SHABBAT_MEVARCHIM)
+		if isMevarchim {
 			// Upgrade the bare holiday event to a MevarchimChodeshEvent that
 			// carries the molad of the upcoming month.
 			if he, ok := ev.(event.HolidayEvent); ok {
 				ev = makeMevarchimEvent(he)
 			}
 		}
+		// Yom Kippur Katan, BeHaB and Shabbat Mevarchim are opt-in streams of
+		// their own, emitted whenever requested even with NoHolidays.
 		if (opts.YomKippurKatan && mask.Has(event.YOM_KIPPUR_KATAN)) ||
-			(opts.BeHaB && mask.Has(event.BEHAB)) {
+			(opts.BeHaB && mask.Has(event.BEHAB)) ||
+			(opts.ShabbatMevarchim && isMevarchim) {
 			events = append(events, ev)
 		} else if !opts.NoHolidays {
 			events = append(events, ev)
