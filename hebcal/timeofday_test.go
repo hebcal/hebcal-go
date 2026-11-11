@@ -58,7 +58,7 @@ func TestTimeOfDayErevAfterLearning(t *testing.T) {
 func TestTimeOfDayErevPesach(t *testing.T) {
 	assert.Equal(t, []string{
 		"Fast begins: 5:12am",
-		"Ta'anit Bechorot",
+		"Ta’anit Bechorot",
 		"Finish eating chametz: 11:07am",
 		"Biur Chametz: 12:13pm",
 		"Daily learning",
@@ -81,7 +81,7 @@ func TestTimeOfDayErevTishaBav(t *testing.T) {
 		"Parashat Devarim",
 		"Shabbat Chazon",
 		"Daily learning",
-		"Erev Tish'a B'Av",
+		"Erev Tish’a B’Av",
 		"Fast begins: 8:34pm",
 		"Havdalah (42 min): 9:16pm",
 	}, renderDayByTimeOfDay(t, 2022, time.August, 6))

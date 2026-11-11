@@ -18,9 +18,11 @@ const mevarchimChodeshPrefix = "Shabbat Mevarchim Chodesh"
 // as an announcement (the time-of-day format is locale/location dependent, so
 // it is intentionally not baked into a single string here).
 type MevarchimChodeshEvent struct {
-	Date      hdate.HDate // the Shabbat on which the month is blessed
-	MonthName string      // untranslated English name of the upcoming month
-	Molad     molad.Molad // molad of the upcoming month
+	Date        hdate.HDate // the Shabbat on which the month is blessed
+	MonthName   string      // untranslated English name of the upcoming month
+	Molad       molad.Molad // molad of the upcoming month
+	CountryCode string      // picks the memo's 12- or 24-hour clock; see ReformatTimeStr
+	Hour12      *bool       // overrides CountryCode when non-nil
 }
 
 // NewMevarchimChodeshEvent constructs a MevarchimChodeshEvent for the given
@@ -54,7 +56,13 @@ func (ev MevarchimChodeshEvent) Basename() string {
 func (ev MevarchimChodeshEvent) Render(locale string) string {
 	prefix, _ := locales.LookupTranslation(mevarchimChodeshPrefix, locale)
 	month, _ := locales.LookupTranslation(ev.MonthName, locale)
-	return prefix + " " + month
+	return smartApostrophe(prefix + " " + month)
+}
+
+// Memo returns the announcement of the molad, e.g. "Molad Sivan: Friday,
+// 2:16pm and 5 chalakim" (see RenderMolad).
+func (ev MevarchimChodeshEvent) Memo(locale string) string {
+	return RenderMolad(ev.Molad, ev.MonthName, locale, ev.CountryCode, ev.Hour12)
 }
 
 // RenderBrief returns the title without the leading "Shabbat" word, e.g.

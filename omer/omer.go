@@ -103,8 +103,14 @@ func (ev OmerEvent) GetEmoji() string {
 	return string(r)
 }
 
+// Basename returns the untranslated description, e.g. "Omer 22".
 func (ev OmerEvent) Basename() string {
-	return "Omer"
+	return ev.GetDesc()
+}
+
+// GetDesc returns the untranslated description, e.g. "Omer 22".
+func (ev OmerEvent) GetDesc() string {
+	return "Omer " + strconv.Itoa(ev.OmerDay)
 }
 
 func (ev OmerEvent) GetCategories() []string {

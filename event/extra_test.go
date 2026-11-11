@@ -81,7 +81,7 @@ func TestHolidayEvent_Extra(t *testing.T) {
 		Desc:  "Rosh Chodesh Sh'vat",
 		Flags: event.ROSH_CHODESH,
 	}
-	assert.Equal(t, "Rosh Chodesh Sh'vat", evRoshChodesh.Render("en"))
+	assert.Equal(t, "Rosh Chodesh Sh’vat", evRoshChodesh.Render("en"))
 	assert.Equal(t, "ראש חודש שבט", evRoshChodesh.Render("he-x-nonikud"))
 
 	// Test Render for Shabbat Mevarchim
@@ -152,7 +152,7 @@ func TestMoladEvent(t *testing.T) {
 	assert.Equal(t, event.MOLAD, ev.GetFlags())
 	assert.Equal(t, "", ev.GetEmoji())
 	assert.Equal(t, []string{"molad"}, ev.GetCategories())
-	assert.Equal(t, "Molad Tammuz", ev.Basename())
+	assert.Equal(t, "Molad Tammuz 5786", ev.Basename())
 
 	// Test renderings for different locales and country codes
 	assert.Contains(t, ev.Render("en"), "Molad Tammuz: Monday, 6:46am and 16 chalakim")

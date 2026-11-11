@@ -46,14 +46,14 @@ func TestHebrewCalendar(t *testing.T) {
 		"2022-04-02 Rosh Chodesh Nisan",
 		"2022-04-09 Shabbat HaGadol",
 		"2022-04-11 Yom HaAliyah",
-		"2022-04-15 Ta'anit Bechorot",
+		"2022-04-15 Ta’anit Bechorot",
 		"2022-04-15 Erev Pesach",
 		"2022-04-16 Pesach I",
 		"2022-04-17 Pesach II",
-		"2022-04-18 Pesach III (CH''M)",
-		"2022-04-19 Pesach IV (CH''M)",
-		"2022-04-20 Pesach V (CH''M)",
-		"2022-04-21 Pesach VI (CH''M)",
+		"2022-04-18 Pesach III (CH’’M)",
+		"2022-04-19 Pesach IV (CH’’M)",
+		"2022-04-20 Pesach V (CH’’M)",
+		"2022-04-21 Pesach VI (CH’’M)",
 		"2022-04-22 Pesach VII",
 		"2022-04-23 Pesach VIII",
 		"2022-04-28 Yom HaShoah",
@@ -69,7 +69,7 @@ func TestHebrewCalendarSedrotOnly(t *testing.T) {
 	}
 	checkEvents(t, "en", opts, []string{
 		"2022-10-01 Parashat Vayeilech",
-		"2022-10-08 Parashat Ha'azinu",
+		"2022-10-08 Parashat Ha’azinu",
 		"2022-10-22 Parashat Bereshit",
 		"2022-10-29 Parashat Noach",
 		"2022-11-05 Parashat Lech-Lecha",
@@ -101,8 +101,8 @@ func TestHebrewCalendarSedrotOnly(t *testing.T) {
 		"2023-05-13 Parashat Behar-Bechukotai",
 		"2023-05-20 Parashat Bamidbar",
 		"2023-06-03 Parashat Nasso",
-		"2023-06-10 Parashat Beha'alotcha",
-		"2023-06-17 Parashat Sh'lach",
+		"2023-06-10 Parashat Beha’alotcha",
+		"2023-06-17 Parashat Sh’lach",
 		"2023-06-24 Parashat Korach",
 		"2023-07-01 Parashat Chukat-Balak",
 		"2023-07-08 Parashat Pinchas",
@@ -110,7 +110,7 @@ func TestHebrewCalendarSedrotOnly(t *testing.T) {
 		"2023-07-22 Parashat Devarim",
 		"2023-07-29 Parashat Vaetchanan",
 		"2023-08-05 Parashat Eikev",
-		"2023-08-12 Parashat Re'eh",
+		"2023-08-12 Parashat Re’eh",
 		"2023-08-19 Parashat Shoftim",
 		"2023-08-26 Parashat Ki Teitzei",
 		"2023-09-02 Parashat Ki Tavo",
@@ -224,7 +224,7 @@ func TestHebrewCalendarMask(t *testing.T) {
 		Mask: event.ROSH_CHODESH | event.SPECIAL_SHABBAT,
 	}
 	checkEvents(t, "en", opts, []string{
-		"2020-01-27 Rosh Chodesh Sh'vat",
+		"2020-01-27 Rosh Chodesh Sh’vat",
 		"2020-02-08 Shabbat Shirah",
 		"2020-02-22 Shabbat Shekalim",
 		"2020-02-25 Rosh Chodesh Adar",
@@ -271,7 +271,7 @@ func ExampleHebrewCalendar() {
 	// Output:
 	// Sat 01-Jan-2022 Parashat Vaera
 	// Sat 01-Jan-2022 Havdalah (50 min): 5:16pm
-	// Mon 03-Jan-2022 Rosh Chodesh Sh'vat
+	// Mon 03-Jan-2022 Rosh Chodesh Sh’vat
 	// Fri 07-Jan-2022 Candle lighting: 4:13pm
 	// Sat 08-Jan-2022 Parashat Bo
 	// Sat 08-Jan-2022 Havdalah (50 min): 5:22pm
@@ -290,7 +290,7 @@ func TestHebrewCalendarLocale(t *testing.T) {
 	checkEvents(t, "es", opts, []string{
 		"2022-01-01 Parashá Vaera",
 		"2022-01-01 Havdalah (50 min): 5:16pm",
-		"2022-01-03 Rosh Jodesh Sh'vat",
+		"2022-01-03 Rosh Jodesh Sh’vat",
 		"2022-01-07 Iluminación de velas: 4:13pm",
 		"2022-01-08 Parashá Bo",
 		"2022-01-08 Havdalah (50 min): 5:22pm",
@@ -315,19 +315,19 @@ func TestNoModern(t *testing.T) {
 		"2022-03-18 Shushan Purim",
 		"2022-04-15 Erev Pesach",
 		"2022-04-16 Pesach I",
-		"2022-04-17 Pesach II (CH''M)",
-		"2022-04-18 Pesach III (CH''M)",
-		"2022-04-19 Pesach IV (CH''M)",
-		"2022-04-20 Pesach V (CH''M)",
-		"2022-04-21 Pesach VI (CH''M)",
+		"2022-04-17 Pesach II (CH’’M)",
+		"2022-04-18 Pesach III (CH’’M)",
+		"2022-04-19 Pesach IV (CH’’M)",
+		"2022-04-20 Pesach V (CH’’M)",
+		"2022-04-21 Pesach VI (CH’’M)",
 		"2022-04-22 Pesach VII",
 		"2022-05-15 Pesach Sheni",
 		"2022-05-19 Lag BaOmer",
 		"2022-06-04 Erev Shavuot",
 		"2022-06-05 Shavuot",
-		"2022-08-06 Erev Tish'a B'Av",
-		"2022-08-07 Tish'a B'Av (observed)",
-		"2022-08-12 Tu B'Av",
+		"2022-08-06 Erev Tish’a B’Av",
+		"2022-08-07 Tish’a B’Av (observed)",
+		"2022-08-12 Tu B’Av",
 		"2022-08-28 Rosh Hashana LaBehemot",
 		"2022-09-17 Leil Selichot",
 		"2022-09-25 Erev Rosh Hashana",
@@ -337,11 +337,11 @@ func TestNoModern(t *testing.T) {
 		"2022-10-05 Yom Kippur",
 		"2022-10-09 Erev Sukkot",
 		"2022-10-10 Sukkot I",
-		"2022-10-11 Sukkot II (CH''M)",
-		"2022-10-12 Sukkot III (CH''M)",
-		"2022-10-13 Sukkot IV (CH''M)",
-		"2022-10-14 Sukkot V (CH''M)",
-		"2022-10-15 Sukkot VI (CH''M)",
+		"2022-10-11 Sukkot II (CH’’M)",
+		"2022-10-12 Sukkot III (CH’’M)",
+		"2022-10-13 Sukkot IV (CH’’M)",
+		"2022-10-14 Sukkot V (CH’’M)",
+		"2022-10-15 Sukkot VI (CH’’M)",
 		"2022-10-16 Sukkot VII (Hoshana Raba)",
 		"2022-10-17 Shmini Atzeret",
 		"2022-12-18 Chanukah: 1 Candle",
@@ -399,7 +399,7 @@ func TestDailyZemanimSortedByTime(t *testing.T) {
 		Hour24:               true,
 	}
 	checkEvents(t, "en", opts, []string{
-		"2020-03-09 Ta'anit Esther",
+		"2020-03-09 Ta’anit Esther",
 		"2020-03-09 Erev Purim",
 		"2020-03-09 Latest Kiddush Levana: 05:42",
 		"2020-03-09 Alot HaShachar: 05:42",
@@ -641,4 +641,54 @@ func TestHebrewCalendarInfile(t *testing.T) {
 		"1967-10-05 1st of Tishrei, 5728",
 		"1967-10-05 Ben Ploni",
 	})
+}
+
+func TestShabbatMevarchimWithNoHolidays(t *testing.T) {
+	opts := &hebcal.CalOptions{
+		Start:            hdate.New(5787, hdate.Tishrei, 1),
+		End:              hdate.New(5787, hdate.Kislev, 30),
+		NoHolidays:       true,
+		ShabbatMevarchim: true,
+	}
+	events, err := hebcal.HebrewCalendar(opts)
+	assert.NoError(t, err)
+	var actual []string
+	for _, ev := range events {
+		actual = append(actual, hd2iso(ev.GetDate())+" "+ev.Render("en"))
+		_, ok := ev.(event.MevarchimChodeshEvent)
+		assert.True(t, ok, "%T", ev)
+	}
+	assert.Equal(t, []string{
+		"2026-10-10 Shabbat Mevarchim Chodesh Cheshvan",
+		"2026-11-07 Shabbat Mevarchim Chodesh Kislev",
+		"2026-12-05 Shabbat Mevarchim Chodesh Tevet",
+	}, actual)
+}
+
+func TestChanukahEmojiKeycap(t *testing.T) {
+	opts := &hebcal.CalOptions{
+		Start:          hdate.New(5783, hdate.Kislev, 24),
+		End:            hdate.New(5783, hdate.Tevet, 3),
+		CandleLighting: true,
+		Location:       zmanim.LookupCity("Jerusalem"),
+	}
+	events, err := hebcal.HebrewCalendar(opts)
+	assert.NoError(t, err)
+	actual := map[string]string{}
+	for _, ev := range events {
+		if ev.GetFlags().Has(event.CHANUKAH_CANDLES) || ev.Render("en") == "Chanukah: 8th Day" {
+			actual[ev.Render("en")] = ev.GetEmoji()
+		}
+	}
+	assert.Equal(t, map[string]string{
+		"Chanukah: 1 Candle: 16:57":  "🕎1️⃣",
+		"Chanukah: 2 Candles: 16:57": "🕎2️⃣",
+		"Chanukah: 3 Candles: 16:57": "🕎3️⃣",
+		"Chanukah: 4 Candles: 16:58": "🕎4️⃣",
+		"Chanukah: 5 Candles: 16:58": "🕎5️⃣",
+		"Chanukah: 6 Candles: 16:00": "🕎6️⃣", // Friday
+		"Chanukah: 7 Candles: 17:21": "🕎7️⃣", // Saturday
+		"Chanukah: 8 Candles: 17:00": "🕎8️⃣",
+		"Chanukah: 8th Day":          "🕎",
+	}, actual)
 }

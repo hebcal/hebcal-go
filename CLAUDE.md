@@ -58,3 +58,13 @@ github.com/hebcal/learning addresses
 https://github.com/hebcal/hebcal/issues/300 ("Add events of '929 daily bible
 chapter project'"); cite it in the v0.2.0 release notes. Ask the user for the
 issue link if a change clearly maps to a request but you don't have the number.
+
+## Deliberate divergences from @hebcal/core
+
+Everything else should match `@hebcal/core`; these differences are on purpose:
+
+- **Rosh Hashana's year is gematriya in Hebrew** ("רֹאשׁ הַשָּׁנָה תשפ״ז"), a
+  number in every other locale. `@hebcal/core` writes a number in Hebrew too.
+- **Tammuz is spelled with two m's** in event descriptions (from `hdate`),
+  where `@hebcal/core` and hebcal.com write "Tamuz". Translations and URLs
+  already handle both spellings.

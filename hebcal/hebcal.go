@@ -21,6 +21,7 @@ import (
 	"errors"
 	"math"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/hebcal/greg"
@@ -292,6 +293,8 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			if dow == time.Friday && opts.Sedrot && (candlesEv != TimedEvent{}) {
 				if parsha := sedraYear.LookupByRD(abs); !parsha.Chag {
 					candlesEv.LinkedEvent = event.NewParshaEvent(hd.OnOrAfter(time.Saturday), parsha, il)
+				} else {
+					candlesEv.chagReading = parsha.Name[0]
 				}
 			}
 		}
@@ -429,6 +432,31 @@ var israelCityOffset = map[string]int{
 	"Zikhron Yaakov":  30,
 }
 
+// geoNameIDCandleOffset is the customary candle-lighting offset of the Israeli
+// cities that light earlier than the usual 20 minutes, by GeoNames id.
+var geoNameIDCandleOffset = map[int]int{
+	281184: 40, // Jerusalem
+	294801: 30, // Haifa
+	293067: 30, // Zikhron Yaakov
+}
+
+// IsraelCandleLightingMins returns the customary candle-lighting offset, in
+// minutes before sunset, of a location in Israel: 40 for Jerusalem, 30 for
+// Haifa and Zikhron Ya'akov, otherwise 20. The city is recognized by its
+// GeoNames id, or else by its name up to the first comma ("Jerusalem,
+// Israel" is Jerusalem). HebrewCalendar applies it when an Israeli location
+// asks for the default 18 minutes.
+func IsraelCandleLightingMins(loc *zmanim.Location) int {
+	if offset, ok := geoNameIDCandleOffset[loc.GeoNameID]; ok {
+		return offset
+	}
+	name, _, _ := strings.Cut(loc.Name, ",")
+	if offset, ok := israelCityOffset[strings.TrimSpace(name)]; ok {
+		return offset
+	}
+	return 20
+}
+
 func checkCandleOptions(opts *CalOptions) error {
 	if !opts.CandleLighting && !opts.KiddushLevanaMaharil {
 		return nil
@@ -485,13 +513,8 @@ func setCandleLightingMins(opts *CalOptions) {
 		mins = opts.CandleLightingMins
 	}
 	loc := opts.Location
-	if loc.CountryCode == "IL" && mins == 18 {
-		offset, ok := israelCityOffset[loc.Name]
-		if ok {
-			mins = offset
-		} else {
-			mins = 20
-		}
+	if loc.CountryCode == "IL" && intAbs(mins) == 18 {
+		mins = IsraelCandleLightingMins(loc)
 	}
 	opts.CandleLightingMins = -1 * intAbs(mins)
 }
@@ -619,19 +642,19 @@ func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 
 // makeMevarchimEvent upgrades a bare "Shabbat Mevarchim Chodesh" holiday event
 // to a MevarchimChodeshEvent carrying the molad of the upcoming month.
-func makeMevarchimEvent(ev event.HolidayEvent) event.MevarchimChodeshEvent {
+func makeMevarchimEvent(ev event.HolidayEvent, opts *CalOptions) event.MevarchimChodeshEvent {
 	hd := ev.Date
 	nextName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 	m := molad.New(hd.Year(), nextMonth)
-	return event.NewMevarchimChodeshEvent(hd, nextName, m)
+	mev := event.NewMevarchimChodeshEvent(hd, nextName, m)
+	mev.CountryCode = clockCountry(opts)
+	mev.Hour12 = hour12Override(opts)
+	return mev
 }
 
 // eventTime returns the time of a timed event, or false for other events.
 func eventTime(ev event.CalEvent) (time.Time, bool) {
-	switch e := ev.(type) {
-	case TimedEvent:
-		return e.EventTime, true
-	case KiddushLevanaEvent:
+	if e, ok := AsTimedEvent(ev); ok {
 		return e.EventTime, true
 	}
 	return time.Time{}, false
@@ -678,13 +701,13 @@ func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev e
 		(opts.NoModern && mask.Has(event.MODERN_HOLIDAY)) {
 		return events, candlesEv // bail out early
 	}
-	if opts.CandleLighting && ev.Render("en") == "Erev Pesach" {
+	if opts.CandleLighting && event.Desc(ev) == "Erev Pesach" {
 		events = append(events, makeErevPesachChametz(ev, opts)...)
 	}
 	isMajorFast := mask.Has(event.MAJOR_FAST)
 	isMinorFast := mask.Has(event.MINOR_FAST)
 	var startEvent, endEvent TimedEvent
-	if opts.CandleLighting && (isMajorFast || isMinorFast) && ev.Render("en") != "Yom Kippur" {
+	if opts.CandleLighting && (isMajorFast || isMinorFast) && event.Desc(ev) != "Yom Kippur" {
 		startEvent, endEvent = makeFastStartEnd(ev, opts)
 		if (startEvent != TimedEvent{}) && (isMajorFast || (isMinorFast && !opts.NoMinorFast)) {
 			events = append(events, startEvent)
@@ -704,15 +727,19 @@ func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev e
 				candlesEv = makeCandleEvent(hd, opts, ev)
 			}
 		}
-		if mask.Has(event.SHABBAT_MEVARCHIM) && !opts.NoHolidays {
+		isMevarchim := mask.Has(event.SHABBAT_MEVARCHIM)
+		if isMevarchim {
 			// Upgrade the bare holiday event to a MevarchimChodeshEvent that
 			// carries the molad of the upcoming month.
 			if he, ok := ev.(event.HolidayEvent); ok {
-				ev = makeMevarchimEvent(he)
+				ev = makeMevarchimEvent(he, opts)
 			}
 		}
+		// Yom Kippur Katan, BeHaB and Shabbat Mevarchim are opt-in streams of
+		// their own, emitted whenever requested even with NoHolidays.
 		if (opts.YomKippurKatan && mask.Has(event.YOM_KIPPUR_KATAN)) ||
-			(opts.BeHaB && mask.Has(event.BEHAB)) {
+			(opts.BeHaB && mask.Has(event.BEHAB)) ||
+			(opts.ShabbatMevarchim && isMevarchim) {
 			events = append(events, ev)
 		} else if !opts.NoHolidays {
 			events = append(events, ev)

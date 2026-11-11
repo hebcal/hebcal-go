@@ -57,6 +57,7 @@ type Location struct {
 	Longitude   float64 // In the range [-180,180]
 	Elevation   int     // Elevation in meters above sea level (never negative)
 	TimeZoneId  string  // timezone identifier such as "America/Los_Angeles" or "Asia/Jerusalem"
+	GeoNameID   int     // GeoNames.org identifier, or 0 when unknown
 }
 
 // NewLocation creates an instance of a Location object.
