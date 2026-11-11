@@ -440,11 +440,13 @@ var geoNameIDCandleOffset = map[int]int{
 	293067: 30, // Zikhron Yaakov
 }
 
-// israelCandleMins returns the candle-lighting offset of a location in Israel:
-// 40 minutes for Jerusalem, 30 for Haifa and Zikhron Ya'akov, otherwise 20.
-// The city is recognized by its GeoNames id, or else by its name up to the
-// first comma ("Jerusalem, Israel" is Jerusalem).
-func israelCandleMins(loc *zmanim.Location) int {
+// IsraelCandleLightingMins returns the customary candle-lighting offset, in
+// minutes before sunset, of a location in Israel: 40 for Jerusalem, 30 for
+// Haifa and Zikhron Ya'akov, otherwise 20. The city is recognized by its
+// GeoNames id, or else by its name up to the first comma ("Jerusalem,
+// Israel" is Jerusalem). HebrewCalendar applies it when an Israeli location
+// asks for the default 18 minutes.
+func IsraelCandleLightingMins(loc *zmanim.Location) int {
 	if offset, ok := geoNameIDCandleOffset[loc.GeoNameID]; ok {
 		return offset
 	}
@@ -512,7 +514,7 @@ func setCandleLightingMins(opts *CalOptions) {
 	}
 	loc := opts.Location
 	if loc.CountryCode == "IL" && intAbs(mins) == 18 {
-		mins = israelCandleMins(loc)
+		mins = IsraelCandleLightingMins(loc)
 	}
 	opts.CandleLightingMins = -1 * intAbs(mins)
 }
