@@ -33,19 +33,32 @@ const latestKiddushLevana = "Latest Kiddush Levana"
 // KiddushLevanaAdjustment says why a KiddushLevanaEvent's time differs from
 // the Maharil's time. The zero value (KiddushLevanaNotAdjusted) means it was
 // not adjusted, apart from rounding down to the minute.
-type KiddushLevanaAdjustment string
+type KiddushLevanaAdjustment int
 
 const (
 	// KiddushLevanaNotAdjusted means the time is the Maharil's time,
 	// rounded down to the minute.
-	KiddushLevanaNotAdjusted KiddushLevanaAdjustment = ""
+	KiddushLevanaNotAdjusted KiddushLevanaAdjustment = iota
 	// KiddushLevanaAlot means the time fell during the day, so it moved
 	// back to alot hashachar.
-	KiddushLevanaAlot KiddushLevanaAdjustment = "alot"
+	KiddushLevanaAlot
 	// KiddushLevanaCandleLighting means the time fell on Shabbat or Yom Tov,
 	// so it moved back to candle-lighting time before it.
-	KiddushLevanaCandleLighting KiddushLevanaAdjustment = "candleLighting"
+	KiddushLevanaCandleLighting
 )
+
+// String returns "alot" or "candleLighting", the same values as
+// @hebcal/core's adjustedTo, or "" for KiddushLevanaNotAdjusted.
+func (a KiddushLevanaAdjustment) String() string {
+	switch a {
+	case KiddushLevanaAlot:
+		return "alot"
+	case KiddushLevanaCandleLighting:
+		return "candleLighting"
+	default:
+		return ""
+	}
+}
 
 // KiddushLevanaEvent is the latest time to recite Kiddush Levana
 // (Sanctification of the Moon), calculated as halfway between one molad and

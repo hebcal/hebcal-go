@@ -72,6 +72,12 @@ func TestKiddushLevana(t *testing.T) {
 	}
 }
 
+func TestKiddushLevanaAdjustmentString(t *testing.T) {
+	assert.Equal(t, "", KiddushLevanaNotAdjusted.String())
+	assert.Equal(t, "alot", KiddushLevanaAlot.String())
+	assert.Equal(t, "candleLighting", KiddushLevanaCandleLighting.String())
+}
+
 func TestKiddushLevanaMatchesCandleLighting(t *testing.T) {
 	newYork := zmanim.LookupCity("New York")
 	ev := kiddushLevanaMonth(t, newYork, 5787, hdate.Tishrei)
