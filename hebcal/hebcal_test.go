@@ -8,6 +8,7 @@ import (
 	"github.com/hebcal/hdate"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/hebcal/hebcal-go/dailylearning"
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/zmanim"
@@ -640,6 +641,30 @@ func TestHebrewCalendarInfile(t *testing.T) {
 	checkEvents(t, "en", opts, []string{
 		"1967-10-05 1st of Tishrei, 5728",
 		"1967-10-05 Ben Ploni",
+	})
+}
+
+// A day whose only events are daily learning is not a day with events: every
+// day has a reading, and AddHebrewDatesForEvents would otherwise date them all.
+func TestAddHebrewDatesForEventsIgnoresLearning(t *testing.T) {
+	dailylearning.AddCalendar("testLearningEveryDay", func(hd hdate.HDate, il bool) event.CalEvent {
+		return event.HolidayEvent{Date: hd, Desc: "Reading", Flags: event.DAILY_LEARNING}
+	})
+	opts := &hebcal.CalOptions{
+		Start:                   hdate.New(5787, hdate.Tishrei, 9),
+		End:                     hdate.New(5787, hdate.Tishrei, 12),
+		AddHebrewDatesForEvents: true,
+		DailyLearning:           []string{"testLearningEveryDay"},
+	}
+	checkEvents(t, "en", opts, []string{
+		"2026-09-20 9th of Tishrei, 5787",
+		"2026-09-20 Reading",
+		"2026-09-20 Erev Yom Kippur",
+		"2026-09-21 10th of Tishrei, 5787",
+		"2026-09-21 Yom Kippur",
+		"2026-09-21 Reading",
+		"2026-09-22 Reading",
+		"2026-09-23 Reading",
 	})
 }
 

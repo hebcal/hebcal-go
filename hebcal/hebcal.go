@@ -242,6 +242,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 				events = append(events, userEv)
 			}
 		}
+		numDailyLearning := 0
 		if !opts.WeeklyAbbreviated || dow == firstWeekday {
 			if opts.Omer && abs >= beginOmer && abs <= endOmer {
 				omerDay := int(abs - beginOmer + 1)
@@ -255,21 +256,25 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			if opts.DafYomi {
 				if ev := dailylearning.Lookup("dafYomi", hd, il); ev != nil {
 					events = append(events, ev)
+					numDailyLearning++
 				}
 			}
 			if opts.YerushalmiYomi {
 				if ev := dailylearning.Lookup(yerushalmiCalendar, hd, il); ev != nil {
 					events = append(events, ev)
+					numDailyLearning++
 				}
 			}
 			if opts.MishnaYomi {
 				if ev := dailylearning.Lookup("mishnaYomi", hd, il); ev != nil {
 					events = append(events, ev)
+					numDailyLearning++
 				}
 			}
 			if opts.NachYomi {
 				if ev := dailylearning.Lookup("nachYomi", hd, il); ev != nil {
 					events = append(events, ev)
+					numDailyLearning++
 				}
 			}
 			// Any additional daily learning schedules requested by name
@@ -278,6 +283,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			for _, name := range opts.DailyLearning {
 				if ev := dailylearning.Lookup(name, hd, il); ev != nil {
 					events = append(events, ev)
+					numDailyLearning++
 				}
 			}
 			if opts.DailyZmanim {
@@ -325,7 +331,10 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			sortTimedEvents(events[prevEventsLength:])
 		}
 		if (opts.AddHebrewDates && (!opts.WeeklyAbbreviated || dow == firstWeekday)) ||
-			((opts.AddHebrewDates || opts.AddHebrewDatesForEvents) && prevEventsLength != len(events)) {
+			(opts.AddHebrewDates && prevEventsLength != len(events)) ||
+			// Every day has a daily-learning reading, so a day whose only
+			// events are learning does not count as a day with events.
+			(opts.AddHebrewDatesForEvents && prevEventsLength != len(events)-numDailyLearning) {
 			events = append(events, nil)
 			copy(events[prevEventsLength+1:], events[prevEventsLength:])
 			events[prevEventsLength] = event.NewHebrewDateEvent(hd)
