@@ -370,19 +370,14 @@ func (s *Sedra) LookupByRD(rataDie int64) Parsha {
 			" is earlier than start of year " +
 			strconv.FormatInt(s.firstSaturday, 10))
 	}
-	var idx int
 	weekNum := int((abs - s.firstSaturday) / 7)
 	if weekNum >= sedraNumWeeks {
-		indexLast := s.theSedraArray[sedraNumWeeks-1]
-		if indexLast < 0 {
-			/* advance 2 parashiyot ahead after a doubled week */
-			idx = undoubled(indexLast) + 2
-		} else {
-			idx = indexLast + 1
-		}
-	} else {
-		idx = s.theSedraArray[weekNum]
+		// The Saturday falls in the next Hebrew year, whose first Shabbat may
+		// well be Rosh Hashana or Shabbat Shuva: ask that year.
+		next := New(s.Year+1, s.IL)
+		return next.LookupByRD(abs)
 	}
+	idx := s.theSedraArray[weekNum]
 	switch {
 	case idx >= 0:
 		return Parsha{Name: []string{parshiot[idx]}, Num: []int{idx + 1}, Chag: false}

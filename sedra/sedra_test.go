@@ -44,6 +44,26 @@ func TestSedra_Lookup(t *testing.T) {
 		sedraYear.Lookup(hdate.FromGregorian(2020, time.October, 17)))
 }
 
+// A date in the last days of a year whose next Shabbat is in the following
+// year is answered by that year: Erev Rosh Hashana on a Friday is followed
+// by Rosh Hashana, not by the portion after the year's last.
+func TestSedra_LookupNextYear(t *testing.T) {
+	assert := assert.New(t)
+	sedraYear := sedra.New(5786, false)
+	assert.Equal(
+		sedra.Parsha{Name: []string{"Rosh Hashana"}, Chag: true},
+		sedraYear.Lookup(hdate.New(5786, hdate.Elul, 29)))
+	sedraYear = sedra.New(5787, false)
+	assert.Equal(
+		sedra.Parsha{Name: []string{"Rosh Hashana"}, Chag: true},
+		sedraYear.Lookup(hdate.New(5787, hdate.Elul, 29)))
+	// 5788 begins on a Thursday, so the Shabbat after it is Ha'azinu.
+	sedraYear = sedra.New(5788, false)
+	assert.Equal(
+		sedra.Parsha{Name: []string{"Ha'azinu"}, Num: []int{53}, Chag: false},
+		sedraYear.Lookup(hdate.New(5788, hdate.Elul, 29)))
+}
+
 func TestSedraAshkenazi(t *testing.T) {
 	assert := assert.New(t)
 	sedraYear := sedra.New(5749, false)
