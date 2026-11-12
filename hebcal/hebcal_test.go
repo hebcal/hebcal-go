@@ -203,9 +203,9 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 	checkEvents(t, "en", opts, []string{
 		"2022-12-18 Chanukah: 1 Candle: 16:57",
 		"2022-12-19 Chanukah: 2 Candles: 16:57",
-		"2022-12-20 Chanukah: 3 Candles: 16:57",
+		"2022-12-20 Chanukah: 3 Candles: 16:58",
 		"2022-12-21 Chanukah: 4 Candles: 16:58",
-		"2022-12-22 Chanukah: 5 Candles: 16:58",
+		"2022-12-22 Chanukah: 5 Candles: 16:59",
 		"2022-12-23 Chanukah: 6 Candles: 16:00",
 		"2022-12-23 Candle lighting: 16:00",
 		"2022-12-24 Chag HaBanot",
@@ -213,7 +213,7 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 		"2022-12-24 Chanukah: 7 Candles: 17:21",
 		"2022-12-24 Havdalah: 17:21",
 		"2022-12-25 Rosh Chodesh Tevet",
-		"2022-12-25 Chanukah: 8 Candles: 17:00",
+		"2022-12-25 Chanukah: 8 Candles: 17:01",
 		"2022-12-26 Chanukah: 8th Day",
 	})
 }
@@ -683,12 +683,12 @@ func TestChanukahEmojiKeycap(t *testing.T) {
 	assert.Equal(t, map[string]string{
 		"Chanukah: 1 Candle: 16:57":  "🕎1️⃣",
 		"Chanukah: 2 Candles: 16:57": "🕎2️⃣",
-		"Chanukah: 3 Candles: 16:57": "🕎3️⃣",
+		"Chanukah: 3 Candles: 16:58": "🕎3️⃣",
 		"Chanukah: 4 Candles: 16:58": "🕎4️⃣",
-		"Chanukah: 5 Candles: 16:58": "🕎5️⃣",
+		"Chanukah: 5 Candles: 16:59": "🕎5️⃣",
 		"Chanukah: 6 Candles: 16:00": "🕎6️⃣", // Friday
 		"Chanukah: 7 Candles: 17:21": "🕎7️⃣", // Saturday
-		"Chanukah: 8 Candles: 17:00": "🕎8️⃣",
+		"Chanukah: 8 Candles: 17:01": "🕎8️⃣",
 		"Chanukah: 8th Day":          "🕎",
 	}, actual)
 }

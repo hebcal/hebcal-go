@@ -108,7 +108,15 @@ var regexes = []*regexp.Regexp{
 	regexp.MustCompile(`^Erev `),
 }
 
+// Basename returns a simplified, untranslated name that groups related
+// events, e.g. "Sukkot" for "Sukkot III (CH”M)". Rosh Chodesh and Yom
+// Kippur Katan keep their full description, so a leap year's "Rosh Chodesh
+// Adar I" and "Rosh Chodesh Adar II" stay distinct, matching @hebcal/core's
+// RoshChodeshEvent and YomKippurKatanEvent.
 func (ev HolidayEvent) Basename() string {
+	if ev.Flags.HasAny(ROSH_CHODESH | YOM_KIPPUR_KATAN) {
+		return ev.Desc
+	}
 	str := ev.Desc
 	for _, regex := range regexes {
 		str = regex.ReplaceAllString(str, "")

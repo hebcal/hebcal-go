@@ -66,8 +66,8 @@ func (ev HolidayEvent) URL() string {
 	if hy < 5513 || hy > 6260 {
 		return ""
 	}
-	// Yom Kippur Katan has no page on the website.
-	if strings.HasPrefix(ev.Desc, "Yom Kippur Katan") {
+	// Yom Kippur Katan and Ta'anit BeHaB have no page on the website.
+	if strings.HasPrefix(ev.Desc, "Yom Kippur Katan") || ev.Flags.Has(BEHAB) {
 		return ""
 	}
 	gy, gm, gd := ev.Date.ProlepticGreg()
@@ -88,10 +88,12 @@ func (ev HolidayEvent) URL() string {
 	if alt, ok := slugOverrides[slug]; ok {
 		slug = alt
 	}
-	// In a leap year the two Adars share one description, but the website
-	// files them under separate pages. Rosh Chodesh can span two days, and on
-	// the first of them the date is the 30th of the *previous* month, so the
-	// month has to be advanced before deciding which Adar this is.
+	// Generated Rosh Chodesh events in a leap year are already described as
+	// "Rosh Chodesh Adar I" or "Adar II", and Basename keeps the numeral.
+	// A caller-built event may say just "Rosh Chodesh Adar", so infer which
+	// Adar from the date. Rosh Chodesh can span two days, and on the first
+	// of them the date is the 30th of the *previous* month, so the month has
+	// to be advanced before deciding which Adar this is.
 	//
 	// A common year has a single Adar and keeps the undecorated slug, even
 	// though hdate numbers that month Adar1.

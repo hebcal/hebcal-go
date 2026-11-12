@@ -2,6 +2,7 @@ package hebcal_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hebcal/hdate"
@@ -693,6 +694,8 @@ func TestBeHaB(t *testing.T) {
 			got = append(got, ev.GetDate().Gregorian().Format("2006-01-02")+" "+ev.Render("en"))
 			assert.Equal(event.MINOR_FAST|event.BEHAB, ev.GetFlags())
 			assert.Equal([]string{"holiday", "fast"}, ev.GetCategories())
+			// no holiday page on hebcal.com, matching @hebcal/core
+			assert.Equal("", event.URL(ev))
 		}
 		assert.Equal(want, got)
 	}
@@ -728,4 +731,36 @@ func TestFamilyDayEmoji(t *testing.T) {
 		}
 	}
 	t.Fatal("Family Day not found in 5783")
+}
+
+func TestAdarBasenameKeepsNumeral(t *testing.T) {
+	// Matches @hebcal/core's RoshChodeshEvent and YomKippurKatanEvent,
+	// whose basename is the full description.
+	want := map[string]string{
+		"Rosh Chodesh Adar I":      "Rosh Chodesh Adar I",
+		"Rosh Chodesh Adar II":     "Rosh Chodesh Adar II",
+		"Yom Kippur Katan Adar I":  "Yom Kippur Katan Adar I",
+		"Yom Kippur Katan Adar II": "Yom Kippur Katan Adar II",
+		"Rosh Chodesh Sh'vat":      "Rosh Chodesh Sh'vat",
+		"Purim Katan":              "Purim Katan",
+		"Pesach II":                "Pesach",
+	}
+	seen := map[string]bool{}
+	events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{Year: 5784, IsHebrewYear: true, YomKippurKatan: true})
+	assert.NoError(t, err)
+	for _, ev := range events {
+		desc := event.Desc(ev)
+		if w, ok := want[desc]; ok {
+			assert.Equal(t, w, ev.Basename(), desc)
+			seen[desc] = true
+			if strings.HasPrefix(desc, "Rosh Chodesh Adar") {
+				suffix := "-adar-i-2024"
+				if strings.HasSuffix(desc, "II") {
+					suffix = "-adar-ii-2024"
+				}
+				assert.Contains(t, event.URL(ev), "/rosh-chodesh"+suffix, desc)
+			}
+		}
+	}
+	assert.Equal(t, len(want), len(seen))
 }

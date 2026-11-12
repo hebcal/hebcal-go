@@ -276,9 +276,11 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEv
 	}
 	return TimedEvent{
 		HolidayEvent: ev,
-		EventTime:    candleLightingTime,
-		LinkedEvent:  ev,
-		opts:         opts,
+		// Round to the nearest minute, as NewTimedEvent does and as
+		// @hebcal/core's TimedChanukahEvent does with Zmanim.roundTime.
+		EventTime:   roundToMinute(candleLightingTime),
+		LinkedEvent: ev,
+		opts:        opts,
 	}
 }
 
