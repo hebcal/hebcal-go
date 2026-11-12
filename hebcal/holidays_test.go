@@ -717,3 +717,15 @@ func TestBeHaB(t *testing.T) {
 	assert.Equal("תַּעֲנִית בה״ב", events[0].Render("he"))
 	assert.Equal("Ta’anis BeHaB", events[0].Render("ashkenazi"))
 }
+
+func TestFamilyDayEmoji(t *testing.T) {
+	// Matches @hebcal/core: Family Day carries the Israeli flag
+	for _, ev := range hebcal.GetHolidaysForYear(5783, true) {
+		if ev.Desc == "Family Day" {
+			assert.Equal(t, "2023-02-21", hd2iso(ev.Date))
+			assert.Equal(t, "🇮🇱", ev.GetEmoji())
+			return
+		}
+	}
+	t.Fatal("Family Day not found in 5783")
+}
