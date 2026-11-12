@@ -1,0 +1,69 @@
+package hebcal_test
+
+import (
+	"testing"
+	"time"
+
+	"github.com/hebcal/hdate"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/hebcal/hebcal-go/event"
+	"github.com/hebcal/hebcal-go/hebcal"
+	"github.com/hebcal/hebcal-go/zmanim"
+)
+
+// A candle-lighting event carries exactly one of LIGHT_CANDLES (minutes
+// before sunset: Shabbat or the start of a chag) and LIGHT_CANDLES_TZEIS
+// (nightfall / Havdalah time), matching @hebcal/core.
+func TestCandleLightingFlags(t *testing.T) {
+	cases := []struct {
+		date  string
+		label string
+		time  string
+		flags event.HolidayFlags
+	}{
+		{"2024-10-16", "Wed, Erev Sukkot", "17:55", event.CHUL_ONLY | event.EREV | event.LIGHT_CANDLES},
+		{"2024-11-08", "plain Friday", "16:25", event.LIGHT_CANDLES},
+		{"2020-05-29", "Fri, Shavuot I", "20:01", event.CHAG | event.CHUL_ONLY | event.LIGHT_CANDLES},
+		{"2020-04-10", "Fri, Yom Tov ends, Shabbat begins", "19:12",
+			event.CHAG | event.CHUL_ONLY | event.YOM_TOV_ENDS | event.LIGHT_CANDLES},
+		{"2024-10-17", "Thu, Sukkot I", "18:53", event.CHAG | event.CHUL_ONLY | event.LIGHT_CANDLES_TZEIS},
+		{"2021-03-27", "Sat, Erev Pesach", "19:57", event.CHUL_ONLY | event.EREV | event.LIGHT_CANDLES_TZEIS},
+	}
+	loc := zmanim.LookupCity("New York")
+	for _, c := range cases {
+		t.Run(c.date+" "+c.label, func(t *testing.T) {
+			d, _ := time.Parse("2006-01-02", c.date)
+			hd := hdate.FromTime(d)
+			events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{
+				Start: hd, End: hd, CandleLighting: true, Location: loc,
+			})
+			assert.NoError(t, err)
+			var found bool
+			for _, ev := range events {
+				te, ok := hebcal.AsTimedEvent(ev)
+				if !ok || te.Desc != "Candle lighting" {
+					continue
+				}
+				found = true
+				assert.Equal(t, c.time, te.EventTime.Format("15:04"))
+				assert.Equal(t, c.flags, te.GetFlags(), te.GetFlags().String())
+			}
+			assert.True(t, found)
+		})
+	}
+}
+
+func TestCandleLightingNeverBothFlags(t *testing.T) {
+	both := event.LIGHT_CANDLES | event.LIGHT_CANDLES_TZEIS
+	for _, city := range []string{"New York", "Jerusalem"} {
+		events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{
+			Year: 5780, IsHebrewYear: true, NumYears: 12, IL: city == "Jerusalem",
+			CandleLighting: true, Location: zmanim.LookupCity(city),
+		})
+		assert.NoError(t, err)
+		for _, ev := range events {
+			assert.False(t, ev.GetFlags().Has(both), ev.Render("en"))
+		}
+	}
+}

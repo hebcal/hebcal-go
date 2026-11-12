@@ -252,6 +252,18 @@ func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev event.CalEvent) TimedE
 	desc := "Candle lighting"
 	if havdalahTitle {
 		desc = "Havdalah"
+	} else if !flags.Has(event.CHANUKAH_CANDLES) {
+		// Exactly one of the two candle-lighting flags, chosen by how the
+		// time was computed: LIGHT_CANDLES for minutes before sunset
+		// (Shabbat or the start of a chag), LIGHT_CANDLES_TZEIS for
+		// nightfall / Havdalah time (the second night of Yom Tov, or a chag
+		// that begins Saturday night). Chanukah keeps its own flags: its
+		// Friday and Saturday events reuse this event as the Chanukah event.
+		if useHavdalahOffset {
+			flags = flags.Without(event.LIGHT_CANDLES).With(event.LIGHT_CANDLES_TZEIS)
+		} else {
+			flags = flags.Without(event.LIGHT_CANDLES_TZEIS).With(event.LIGHT_CANDLES)
+		}
 	}
 	return NewTimedEvent(hd, desc, flags, eventTime, offset, ev, opts)
 }
