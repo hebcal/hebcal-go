@@ -43,29 +43,31 @@ func TestKiddushLevana(t *testing.T) {
 		hyear  int
 		hmonth hdate.HMonth
 		want   string
+		adjust KiddushLevanaAdjustment
 	}{
 		{"weeknight, before midnight", newYork, 5787, hdate.Cheshvan,
-			"14 Cheshvan 5787 | Sun Oct 25 2026 | 21:44"},
+			"14 Cheshvan 5787 | Sun Oct 25 2026 | 21:44", KiddushLevanaNotAdjusted},
 		// Maharil's time is Tue Nov 24 2026 9:28am
 		{"daytime is moved back to alot hashachar", newYork, 5787, hdate.Kislev,
-			"14 Kislev 5787 | Tue Nov 24 2026 | 05:27"},
+			"14 Kislev 5787 | Tue Nov 24 2026 | 05:27", KiddushLevanaAlot},
 		{"Motzei Shabbat is not moved", newYork, 5787, hdate.Adar1,
-			"13 Adar I 5787 | Sat Feb 20 2027 | 23:40"},
+			"13 Adar I 5787 | Sat Feb 20 2027 | 23:40", KiddushLevanaNotAdjusted},
 		// Maharil's time is Shabbat Sep 26 2026 9:00am, first day of Sukkot
 		{"Shabbat and Yom Tov moves back to candle-lighting", newYork, 5787, hdate.Tishrei,
-			"14 Tishrei 5787 | Fri Sep 25 2026 | 18:30"},
+			"14 Tishrei 5787 | Fri Sep 25 2026 | 18:30", KiddushLevanaCandleLighting},
 		// Maharil's time is Sunday Apr 3 1977, 15 Nisan (Pesach I).
 		// @hebcal/core says 18:03; its sunset that day is a minute later.
 		{"Shabbat followed by Pesach moves back to Friday", newYork, 5737, hdate.Nisan,
-			"13 Nisan 5737 | Fri Apr 01 1977 | 18:02"},
+			"13 Nisan 5737 | Fri Apr 01 1977 | 18:02", KiddushLevanaCandleLighting},
 		// Jerusalem candle-lighting is 40 minutes before sunset
 		{"Yom Tov in Israel uses Israeli candle-lighting", jerusalem, 5784, hdate.Nisan,
-			"14 Nisan 5784 | Mon Apr 22 2024 | 18:33"},
+			"14 Nisan 5784 | Mon Apr 22 2024 | 18:33", KiddushLevanaCandleLighting},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ev := kiddushLevanaMonth(t, tt.loc, tt.hyear, tt.hmonth)
 			assert.Equal(t, tt.want, klSummary(ev))
+			assert.Equal(t, tt.adjust, ev.AdjustedTo)
 		})
 	}
 }
