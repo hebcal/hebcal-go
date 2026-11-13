@@ -110,7 +110,7 @@ func (ev KiddushLevanaEvent) Memo(locale string) string {
 	for i, zman := range times {
 		label, _ := locales.LookupTranslation(zman.label, locale)
 		t := zman.t.In(tz)
-		timeStr := formatTime(t, ev.opts)
+		timeStr := ev.clock.formatTime(t)
 		lines[i] = label + ": " + t.Format("Mon, Jan 2, 2006") + ", " + timeStr
 	}
 	return strings.Join(lines, "\n")
@@ -137,8 +137,8 @@ func isShabbatOrChag(hd hdate.HDate, il bool) bool {
 	return false
 }
 
-func newKiddushLevanaEvent(hd hdate.HDate, t time.Time, m molad.Molad, opts *CalOptions, adjustedTo KiddushLevanaAdjustment) KiddushLevanaEvent {
-	timedEv := NewTimedEvent(hd, latestKiddushLevana, event.KIDDUSH_LEVANA, t, 0, nil, opts)
+func newKiddushLevanaEvent(hd hdate.HDate, t time.Time, m molad.Molad, opts *calConfig, adjustedTo KiddushLevanaAdjustment) KiddushLevanaEvent {
+	timedEv := newTimedEvent(hd, latestKiddushLevana, event.KIDDUSH_LEVANA, t, 0, nil, opts.clock)
 	timedEv.Emoji = "🌔"
 	return KiddushLevanaEvent{TimedEvent: timedEv, Molad: m, AdjustedTo: adjustedTo}
 }
@@ -147,7 +147,7 @@ func newKiddushLevanaEvent(hd hdate.HDate, t time.Time, m molad.Molad, opts *Cal
 // Hebrew month, or returns false if it can't be calculated (e.g. no sunrise
 // or sunset). The returned event's date may be earlier than the date of the
 // actual latest time, when that time falls on Shabbat or a Yom Tov.
-func makeKiddushLevanaEvent(hyear int, hmonth hdate.HMonth, opts *CalOptions) (KiddushLevanaEvent, bool) {
+func makeKiddushLevanaEvent(hyear int, hmonth hdate.HMonth, opts *calConfig) (KiddushLevanaEvent, bool) {
 	il := opts.IL
 	// Find the civil date on which the Maharil's time falls.
 	// Zmanim only computes this zman between the 11th and 16th of the month.

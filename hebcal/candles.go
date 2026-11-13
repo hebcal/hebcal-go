@@ -28,19 +28,13 @@ import (
 	"github.com/hebcal/locales"
 )
 
-// formatTime renders t as 24-hour "15:04" or 12-hour "3:04pm", as chosen by
-// ReformatTimeStr.
-func formatTime(t time.Time, opts *CalOptions) string {
-	return ReformatTimeStr(t.Format("15:04"), "pm", opts)
-}
-
 // TimedEvent is used for Candle-lighting, Havdalah, and fast start/end
 type TimedEvent struct {
 	event.HolidayEvent
 	EventTime    time.Time
 	LinkedEvent  event.CalEvent
 	sunsetOffset int
-	opts         *CalOptions
+	clock        clock
 	// chagReading is the untranslated name of the festival reading that
 	// displaces the weekly portion, for erev-Shabbat candle-lighting in a
 	// festival week (see Memo).
@@ -87,8 +81,16 @@ func (ev TimedEvent) GetDesc() string {
 	return ev.Desc
 }
 
+// NewTimedEvent constructs a timed event. opts chooses the clock format its
+// time is rendered in (see ReformatTimeStr) and may be nil; the event keeps
+// that format, not a reference to opts.
 func NewTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time.Time,
 	sunsetOffset int, linkedEvent event.CalEvent, opts *CalOptions) TimedEvent {
+	return newTimedEvent(hd, desc, flags, t, sunsetOffset, linkedEvent, clockFor(opts))
+}
+
+func newTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time.Time,
+	sunsetOffset int, linkedEvent event.CalEvent, clock clock) TimedEvent {
 	if t.IsZero() {
 		return TimedEvent{}
 	}
@@ -116,7 +118,7 @@ func NewTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time
 		},
 		EventTime:    t,
 		LinkedEvent:  linkedEvent,
-		opts:         opts,
+		clock:        clock,
 		sunsetOffset: sunsetOffset,
 	}
 }
@@ -143,7 +145,7 @@ func (ev TimedEvent) GetDate() hdate.HDate {
 }
 
 func (ev TimedEvent) Render(locale string) string {
-	timeStr := formatTime(ev.EventTime, ev.opts)
+	timeStr := ev.clock.formatTime(ev.EventTime)
 	return fmt.Sprintf("%s: %s", ev.RenderBrief(locale), timeStr)
 }
 
@@ -203,7 +205,7 @@ func (ev TimedEvent) GetCategories() []string {
 // Location, honoring opts.UseElevation so that sunrise/sunset-based times
 // account for the location's elevation when requested. Degree-based zmanim are
 // never affected by elevation.
-func newZmanim(hd hdate.HDate, opts *CalOptions) zmanim.Zmanim {
+func newZmanim(hd hdate.HDate, opts *calConfig) zmanim.Zmanim {
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	z := zmanim.New(opts.Location, gregDate)
@@ -211,7 +213,7 @@ func newZmanim(hd hdate.HDate, opts *CalOptions) zmanim.Zmanim {
 	return z
 }
 
-func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev event.CalEvent) TimedEvent {
+func makeCandleEvent(hd hdate.HDate, opts *calConfig, ev event.CalEvent) TimedEvent {
 	havdalahTitle := false
 	useHavdalahOffset := false
 	dow := hd.Weekday()
@@ -265,10 +267,10 @@ func makeCandleEvent(hd hdate.HDate, opts *CalOptions, ev event.CalEvent) TimedE
 			flags = flags.Without(event.LIGHT_CANDLES_TZEIS).With(event.LIGHT_CANDLES)
 		}
 	}
-	return NewTimedEvent(hd, desc, flags, eventTime, offset, ev, opts)
+	return newTimedEvent(hd, desc, flags, eventTime, offset, ev, opts.clock)
 }
 
-func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEvent {
+func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEvent {
 	hd := ev.Date
 	dow := hd.Weekday()
 	if dow == time.Friday || dow == time.Saturday {
@@ -292,11 +294,11 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *CalOptions) TimedEv
 		// @hebcal/core's TimedChanukahEvent does with Zmanim.roundTime.
 		EventTime:   roundToMinute(candleLightingTime),
 		LinkedEvent: ev,
-		opts:        opts,
+		clock:       opts.clock,
 	}
 }
 
-func makeFastStartEnd(ev event.CalEvent, opts *CalOptions) (TimedEvent, TimedEvent) {
+func makeFastStartEnd(ev event.CalEvent, opts *calConfig) (TimedEvent, TimedEvent) {
 	hd := ev.GetDate()
 	z := newZmanim(hd, opts)
 	desc := event.Desc(ev)
@@ -304,13 +306,13 @@ func makeFastStartEnd(ev event.CalEvent, opts *CalOptions) (TimedEvent, TimedEve
 	var startEvent, endEvent TimedEvent
 	if desc == "Erev Tish'a B'Av" {
 		sunset := z.Sunset()
-		startEvent = NewTimedEvent(hd, "Fast begins", flags, sunset, 0, ev, opts)
+		startEvent = newTimedEvent(hd, "Fast begins", flags, sunset, 0, ev, opts.clock)
 	} else if strings.HasPrefix(desc, "Tish'a B'Av") {
-		endEvent = NewTimedEvent(hd, "Fast ends", flags, fastEndTime(&z, true, opts), 0, ev, opts)
+		endEvent = newTimedEvent(hd, "Fast ends", flags, fastEndTime(&z, true, opts), 0, ev, opts.clock)
 	} else {
-		startEvent = NewTimedEvent(hd, "Fast begins", flags, fastStartTime(&z, opts), 0, ev, opts)
+		startEvent = newTimedEvent(hd, "Fast begins", flags, fastStartTime(&z, opts), 0, ev, opts.clock)
 		if hd.Weekday() != time.Friday && !(hd.Day() == 14 && hd.Month() == hdate.Nisan) {
-			endEvent = NewTimedEvent(hd, "Fast ends", flags, fastEndTime(&z, false, opts), 0, ev, opts)
+			endEvent = newTimedEvent(hd, "Fast ends", flags, fastEndTime(&z, false, opts), 0, ev, opts.clock)
 		}
 	}
 	return startEvent, endEvent
@@ -330,7 +332,7 @@ const (
 // fastStartTime is when a minor fast begins: opts.FastStartMins before
 // sunrise, when the sun is opts.FastStartDeg below the horizon, or at Alot
 // HaShachar.
-func fastStartTime(z *zmanim.Zmanim, opts *CalOptions) time.Time {
+func fastStartTime(z *zmanim.Zmanim, opts *calConfig) time.Time {
 	if opts.FastStartMins != 0 {
 		return z.SunriseOffset(-opts.FastStartMins, true)
 	}
@@ -346,7 +348,7 @@ func fastStartTime(z *zmanim.Zmanim, opts *CalOptions) time.Time {
 // ignores opts.IL. A minor fast ends opts.FastEndMins after sunset, at tzeit
 // opts.FastEndDeg, or else 15 minutes after sunset in Israel and at tzeit
 // 7.083 degrees elsewhere.
-func fastEndTime(z *zmanim.Zmanim, isTishaBav bool, opts *CalOptions) time.Time {
+func fastEndTime(z *zmanim.Zmanim, isTishaBav bool, opts *calConfig) time.Time {
 	if isTishaBav {
 		if opts.TishaBavEndMins != 0 {
 			return z.SunsetOffset(opts.TishaBavEndMins, true)
@@ -378,7 +380,7 @@ func fastEndTime(z *zmanim.Zmanim, isTishaBav bool, opts *CalOptions) time.Time 
 // Pesach falls on Shabbat, chametz cannot be burned on Shabbat, so the Biur
 // Chametz event is emitted on the Friday before instead (see makeBiurChametz)
 // and is omitted here.
-func makeErevPesachChametz(ev event.CalEvent, opts *CalOptions) []event.CalEvent {
+func makeErevPesachChametz(ev event.CalEvent, opts *calConfig) []event.CalEvent {
 	hd := ev.GetDate()
 	z := newZmanim(hd, opts)
 	events := make([]event.CalEvent, 0, 2)
@@ -386,7 +388,7 @@ func makeErevPesachChametz(ev event.CalEvent, opts *CalOptions) []event.CalEvent
 	if achilas.IsZero() {
 		return events
 	}
-	achilasEv := NewTimedEvent(hd, "Finish eating chametz", 0, achilas, 0, nil, opts)
+	achilasEv := newTimedEvent(hd, "Finish eating chametz", 0, achilas, 0, nil, opts.clock)
 	achilasEv.Emoji = "🍞"
 	events = append(events, achilasEv)
 	if hd.Weekday() != time.Saturday {
@@ -399,20 +401,27 @@ func makeErevPesachChametz(ev event.CalEvent, opts *CalOptions) []event.CalEvent
 
 // makeBiurChametz returns the "Biur Chametz" (sof zman biur chametz) event for
 // the given day, or an empty TimedEvent if the sun does not rise/set.
-func makeBiurChametz(hd hdate.HDate, opts *CalOptions) TimedEvent {
+func makeBiurChametz(hd hdate.HDate, opts *calConfig) TimedEvent {
 	z := newZmanim(hd, opts)
 	biur := z.SofZmanBiurChametz()
 	if biur.IsZero() {
 		return TimedEvent{}
 	}
-	biurEv := NewTimedEvent(hd, "Biur Chametz", 0, biur, 0, nil, opts)
+	biurEv := newTimedEvent(hd, "Biur Chametz", 0, biur, 0, nil, opts.clock)
 	biurEv.Emoji = "🔥"
 	return biurEv
 }
 
 type riseSetEvent struct {
-	date hdate.HDate
-	opts *CalOptions
+	date    hdate.HDate
+	sunrise time.Time
+	sunset  time.Time
+	clock   clock
+}
+
+func newRiseSetEvent(hd hdate.HDate, opts *calConfig) riseSetEvent {
+	z := newZmanim(hd, opts)
+	return riseSetEvent{date: hd, sunrise: z.Sunrise(), sunset: z.Sunset(), clock: opts.clock}
 }
 
 func (ev riseSetEvent) GetDate() hdate.HDate {
@@ -420,9 +429,8 @@ func (ev riseSetEvent) GetDate() hdate.HDate {
 }
 
 func (ev riseSetEvent) Render(locale string) string {
-	z := newZmanim(ev.date, ev.opts)
-	riseStr := formatTime(z.Sunrise(), ev.opts)
-	setStr := formatTime(z.Sunset(), ev.opts)
+	riseStr := ev.clock.formatTime(ev.sunrise)
+	setStr := ev.clock.formatTime(ev.sunset)
 	return fmt.Sprintf("Sunrise: %s; Sunset %s", riseStr, setStr)
 }
 
@@ -442,7 +450,7 @@ func (ev riseSetEvent) GetCategories() []string {
 	return []string{"zmanim"}
 }
 
-func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
+func dailyZemanim(date hdate.HDate, opts *calConfig) []event.CalEvent {
 	z := newZmanim(date, opts)
 	times := []struct {
 		desc string
@@ -467,7 +475,7 @@ func dailyZemanim(date hdate.HDate, opts *CalOptions) []event.CalEvent {
 	events := make([]event.CalEvent, 0, len(times))
 	for _, zman := range times {
 		if !zman.t.IsZero() {
-			ev := NewTimedEvent(date, zman.desc, event.ZMANIM, zman.t, 0, nil, opts)
+			ev := newTimedEvent(date, zman.desc, event.ZMANIM, zman.t, 0, nil, opts.clock)
 			events = append(events, ev)
 		}
 	}

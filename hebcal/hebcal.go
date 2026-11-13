@@ -41,6 +41,10 @@ Each holiday is represented by event.CalEvent object which includes a date,
 a description, flags and optional attributes.
 If given no options, returns holidays for the Diaspora for the current Gregorian year.
 
+HebrewCalendar does not modify opts, and the events it returns keep no
+reference to it, so one CalOptions value may be shared by concurrent calls and
+changed freely afterwards. A nil opts is the same as a zero CalOptions.
+
 The date range returned by this function can be controlled by:
   - opts.Year - Gregorian (e.g. 1993) or Hebrew year (e.g. 5749)
   - opts.IsHebrewYear - to interpret year as Hebrew year
@@ -122,36 +126,12 @@ Two options also exist for generating an Event with the Hebrew date:
   - opts.AddHebrewDates - print the Hebrew date for the entire date range
   - opts.AddHebrewDatesForEvents - print the Hebrew date for dates with some events
 */
-func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
-	// before checkCandleOptions, because the mask can enable this option
-	if opts.Mask.Has(event.KIDDUSH_LEVANA) {
-		opts.KiddushLevanaMaharil = true
-	}
-	err := checkCandleOptions(opts)
+func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
+	opts, startAbs, endAbs, err := newCalConfig(options)
 	if err != nil {
 		return nil, err
 	}
-	if opts.SunriseSunset && opts.Location == nil {
-		return nil, errors.New("opts.SunriseSunset requires opts.Location")
-	}
-	if opts.DailyZmanim && opts.Location == nil {
-		return nil, errors.New("opts.DailyZmanim requires opts.Location")
-	}
-	startAbs, endAbs, err := getStartAndEnd(opts)
-	if err != nil {
-		return nil, err
-	}
-	if opts.Location != nil && opts.Location.CountryCode == "IL" {
-		opts.IL = true
-	}
-	opts.Mask = getMaskFromOptions(opts)
-	if opts.YerushalmiYomi && opts.YerushalmiEdition == 0 {
-		opts.YerushalmiEdition = Vilna
-	}
-	yerushalmiCalendar := "yerushalmi-vilna"
-	if opts.YerushalmiEdition == Schottenstein {
-		yerushalmiCalendar = "yerushalmi-schottenstein"
-	}
+	yerushalmiCalendar := opts.yerushalmiCalendar
 	var (
 		il           = opts.IL
 		currentYear  = -1
@@ -207,7 +187,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		prevEventsLength := len(events)
 		sortByTime := false
 		if opts.SunriseSunset && (!opts.WeeklyAbbreviated || dow == firstWeekday) {
-			events = append(events, riseSetEvent{date: hd, opts: opts})
+			events = append(events, newRiseSetEvent(hd, opts))
 		}
 		if opts.DailySedra || (opts.Sedrot && dow == time.Saturday) {
 			parsha := sedraYear.LookupByRD(abs)
@@ -220,7 +200,7 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 			molad := molad.New(hd.Year(), nextMonth)
 			events = append(events, event.NewMoladEvent(hd, molad, nextMonthName,
-				clockCountry(opts), opts.Clock))
+				opts.clock.cc, opts.clock.format))
 		}
 		for _, holidayEv := range holidaysYear {
 			if hd == holidayEv.Date {
@@ -343,6 +323,61 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 	return events, nil
 }
 
+// calConfig is what HebrewCalendar works from: a private copy of the caller's
+// CalOptions, validated and normalized (defaults filled in, the Israel
+// schedule implied by an Israeli location, the event mask resolved), plus
+// the values derived from it. The caller's CalOptions is never written to.
+type calConfig struct {
+	CalOptions
+	// clock is the clock format events render their times in
+	clock clock
+	// yerushalmiCalendar is the registered name of the Yerushalmi Yomi edition
+	yerushalmiCalendar string
+}
+
+// newCalConfig copies and normalizes options, and returns the range of R.D.
+// days the calendar covers.
+func newCalConfig(options *CalOptions) (cfg *calConfig, startAbs, endAbs int64, err error) {
+	cfg = &calConfig{}
+	if options != nil {
+		cfg.CalOptions = *options
+	}
+	opts := &cfg.CalOptions
+	// before checkCandleOptions, because the mask can enable this option
+	if opts.Mask.Has(event.KIDDUSH_LEVANA) {
+		opts.KiddushLevanaMaharil = true
+	}
+	if err = checkCandleOptions(opts); err != nil {
+		return nil, 0, 0, err
+	}
+	if opts.SunriseSunset && opts.Location == nil {
+		return nil, 0, 0, errors.New("opts.SunriseSunset requires opts.Location")
+	}
+	if opts.DailyZmanim && opts.Location == nil {
+		return nil, 0, 0, errors.New("opts.DailyZmanim requires opts.Location")
+	}
+	startAbs, endAbs, err = getStartAndEnd(opts)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+	if opts.Location != nil && opts.Location.CountryCode == "IL" {
+		opts.IL = true
+	}
+	opts.Mask = getMaskFromOptions(opts)
+	if opts.YerushalmiYomi && opts.YerushalmiEdition == 0 {
+		opts.YerushalmiEdition = Vilna
+	}
+	cfg.yerushalmiCalendar = "yerushalmi-vilna"
+	if opts.YerushalmiEdition == Schottenstein {
+		cfg.yerushalmiCalendar = "yerushalmi-schottenstein"
+	}
+	cfg.clock = clockFor(opts)
+	return cfg, startAbs, endAbs, nil
+}
+
+// getStartAndEnd returns the first and last R.D. day of the calendar. It
+// turns opts.CandleLighting off for years too early for candle-lighting
+// times; opts is HebrewCalendar's private copy.
 func getStartAndEnd(opts *CalOptions) (int64, int64, error) {
 	hasStart := opts.Start != hdate.HDate{}
 	hasEnd := opts.End != hdate.HDate{}
@@ -651,13 +686,13 @@ func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 
 // makeMevarchimEvent upgrades a bare "Shabbat Mevarchim Chodesh" holiday event
 // to a MevarchimChodeshEvent carrying the molad of the upcoming month.
-func makeMevarchimEvent(ev event.HolidayEvent, opts *CalOptions) event.MevarchimChodeshEvent {
+func makeMevarchimEvent(ev event.HolidayEvent, opts *calConfig) event.MevarchimChodeshEvent {
 	hd := ev.Date
 	nextName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 	m := molad.New(hd.Year(), nextMonth)
 	mev := event.NewMevarchimChodeshEvent(hd, nextName, m)
-	mev.CountryCode = clockCountry(opts)
-	mev.Clock = opts.Clock
+	mev.CountryCode = opts.clock.cc
+	mev.Clock = opts.clock.format
 	return mev
 }
 
@@ -703,7 +738,7 @@ func sortTimedEvents(events []event.CalEvent) {
 	})
 }
 
-func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev event.CalEvent, opts *CalOptions) ([]event.CalEvent, TimedEvent) {
+func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev event.CalEvent, opts *calConfig) ([]event.CalEvent, TimedEvent) {
 	mask := ev.GetFlags()
 	if (!opts.YomKippurKatan && mask.Has(event.YOM_KIPPUR_KATAN)) ||
 		(!opts.BeHaB && mask.Has(event.BEHAB)) ||
