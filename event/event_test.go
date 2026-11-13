@@ -96,3 +96,30 @@ func TestRoshHashanaLocale(t *testing.T) {
 	assert.Equal(t, "ראש השנה תשע״א", ev.Render("he-x-NoNikud"))
 	assert.Equal(t, "Рош-А-Шана 5771", ev.Render("ru"))
 }
+
+// A caller can build a holiday whose description is shorter than its flags
+// suggest; rendering it must not slice past the end of the string.
+func TestRenderShortDescriptions(t *testing.T) {
+	hd := hdate.New(5786, hdate.Shvat, 1)
+	for _, tc := range []struct {
+		desc  string
+		flags event.Flags
+	}{
+		{"RC", event.RoshChodesh},
+		{"", event.RoshChodesh},
+		{"YKK", event.YomKippurKatan | event.MinorFast},
+		{"", event.YomKippurKatan},
+	} {
+		ev := event.NewHolidayEvent(hd, tc.desc, tc.flags, "")
+		assert.NotPanics(t, func() {
+			_ = ev.Render("en")
+			_ = ev.Render("he")
+			_ = ev.RenderBrief("en")
+			_ = ev.Memo("en")
+			_ = ev.URL()
+			_ = ev.Basename()
+		}, "%q", tc.desc)
+	}
+	rc := event.NewHolidayEvent(hd, "Rosh Chodesh Sh'vat", event.RoshChodesh, "")
+	assert.Equal(t, "Rosh Chodesh Sh’vat", rc.Render("en"))
+}

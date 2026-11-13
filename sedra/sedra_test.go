@@ -2,6 +2,7 @@ package sedra_test
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -205,5 +206,28 @@ func TestSedraEarlyYears(t *testing.T) {
 	for _, year := range years {
 		s := sedra.New(year, false)
 		assert.Equal(t, year, s.Year)
+	}
+}
+
+// A lookup for a date outside the Sedra's own year is answered by the year
+// the date belongs to, whether that is later or earlier.
+func TestLookupOutsideYear(t *testing.T) {
+	for year := 5780; year <= 5800; year++ {
+		for _, il := range []bool{false, true} {
+			s := sedra.New(year, il)
+			for delta := -2; delta <= 2; delta++ {
+				other := sedra.New(year+delta, il)
+				start := hdate.New(year+delta, hdate.Tishrei, 1).Abs()
+				end := hdate.New(year+delta+1, hdate.Tishrei, 1).Abs()
+				for abs := start; abs < end; abs += 3 {
+					want := other.LookupByRD(abs)
+					got := s.LookupByRD(abs)
+					if !reflect.DeepEqual(want, got) {
+						t.Fatalf("year %d il=%v, date %s: got %v, want %v",
+							year, il, hdate.FromRD(abs), got, want)
+					}
+				}
+			}
+		}
 	}
 }

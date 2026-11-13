@@ -65,6 +65,13 @@ var (
 	ErrStartRequiresEnd = errors.New("opts.Start requires opts.End")
 	// ErrInvalidHebrewYear: IsHebrewYear with a Year below 1.
 	ErrInvalidHebrewYear = errors.New("invalid Hebrew year")
+	// ErrInvalidMonth: Month is not zero and not a month from January to
+	// December.
+	ErrInvalidMonth = errors.New("opts.Month must be between 1 and 12")
+	// ErrBeforeHebrewEpoch: the calendar would begin before 1 Tishrei of
+	// Hebrew year 1 (in the Gregorian year -3761), where no Hebrew date
+	// exists.
+	ErrBeforeHebrewEpoch = errors.New("calendar begins before Hebrew year 1")
 )
 
 // optionError is an error about one option that also matches the kind of

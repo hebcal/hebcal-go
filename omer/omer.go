@@ -18,6 +18,7 @@ package omer
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 
@@ -37,12 +38,29 @@ type OmerEvent struct {
 	DaysWithinWeeks int
 }
 
+// ErrOmerDay means a day of the Omer is outside the range 1-49.
+var ErrOmerDay = errors.New("omer: day out of range [1,49]")
+
 // NewOmerEvent constructs an OmerEvent for the given Hebrew date and day of the
-// Omer. It panics if omerDay is outside the range 1-49.
-func NewOmerEvent(hd hdate.HDate, omerDay int) OmerEvent {
+// Omer. It returns ErrOmerDay if omerDay is outside the range 1-49.
+func NewOmerEvent(hd hdate.HDate, omerDay int) (OmerEvent, error) {
 	if omerDay < 1 || omerDay > 49 {
-		panic("invalid omerDay")
+		return OmerEvent{}, ErrOmerDay
 	}
+	return newOmerEvent(hd, omerDay), nil
+}
+
+// MustNewOmerEvent is like NewOmerEvent but panics if omerDay is out of
+// range. It is meant for a day computed from the calendar, which cannot be.
+func MustNewOmerEvent(hd hdate.HDate, omerDay int) OmerEvent {
+	ev, err := NewOmerEvent(hd, omerDay)
+	if err != nil {
+		panic(err)
+	}
+	return ev
+}
+
+func newOmerEvent(hd hdate.HDate, omerDay int) OmerEvent {
 	week := ((omerDay - 1) / 7) + 1
 	days := (omerDay % 7)
 	if days == 0 {

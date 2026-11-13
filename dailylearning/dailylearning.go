@@ -55,6 +55,7 @@ var (
 
 // AddCalendar registers a learning calendar under a case-insensitive name.
 // Registering a name that already exists overwrites the previous entry.
+// It panics if fn is nil.
 //
 // Use AddCalendarFrom for a calendar whose cycle began on a known date.
 func AddCalendar(name string, fn CalendarFunc) {
@@ -70,6 +71,11 @@ func AddCalendarFrom(name string, fn CalendarFunc, startDate hdate.HDate) {
 }
 
 func add(name string, c calendar) {
+	if c.fn == nil {
+		// A mistake in the registering package, found at start-up, like
+		// database/sql.Register with a nil driver.
+		panic("dailylearning: AddCalendar with a nil CalendarFunc")
+	}
 	mu.Lock()
 	defer mu.Unlock()
 	calendars[strings.ToLower(name)] = c

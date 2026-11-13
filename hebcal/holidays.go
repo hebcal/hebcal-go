@@ -817,6 +817,9 @@ var (
 // GetHolidaysForYear returns all holidays in the given Hebrew year, for either
 // the Diaspora (il=false) or Israel (il=true) schedule.
 //
+// year must be a valid Hebrew year, 1 or later; an earlier year panics, as
+// in github.com/hebcal/hdate.
+//
 // The result is memoized and shared between callers, so it must be treated as
 // read-only: do not modify the returned slice or its elements. (The slice is
 // returned with its capacity clamped to its length, so appending to it safely

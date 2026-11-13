@@ -223,7 +223,8 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 		if !opts.WeeklyAbbreviated || dow == firstWeekday {
 			if opts.Omer && abs >= beginOmer && abs <= endOmer {
 				omerDay := int(abs - beginOmer + 1)
-				events = append(events, omer.NewOmerEvent(hd, omerDay))
+				// omerDay is between 1 and 49 by the bounds just tested
+				events = append(events, omer.MustNewOmerEvent(hd, omerDay))
 			}
 			// Daily learning schedules (Daf Yomi, Mishna Yomi, Yerushalmi
 			// Yomi) are supplied by schedule providers that register
@@ -320,6 +321,10 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 	return events, nil
 }
 
+// hebrewEpoch is the R.D. day of 1 Tishrei of Hebrew year 1, the first day
+// that has a Hebrew date.
+var hebrewEpoch = hdate.ToRD(1, hdate.Tishrei, 1)
+
 // calConfig is what HebrewCalendar works from: a private copy of the caller's
 // CalOptions, validated and normalized (defaults filled in, the Israel
 // schedule implied by an Israeli location, the event mask resolved), plus
@@ -356,6 +361,9 @@ func newCalConfig(options *CalOptions) (cfg *calConfig, startAbs, endAbs int64, 
 	startAbs, endAbs, err = getStartAndEnd(opts)
 	if err != nil {
 		return nil, 0, 0, err
+	}
+	if startAbs < hebrewEpoch {
+		return nil, 0, 0, ErrBeforeHebrewEpoch
 	}
 	if opts.CandleLighting || opts.KiddushLevanaMaharil || opts.SunriseSunset || opts.DailyZmanim {
 		// The location is about to be used for times: check it once, here,
@@ -427,6 +435,9 @@ func getStartAndEnd(opts *CalOptions) (int64, int64, error) {
 	// disable candle-lighting times for very early dates
 	if year < 1753 {
 		opts.CandleLighting = false
+	}
+	if opts.Month < 0 || opts.Month > time.December {
+		return 0, 0, ErrInvalidMonth
 	}
 	month := time.January
 	if opts.Month != 0 {

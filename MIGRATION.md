@@ -441,8 +441,40 @@ if errors.Is(err, hebcal.ErrLocationRequired) {
 }
 ```
 
+Two kinds of input that used to panic part-way through are reported too:
+`ErrInvalidMonth` for a `Month` outside 1-12, and `ErrBeforeHebrewEpoch` for a
+calendar that would begin before 1 Tishrei of Hebrew year 1 (a Gregorian year
+of -3761 or earlier).
+
 `hebcal.IsAssurBemelacha` (see below) also returns an error for an unusable
 location instead of panicking.
+
+### `omer.NewOmerEvent`
+
+It used to panic for a day outside 1-49, and now returns `omer.ErrOmerDay`:
+
+```go
+// Before
+ev := omer.NewOmerEvent(hd, day)           // might panic
+
+// After
+ev, err := omer.NewOmerEvent(hd, day)
+// or, for a day computed from the calendar:
+ev := omer.MustNewOmerEvent(hd, day)
+```
+
+### `sedra.Sedra.Lookup`
+
+A lookup for a date before the Sedra's own year used to panic. It is now
+answered by the year the date belongs to, as a date after the year already
+was. Nothing to change in your code.
+
+### What still panics
+
+A Hebrew year below 1 passed to `sedra.New`, `molad.New` or
+`hebcal.GetHolidaysForYear` panics, as it does in `github.com/hebcal/hdate`,
+which these call. So does a lookup on a zero `sedra.Sedra`, and registering a
+nil function with `dailylearning.AddCalendar`.
 
 ## 9. Other renames
 
@@ -604,6 +636,7 @@ values (section 8), and the `Hour12`/`Hour24` options (section 6). Finish with
 | reading `opts.IL`, `opts.Mask`, ... after `HebrewCalendar` | no longer written; compute them yourself |
 | `zmanim.NewLocation(...)` (one result) | `loc, err := zmanim.NewLocation(...)` or `zmanim.MustNewLocation(...)` |
 | `zmanim.New(loc, date)` (one result) | `z, err := zmanim.New(loc, date)` or `zmanim.MustNew(loc, date)` |
+| `omer.NewOmerEvent(hd, day)` (one result) | `ev, err := omer.NewOmerEvent(hd, day)` or `omer.MustNewOmerEvent(hd, day)` |
 | comparing `err.Error()` from `HebrewCalendar` | `errors.Is(err, hebcal.ErrLocationRequired)` and the others in section 8 |
 | `loc.TimeZoneId` | `loc.TimeZoneID` |
 | `hebcal.IsAssurBemlacha` | `hebcal.IsAssurBemelacha` |

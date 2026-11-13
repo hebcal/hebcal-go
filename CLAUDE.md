@@ -82,14 +82,32 @@ https://github.com/hebcal/hebcal/issues/300 ("Add events of '929 daily bible
 chapter project'"); cite it in the v0.2.0 release notes. Ask the user for the
 issue link if a change clearly maps to a request but you don't have the number.
 
-## Library code does not panic on input
+## When to panic and when to return an error
 
-A value that comes from a caller (coordinates, a time zone name, options) is
-reported with an error, and the errors a caller might branch on are exported
-values. `Must...` constructors exist beside the error-returning ones for
-tests and for values known to be good. The remaining panics are for
-programmer errors (`omer.NewOmerEvent` with a day outside 1-49, a lookup on
-a zero `sedra.Sedra` or for a date before its year).
+The rule this module follows, after an audit of every `panic`:
+
+- **Return an error** for anything a caller's data can get wrong: coordinates,
+  a time zone name, a day of the Omer, a month number, a date range, options
+  that contradict each other. The errors a caller might branch on are
+  exported values (`zmanim.ErrLatitude`, `omer.ErrOmerDay`,
+  `hebcal.ErrInvalidMonth`, ...), tested with `errors.Is`.
+- **Offer a `Must...` twin** where the value is often known to be good
+  (`zmanim.MustNew`, `zmanim.MustNewLocation`, `omer.MustNewOmerEvent`). It
+  panics, by name and on purpose, and is for tests and for values the code has
+  just computed or checked.
+- **Make the function total** when there is a right answer after all: a
+  `Sedra` asked about a date outside its year delegates to that year, and
+  rendering a holiday trims a prefix rather than slicing at a fixed offset.
+- **Panic** only for a broken invariant or a misuse no input can cause: the
+  sedra tables not covering a year type (they cover all fourteen), a lookup on
+  a zero `sedra.Sedra`, registering a nil `dailylearning.CalendarFunc` (found
+  at start-up, like `database/sql.Register`).
+
+One panic is inherited rather than chosen: `github.com/hebcal/hdate` panics on
+a Hebrew year below 1 and on an R.D. day before the Hebrew epoch, so
+`sedra.New`, `molad.New` and `GetHolidaysForYear` do too for such a year.
+`HebrewCalendar` checks its range first and returns `ErrInvalidHebrewYear` or
+`ErrBeforeHebrewEpoch`. Changing the rest belongs in `hdate`.
 
 ## Breaking changes go in MIGRATION.md
 

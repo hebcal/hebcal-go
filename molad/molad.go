@@ -66,6 +66,9 @@ func (m *Molad) setMoladTime(chalakim int) {
 
 // New makes an instance of Molad for a given Hebrew year and
 // month.
+//
+// year must be a valid Hebrew year, 1 or later; an earlier year panics, as
+// in github.com/hebcal/hdate.
 func New(year int, month hdate.HMonth) Molad {
 	chalakim := getChalakimSinceMoladTohu(year, month)
 	hd := hdate.FromRD(moladToAbsDate(chalakim))

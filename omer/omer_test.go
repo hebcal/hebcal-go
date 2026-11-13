@@ -1,6 +1,7 @@
 package omer_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -12,14 +13,14 @@ import (
 
 func TestSefira(t *testing.T) {
 	assert := assert.New(t)
-	omer := omer.NewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
+	omer := omer.MustNewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
 	assert.Equal("Eternity within Majesty", omer.Sefira("en"))
 	assert.Equal("נֶּֽצַח שֶׁבְּמַלְכוּת", omer.Sefira("he"))
 	assert.Equal("Netzach sheb'Malkhut", omer.Sefira("translit"))
 }
 
 func ExampleOmerEvent_Sefira() {
-	ev := omer.NewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
+	ev := omer.MustNewOmerEvent(hdate.New(5770, hdate.Sivan, 2), 46)
 	fmt.Println(ev.Sefira("en"))
 	fmt.Println(ev.Sefira("he"))
 	fmt.Println(ev.Sefira("translit"))
@@ -34,7 +35,7 @@ func omerEvents() []omer.OmerEvent {
 	events := make([]omer.OmerEvent, 50)
 	startAbs := hdate.New(5782, hdate.Nisan, 16).Abs()
 	for i := 1; i <= 49; i++ {
-		events[i] = omer.NewOmerEvent(hdate.FromRD(startAbs+int64(i)-1), i)
+		events[i] = omer.MustNewOmerEvent(hdate.FromRD(startAbs+int64(i)-1), i)
 	}
 	return events
 }
@@ -91,20 +92,20 @@ func TestEmoji(t *testing.T) {
 	startAbs := start.Abs()
 	for i := 1; i <= 49; i++ {
 		abs := startAbs + int64(i) - 1
-		ev := omer.NewOmerEvent(hdate.FromRD(abs), i)
+		ev := omer.MustNewOmerEvent(hdate.FromRD(abs), i)
 		actual[i] = ev.Emoji()
 	}
 	assert.Equal(t, expected, actual)
 }
 
 func ExampleOmerEvent_Emoji() {
-	omer := omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
+	omer := omer.MustNewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
 	fmt.Println(omer.Emoji())
 	// Output: ⑬
 }
 
 func ExampleOmerEvent_TodayIs() {
-	omer := omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
+	omer := omer.MustNewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
 	fmt.Println(omer.TodayIs("en"))
 	fmt.Println(omer.TodayIs("he"))
 	fmt.Println(omer.TodayIs("he-x-NoNikud"))
@@ -115,8 +116,23 @@ func ExampleOmerEvent_TodayIs() {
 }
 
 func TestRenderBrief(t *testing.T) {
-	ev := omer.NewOmerEvent(hdate.New(5786, hdate.Iyyar, 7), 22)
+	ev := omer.MustNewOmerEvent(hdate.New(5786, hdate.Iyyar, 7), 22)
 	assert.Equal(t, "22nd day of the Omer", ev.Render("en"))
 	assert.Equal(t, "Omer day 22", ev.RenderBrief("en"))
 	assert.Equal(t, "עוֹמֶר יוֹם 22", ev.RenderBrief("he"))
+}
+
+func TestNewOmerEventRange(t *testing.T) {
+	hd := hdate.New(5786, hdate.Nisan, 16)
+	for _, day := range []int{-1, 0, 50, 1000} {
+		_, err := omer.NewOmerEvent(hd, day)
+		assert.True(t, errors.Is(err, omer.ErrOmerDay), "day %d", day)
+		assert.Panics(t, func() { omer.MustNewOmerEvent(hd, day) })
+	}
+	for _, day := range []int{1, 7, 49} {
+		ev, err := omer.NewOmerEvent(hd, day)
+		assert.NoError(t, err)
+		assert.Equal(t, day, ev.OmerDay)
+		assert.Equal(t, ev, omer.MustNewOmerEvent(hd, day))
+	}
 }

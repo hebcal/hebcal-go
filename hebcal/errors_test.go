@@ -80,3 +80,24 @@ func TestUnusableLocation(t *testing.T) {
 	_, err = hebcal.IsAssurBemelacha(hdate.New(5786, hdate.Tishrei, 1).Gregorian(), badZone, false, false)
 	assert.True(t, errors.Is(err, zmanim.ErrTimeZone), "%v", err)
 }
+
+// Input that used to panic part-way through the calendar is an error.
+func TestRangeErrors(t *testing.T) {
+	_, err := hebcal.HebrewCalendar(&hebcal.CalOptions{Year: 2026, Month: 13})
+	assert.True(t, errors.Is(err, hebcal.ErrInvalidMonth), "%v", err)
+	_, err = hebcal.HebrewCalendar(&hebcal.CalOptions{Year: 2026, Month: -1})
+	assert.True(t, errors.Is(err, hebcal.ErrInvalidMonth), "%v", err)
+
+	// The Gregorian year -3761 begins before 1 Tishrei of Hebrew year 1.
+	for _, year := range []int{-3761, -3762, -5000} {
+		_, err = hebcal.HebrewCalendar(&hebcal.CalOptions{Year: year, Sedrot: true, Omer: true})
+		assert.True(t, errors.Is(err, hebcal.ErrBeforeHebrewEpoch), "year %d: %v", year, err)
+	}
+	// The first years that have Hebrew dates throughout still work.
+	events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{Year: -3760, Sedrot: true, Omer: true, Molad: true})
+	assert.NoError(t, err)
+	assert.NotEmpty(t, events)
+	events, err = hebcal.HebrewCalendar(&hebcal.CalOptions{Year: 1, IsHebrewYear: true, Sedrot: true, Omer: true, Molad: true})
+	assert.NoError(t, err)
+	assert.NotEmpty(t, events)
+}

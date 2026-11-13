@@ -53,7 +53,7 @@ func (ev HolidayEvent) render(locale string) string {
 	switch {
 	case ev.flags.Has(RoshChodesh):
 		rchStr, _ := locales.LookupTranslation("Rosh Chodesh", locale)
-		monthStr, _ := locales.LookupTranslation(ev.desc[13:], locale)
+		monthStr, _ := locales.LookupTranslation(strings.TrimPrefix(ev.desc, "Rosh Chodesh "), locale)
 		return rchStr + " " + monthStr
 	case ev.flags.Has(ShabbatMevarchim):
 		mevarchimStr, _ := locales.LookupTranslation(
@@ -75,7 +75,7 @@ func (ev HolidayEvent) render(locale string) string {
 		return s + " " + strconv.Itoa(year)
 	case ev.flags.Has(YomKippurKatan):
 		rchStr, _ := locales.LookupTranslation("Yom Kippur Katan", locale)
-		monthStr, _ := locales.LookupTranslation(ev.desc[17:], locale)
+		monthStr, _ := locales.LookupTranslation(strings.TrimPrefix(ev.desc, yomKippurKatanPrefix), locale)
 		return rchStr + " " + monthStr
 	}
 	str, _ := locales.LookupTranslation(ev.desc, locale)
