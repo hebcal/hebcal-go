@@ -54,11 +54,11 @@ func TestIsAssurBemlachaPolarError(t *testing.T) {
 	assert.Error(err)
 }
 
-func TestGetHolidaysOnDate(t *testing.T) {
+func TestHolidaysOnDate(t *testing.T) {
 	assert := assert.New(t)
 	// 15 Nisan 5784 = Pesach I (2024-04-23).
 	hd := hdate.New(5784, hdate.Nisan, 15)
-	events := hebcal.GetHolidaysOnDate(hd, false)
+	events := hebcal.HolidaysOnDate(hd, false)
 	found := false
 	for _, ev := range events {
 		if ev.Desc() == "Pesach I" {
@@ -68,6 +68,6 @@ func TestGetHolidaysOnDate(t *testing.T) {
 	assert.True(found, "expected Pesach I on 15 Nisan 5784")
 
 	// A random weekday with no holiday.
-	none := hebcal.GetHolidaysOnDate(hdate.New(5784, hdate.Iyyar, 3), false)
+	none := hebcal.HolidaysOnDate(hdate.New(5784, hdate.Iyyar, 3), false)
 	assert.Empty(none)
 }

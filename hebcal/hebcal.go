@@ -150,7 +150,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 		hyear := hd.Year()
 		if hyear != currentYear {
 			currentYear = hyear
-			holidaysYear = GetHolidaysForYear(hyear, il)
+			holidaysYear = HolidaysForYear(hyear, il)
 			if opts.Sedrot || opts.DailySedra {
 				sedraYear = sedra.New(hyear, il)
 			}

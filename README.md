@@ -18,9 +18,9 @@ This Golang implementation was released in 2022 by Michael J. Radwin.
 Many users of this library will utilize the HebrewCalendar and HDate
 interfaces.
 
-## Upgrading to v0.50.0
+## Upgrading to v0.50
 
-v0.50.0 changes the API in ways that break existing callers. The calendar's
+v0.50 changes the API in ways that break existing callers. The calendar's
 output is unchanged; the Go API around it is cleaner:
 
   - `event.CalEvent` gained `Desc()` and `URL()`, and its getters lost their

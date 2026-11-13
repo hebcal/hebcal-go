@@ -172,7 +172,7 @@ func isShabbatOrChag(hd hdate.HDate, il bool) bool {
 	if hd.Weekday() == time.Saturday {
 		return true
 	}
-	for _, ev := range GetHolidaysOnDate(hd, il) {
+	for _, ev := range HolidaysOnDate(hd, il) {
 		if ev.Flags().Has(event.Chag) {
 			return true
 		}

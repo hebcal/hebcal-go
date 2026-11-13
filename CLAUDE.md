@@ -50,7 +50,7 @@ URL generation lives in `event/url.go` (holidays, parsha, Hebrew date) and `omer
 
 **`HebrewCalendar` never writes to the caller's `CalOptions`.** `newCalConfig` copies it and normalizes the copy into the unexported `calConfig` (defaults, the Israel schedule implied by an Israeli location, the resolved mask, a negated candle-lighting offset), and the internal helpers take `*calConfig`. Events keep only the resolved `clock` (country code and `ClockFormat`), never a pointer to the options, so one options value can be shared by concurrent calls. `options_immutable_test.go` guards this, including under `-race`; a new normalization must go on the copy.
 
-- `holidays.go` — `GetHolidaysForYear(year, il)` / `getAllHolidaysForYear` build the fixed holiday set for a Hebrew year, including computed dates (`tzomGedaliahDate`, `taanitEstherDate`, Birkat HaChama).
+- `holidays.go` — `HolidaysForYear(year, il)` / `getAllHolidaysForYear` build the fixed holiday set for a Hebrew year, including computed dates (`tzomGedaliahDate`, `taanitEstherDate`, Birkat HaChama).
 - `candles.go` — candle-lighting / havdalah / fast start-end / Chanukah / biur chametz. `TimedEvent` is the timed `CalEvent`; times come from `zmanim`. Its `Kind()` is a `TimedKind` (`CandleLighting`, `Havdalah`, `ChanukahCandles`, `FastBegins`, `FastEnds`, `FinishChametz`, `BiurChametz`, `KiddushLevana`, `Zman`): switch on the kind, not on the description string, which is only the translation key and identifier. `TimedKindOf(ev)` reads it from a `CalEvent`. `checkCandleOptions` validates location config.
 - Holiday "related" events (candle-lighting, havdalah, mevarchim, chametz) are appended by `appendHolidayAndRelated`.
 - `errors.go` — the option errors `HebrewCalendar` returns, as exported values (`ErrCandleLightingLocation`, `ErrHavdalahMinsAndDeg`, ...). Each also matches its kind, `ErrLocationRequired` or `ErrMutuallyExclusive`, with `errors.Is`. Their messages are part of the observable output; do not reword them.
@@ -105,7 +105,7 @@ The rule this module follows, after an audit of every `panic`:
 
 One panic is inherited rather than chosen: `github.com/hebcal/hdate` panics on
 a Hebrew year below 1 and on an R.D. day before the Hebrew epoch, so
-`sedra.New`, `molad.New` and `GetHolidaysForYear` do too for such a year.
+`sedra.New`, `molad.New` and `HolidaysForYear` do too for such a year.
 `HebrewCalendar` checks its range first and returns `ErrInvalidHebrewYear` or
 `ErrBeforeHebrewEpoch`. Changing the rest belongs in `hdate`.
 

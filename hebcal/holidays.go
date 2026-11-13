@@ -800,13 +800,13 @@ func getBirkatHaChama(year int) int64 {
 	return 0
 }
 
-// holidaysYearKey identifies a memoized GetHolidaysForYear result.
+// holidaysYearKey identifies a memoized HolidaysForYear result.
 type holidaysYearKey struct {
 	year int
 	il   bool
 }
 
-// holidaysForYearCache memoizes GetHolidaysForYear. The map is unbounded (the
+// holidaysForYearCache memoizes HolidaysForYear. The map is unbounded (the
 // set of (year, il) pairs a process sees is small in practice) and guarded by
 // holidaysForYearMu.
 var (
@@ -814,7 +814,7 @@ var (
 	holidaysForYearCache = make(map[holidaysYearKey][]event.HolidayEvent)
 )
 
-// GetHolidaysForYear returns all holidays in the given Hebrew year, for either
+// HolidaysForYear returns all holidays in the given Hebrew year, for either
 // the Diaspora (il=false) or Israel (il=true) schedule.
 //
 // year must be a valid Hebrew year, 1 or later; an earlier year panics, as
@@ -824,7 +824,7 @@ var (
 // read-only: do not modify the returned slice or its elements. (The slice is
 // returned with its capacity clamped to its length, so appending to it safely
 // allocates a new backing array rather than corrupting the cache.)
-func GetHolidaysForYear(year int, il bool) []event.HolidayEvent {
+func HolidaysForYear(year int, il bool) []event.HolidayEvent {
 	key := holidaysYearKey{year: year, il: il}
 	holidaysForYearMu.RLock()
 	cached, ok := holidaysForYearCache[key]

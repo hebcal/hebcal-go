@@ -1,6 +1,6 @@
-# Migrating to hebcal-go v0.50.0
+# Migrating to hebcal-go v0.50
 
-v0.50.0 changes the public API of `github.com/hebcal/hebcal-go` in ways that
+v0.50 changes the public API of `github.com/hebcal/hebcal-go` in ways that
 break existing callers. The version number jumps from v0.27 to say so. This
 module is still v0, so the import path does not change.
 
@@ -475,7 +475,7 @@ was. Nothing to change in your code.
 ### What still panics
 
 A Hebrew year below 1 passed to `sedra.New`, `molad.New` or
-`hebcal.GetHolidaysForYear` panics, as it does in `github.com/hebcal/hdate`,
+`hebcal.HolidaysForYear` panics, as it does in `github.com/hebcal/hdate`,
 which these call. So does a lookup on a zero `sedra.Sedra`, and registering a
 nil function with `dailylearning.AddCalendar`.
 
@@ -485,6 +485,8 @@ nil function with `dailylearning.AddCalendar`.
 |---|---|---|
 | `zmanim.Location.TimeZoneId` | `TimeZoneID` | field rename; also in struct literals |
 | `hebcal.IsAssurBemlacha` | `hebcal.IsAssurBemelacha` | spelling |
+| `hebcal.GetHolidaysForYear(year, il)` | `hebcal.HolidaysForYear(year, il)` | |
+| `hebcal.GetHolidaysOnDate(hd, il)` | `hebcal.HolidaysOnDate(hd, il)` | |
 | `hebcal.UserEvent` | `hebcal.UserEventSpec` | the *input* in `CalOptions.UserEvents`; `event.UserEvent` is the event it produces. The `UserEvents` field keeps its name. |
 | `hebcal.TimeOfDay(ev) int` | `hebcal.DayPartOf(ev) hebcal.DayPart` | typed result |
 | `hebcal.TimeOfDayDawn` ... `TimeOfDayNight` | `hebcal.DayPartDawn` ... `DayPartNight` | same values, same order |
@@ -500,7 +502,6 @@ for "before everything" still works as an untyped constant.
 changing the list in place to change what `LookupCity` returns, that no longer
 works.
 
-`hebcal.GetHolidaysForYear` and `hebcal.GetHolidaysOnDate` keep their names.
 
 ## 10. If you implement `event.CalEvent` or register a schedule
 
@@ -549,7 +550,7 @@ The registry is now safe to use from several goroutines, including
 registering while calendars are being generated.
 
 `github.com/hebcal/learning` has been updated; use a release of it made for
-hebcal-go v0.50.0 or later.
+hebcal-go v0.50 or later.
 
 ## 11. Doing the renames mechanically
 
@@ -585,6 +586,14 @@ gofmt -l -w -r 'event.URL(a) -> a.URL()' .
 
 ```bash
 gofmt -l -w -r 'event.HolidayFlags -> event.Flags' .
+```
+
+```bash
+gofmt -l -w -r 'hebcal.GetHolidaysForYear -> hebcal.HolidaysForYear' .
+```
+
+```bash
+gofmt -l -w -r 'hebcal.GetHolidaysOnDate -> hebcal.HolidaysOnDate' .
 ```
 
 The flag constants, one command for all of them:
@@ -644,6 +653,7 @@ values (section 8), and the `Hour12`/`Hour24` options (section 6). Finish with
 | comparing `err.Error()` from `HebrewCalendar` | `errors.Is(err, hebcal.ErrLocationRequired)` and the others in section 8 |
 | `loc.TimeZoneId` | `loc.TimeZoneID` |
 | `hebcal.IsAssurBemlacha` | `hebcal.IsAssurBemelacha` |
+| `hebcal.GetHolidaysForYear` / `GetHolidaysOnDate` | `hebcal.HolidaysForYear` / `HolidaysOnDate` |
 | `hebcal.UserEvent` | `hebcal.UserEventSpec` |
 | `hebcal.TimeOfDay(ev)`, `hebcal.TimeOfDayDawn` ... | `hebcal.DayPartOf(ev)`, `hebcal.DayPartDawn` ... |
 | `dailylearning.GetCalendars()` / `GetStartDate(n)` | `dailylearning.Calendars()` / `StartDate(n)` |

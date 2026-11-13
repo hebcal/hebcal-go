@@ -27,11 +27,11 @@ import (
 	"github.com/hebcal/hebcal-go/zmanim"
 )
 
-// GetHolidaysOnDate returns the holidays observed on the given Hebrew date, for
+// HolidaysOnDate returns the holidays observed on the given Hebrew date, for
 // either the Diaspora (il=false) or Israel (il=true) schedule.
-func GetHolidaysOnDate(hd hdate.HDate, il bool) []event.HolidayEvent {
+func HolidaysOnDate(hd hdate.HDate, il bool) []event.HolidayEvent {
 	abs := hd.Abs()
-	yearEvents := GetHolidaysForYear(hd.Year(), il)
+	yearEvents := HolidaysForYear(hd.Year(), il)
 	var result []event.HolidayEvent
 	for _, ev := range yearEvents {
 		if ev.Date().Abs() == abs {
@@ -102,7 +102,7 @@ func IsAssurBemelacha(currentTime time.Time, loc *zmanim.Location, il bool, useE
 	}
 	hd := hdate.FromTime(currentTime)
 	dow := hd.Weekday()
-	events := GetHolidaysOnDate(hd, il)
+	events := HolidaysOnDate(hd, il)
 	// erev Shabbat, Yom Tov or Yom Tov sheni and after shkiah
 	if isTomorrowShabbosOrYomTov(dow, events) && !currentTime.Before(sunset) {
 		return true, nil
