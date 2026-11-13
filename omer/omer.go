@@ -1,4 +1,4 @@
-// Hebcal's omer package calculates the Sefirat HaOmer.
+// Package omer calculates the Sefirat HaOmer.
 package omer
 
 // Hebcal - A Jewish Calendar Generator

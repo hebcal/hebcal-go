@@ -150,11 +150,11 @@ func TestParshaEventURL(t *testing.T) {
 	hd := hdate.FromGregorian(2026, time.August, 8)
 	ev := NewParshaEvent(hd, parshaFor("Eikev"), false)
 	want := "https://www.hebcal.com/sedrot/eikev-20260808"
-	if got := URL(ev); got != want {
+	if got := ev.URL(); got != want {
 		t.Errorf("URL() = %q, want %q", got, want)
 	}
 	il := NewParshaEvent(hd, parshaFor("Eikev"), true)
-	if got := URL(il); got != want+"?i=on" {
+	if got := il.URL(); got != want+"?i=on" {
 		t.Errorf("Israel URL() = %q, want %q", got, want+"?i=on")
 	}
 }
@@ -163,14 +163,14 @@ func TestParshaEventURL(t *testing.T) {
 func TestDoubledParshaURL(t *testing.T) {
 	hd := hdate.FromGregorian(2026, time.March, 14)
 	ev := NewParshaEvent(hd, parshaFor("Vayakhel", "Pekudei"), false)
-	if got := URL(ev); !strings.Contains(got, "/sedrot/vayakhel-pekudei-") {
+	if got := ev.URL(); !strings.Contains(got, "/sedrot/vayakhel-pekudei-") {
 		t.Errorf("URL() = %q, want it to contain /sedrot/vayakhel-pekudei-", got)
 	}
 }
 
 func TestHebrewDateEventURL(t *testing.T) {
 	ev := NewHebrewDateEvent(hdate.New(5786, hdate.Nisan, 15))
-	got := URL(ev)
+	got := ev.URL()
 	for _, want := range []string{"hd=15", "hm=Nisan", "hy=5786", "h2g=1"} {
 		if !strings.Contains(got, want) {
 			t.Errorf("URL() = %q, want it to contain %q", got, want)
@@ -178,11 +178,10 @@ func TestHebrewDateEventURL(t *testing.T) {
 	}
 }
 
-// URL returns "" for events that implement CalEvent but not URLer, rather
-// than panicking on the type assertion.
-func TestURLHelperHandlesEventsWithoutURLs(t *testing.T) {
+// An event with no page has an empty URL.
+func TestEventsWithoutURLs(t *testing.T) {
 	ev := UserEvent{}
-	if got := URL(ev); got != "" {
+	if got := ev.URL(); got != "" {
 		t.Errorf("URL() = %q, want empty", got)
 	}
 }

@@ -10,21 +10,6 @@ import (
 	"github.com/hebcal/hdate"
 )
 
-// URLer is the URL method of CalEvent.
-//
-// Deprecated: every CalEvent has a URL method. URLer will be removed in the
-// next minor release.
-type URLer interface {
-	URL() string
-}
-
-// URL returns the canonical URL for ev, or "" if it has none.
-//
-// Deprecated: call ev.URL(). URL will be removed in the next minor release.
-func URL(ev CalEvent) string {
-	return ev.URL()
-}
-
 // slugOverrides maps a generated slug onto the spelling hebcal.com actually
 // uses, where the two differ. The website predates these tables and its URLs
 // are permanent, so the event descriptions cannot simply be renamed.

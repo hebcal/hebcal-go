@@ -1,20 +1,5 @@
 package event
 
-// Descer is the Desc method of CalEvent.
-//
-// Deprecated: every CalEvent has a Desc method. Descer will be removed in the
-// next minor release.
-type Descer interface {
-	Desc() string
-}
-
-// Desc returns ev's untranslated description.
-//
-// Deprecated: call ev.desc(). Desc will be removed in the next minor release.
-func Desc(ev CalEvent) string {
-	return ev.Desc()
-}
-
 // Memoer is implemented by events that carry a longer note of their own: the
 // molad announced on Shabbat Mevarchim, the meaning of Yom Kippur Katan, the
 // Torah portion of the Shabbat that erev-Shabbat candle-lighting begins, the

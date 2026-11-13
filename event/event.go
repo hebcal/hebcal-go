@@ -1,4 +1,6 @@
-// Hebcal's event package provides an interface for calendar events.
+// Package event defines CalEvent, the interface every calendar event
+// satisfies, and the event types shared across the module: holidays, the
+// weekly Torah portion, Hebrew dates, the molad and personal events.
 package event
 
 import (

@@ -1,4 +1,4 @@
-// Hebcal's sedra package calculates the weekly Torah reading
+// Package sedra calculates the weekly Torah reading
 // (Parashat HaShavua).
 package sedra
 

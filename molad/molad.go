@@ -1,4 +1,4 @@
-// Hebcal's molad package calculates the time at which the
+// Package molad calculates the time at which the
 // New Moon is "born" each month.
 //
 // This code was largely ported from the Java implementation

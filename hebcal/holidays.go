@@ -800,8 +800,6 @@ func getBirkatHaChama(year int) int64 {
 	return 0
 }
 
-// Returns a slice of holidays for the year.
-// For Israel holiday schedule, specify il=true.
 // holidaysYearKey identifies a memoized GetHolidaysForYear result.
 type holidaysYearKey struct {
 	year int

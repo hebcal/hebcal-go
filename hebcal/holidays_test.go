@@ -695,7 +695,7 @@ func TestBeHaB(t *testing.T) {
 			assert.Equal(event.MinorFast|event.BeHaB, ev.Flags())
 			assert.Equal([]string{"holiday", "fast"}, ev.Categories())
 			// no holiday page on hebcal.com, matching @hebcal/core
-			assert.Equal("", event.URL(ev))
+			assert.Equal("", ev.URL())
 		}
 		assert.Equal(want, got)
 	}
@@ -749,7 +749,7 @@ func TestAdarBasenameKeepsNumeral(t *testing.T) {
 	events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{Year: 5784, IsHebrewYear: true, YomKippurKatan: true})
 	assert.NoError(t, err)
 	for _, ev := range events {
-		desc := event.Desc(ev)
+		desc := ev.Desc()
 		if w, ok := want[desc]; ok {
 			assert.Equal(t, w, ev.Basename(), desc)
 			seen[desc] = true
@@ -758,7 +758,7 @@ func TestAdarBasenameKeepsNumeral(t *testing.T) {
 				if strings.HasSuffix(desc, "II") {
 					suffix = "-adar-ii-2024"
 				}
-				assert.Contains(t, event.URL(ev), "/rosh-chodesh"+suffix, desc)
+				assert.Contains(t, ev.URL(), "/rosh-chodesh"+suffix, desc)
 			}
 		}
 	}

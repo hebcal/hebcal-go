@@ -59,11 +59,6 @@ func TestTimedInterfaceAndKind(t *testing.T) {
 			_, isKL := ev.(hebcal.KiddushLevanaEvent)
 			assert.True(t, isKL)
 		}
-		// the deprecated helper finds the same events
-		te, ok := hebcal.AsTimedEvent(ev)
-		require.True(t, ok)
-		assert.Equal(t, timed.Time(), te.Time())
-		assert.Equal(t, ev.Desc(), te.Desc())
 	}
 	for kind := hebcal.CandleLighting; kind <= hebcal.Zman; kind++ {
 		assert.NotZero(t, seen[kind], kind.String())

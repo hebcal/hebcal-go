@@ -96,25 +96,3 @@ func TestRoshHashanaLocale(t *testing.T) {
 	assert.Equal(t, "ראש השנה תשע״א", ev.Render("he-x-NoNikud"))
 	assert.Equal(t, "Рош-А-Шана 5771", ev.Render("ru"))
 }
-
-// The deprecated helpers answer exactly as the methods they wrap.
-func TestDeprecatedDescAndURLHelpers(t *testing.T) {
-	events := []event.CalEvent{
-		event.NewHolidayEvent(hdate.New(5787, hdate.Tishrei, 17), "Sukkot III (CH''M)", event.CholHamoed, ""),
-		event.NewUserEvent(hdate.New(5787, hdate.Tishrei, 17), "Birthday"),
-		event.NewHebrewDateEvent(hdate.New(5786, hdate.Elul, 29)),
-	}
-	want := []struct{ desc, url string }{
-		{"Sukkot III (CH''M)", "https://www.hebcal.com/holidays/sukkot-2026"},
-		{"Birthday", ""},
-		{"29 Elul 5786", "https://www.hebcal.com/converter?hd=29&hm=Elul&hy=5786&h2g=1"},
-	}
-	for i, ev := range events {
-		assert.Equal(t, want[i].desc, ev.Desc())
-		assert.Equal(t, want[i].url, ev.URL())
-		assert.Equal(t, ev.Desc(), event.Desc(ev))
-		assert.Equal(t, ev.URL(), event.URL(ev))
-		var _ event.Descer = ev
-		var _ event.URLer = ev
-	}
-}

@@ -41,7 +41,7 @@ func TestCandleLightingFlags(t *testing.T) {
 			assert.NoError(t, err)
 			var found bool
 			for _, ev := range events {
-				te, ok := hebcal.AsTimedEvent(ev)
+				te, ok := ev.(event.Timed)
 				if !ok || te.Desc() != "Candle lighting" {
 					continue
 				}

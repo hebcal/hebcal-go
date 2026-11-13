@@ -21,7 +21,7 @@ func calendar(t *testing.T, opts *hebcal.CalOptions) []event.CalEvent {
 
 func find(events []event.CalEvent, desc string) event.CalEvent {
 	for _, ev := range events {
-		if event.Desc(ev) == desc {
+		if ev.Desc() == desc {
 			return ev
 		}
 	}
@@ -36,7 +36,7 @@ func TestTimedEventEmoji(t *testing.T) {
 	})
 	var candles, havdalah, yomTovHavdalah, erevYomTov int
 	for _, ev := range events {
-		te, ok := hebcal.AsTimedEvent(ev)
+		te, ok := ev.(event.Timed)
 		if !ok {
 			continue
 		}
@@ -74,7 +74,7 @@ func TestChanukahCandleLightingIsTheHoliday(t *testing.T) {
 		if assert.NotNil(t, ev, desc) {
 			assert.Equal(t, "Chanukah", ev.Basename())
 			assert.Equal(t, []string{"holiday", "minor"}, ev.Categories())
-			assert.Equal(t, "https://www.hebcal.com/holidays/chanukah-2022", event.URL(ev))
+			assert.Equal(t, "https://www.hebcal.com/holidays/chanukah-2022", ev.URL())
 		}
 	}
 }
@@ -152,13 +152,13 @@ func TestDescAndBasename(t *testing.T) {
 	})
 	var got []string
 	for _, ev := range evs {
-		got = append(got, event.Desc(ev)+" | "+ev.Basename())
+		got = append(got, ev.Desc()+" | "+ev.Basename())
 	}
 	assert.Contains(t, got, "Omer 1 | Omer 1")
 	assert.Contains(t, got, "Pesach II | Pesach")
 	m := calendar(t, &hebcal.CalOptions{Start: hdate.New(5787, hdate.Cheshvan, 27), End: hdate.New(5787, hdate.Cheshvan, 27), Molad: true, NoHolidays: true})
 	if assert.Len(t, m, 1) {
-		assert.Equal(t, "Molad Kislev 5787", event.Desc(m[0]))
+		assert.Equal(t, "Molad Kislev 5787", m[0].Desc())
 	}
 }
 
