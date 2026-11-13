@@ -12,7 +12,7 @@ import (
 	"github.com/hebcal/hebcal-go/zmanim"
 )
 
-func calendar(t *testing.T, opts *hebcal.CalOptions) []event.CalEvent {
+func calendar(t *testing.T, opts *hebcal.Options) []event.CalEvent {
 	t.Helper()
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(t, err)
@@ -29,7 +29,7 @@ func find(events []event.CalEvent, desc string) event.CalEvent {
 }
 
 func TestTimedEventEmoji(t *testing.T) {
-	events := calendar(t, &hebcal.CalOptions{
+	events := calendar(t, &hebcal.Options{
 		Year: 5787, IsHebrewYear: true,
 		CandleLighting: true,
 		Location:       zmanim.LookupCity("Boston"),
@@ -63,7 +63,7 @@ func TestTimedEventEmoji(t *testing.T) {
 }
 
 func TestChanukahCandleLightingIsTheHoliday(t *testing.T) {
-	events := calendar(t, &hebcal.CalOptions{
+	events := calendar(t, &hebcal.Options{
 		Start:          hdate.New(5783, hdate.Kislev, 25),
 		End:            hdate.New(5783, hdate.Kislev, 29), // Friday 6th candle
 		CandleLighting: true,
@@ -80,8 +80,8 @@ func TestChanukahCandleLightingIsTheHoliday(t *testing.T) {
 }
 
 func TestCandleLightingMemo(t *testing.T) {
-	opts := func(start, end hdate.HDate) *hebcal.CalOptions {
-		return &hebcal.CalOptions{Start: start, End: end, CandleLighting: true,
+	opts := func(start, end hdate.HDate) *hebcal.Options {
+		return &hebcal.Options{Start: start, End: end, CandleLighting: true,
 			Sedrot: true, Location: zmanim.LookupCity("Boston")}
 	}
 	memos := func(events []event.CalEvent, locale string) []string {
@@ -106,7 +106,7 @@ func TestCandleLightingMemo(t *testing.T) {
 }
 
 func TestMevarchimAndYKKMemo(t *testing.T) {
-	evs := calendar(t, &hebcal.CalOptions{
+	evs := calendar(t, &hebcal.Options{
 		Start:            hdate.New(5787, hdate.Cheshvan, 1),
 		End:              hdate.New(5787, hdate.Cheshvan, 30),
 		ShabbatMevarchim: true,
@@ -128,7 +128,7 @@ func TestMevarchimAndYKKMemo(t *testing.T) {
 func TestIsraelCandleMins(t *testing.T) {
 	friday := hdate.New(5787, hdate.Cheshvan, 19)
 	candles := func(loc zmanim.Location) string {
-		evs := calendar(t, &hebcal.CalOptions{Start: friday, End: friday, CandleLighting: true, Location: &loc})
+		evs := calendar(t, &hebcal.Options{Start: friday, End: friday, CandleLighting: true, Location: &loc})
 		return evs[0].Render("en")
 	}
 	jlm := *zmanim.LookupCity("Jerusalem")
@@ -146,7 +146,7 @@ func TestIsraelCandleMins(t *testing.T) {
 }
 
 func TestDescAndBasename(t *testing.T) {
-	evs := calendar(t, &hebcal.CalOptions{
+	evs := calendar(t, &hebcal.Options{
 		Start: hdate.New(5786, hdate.Nisan, 16), End: hdate.New(5786, hdate.Nisan, 22),
 		Omer: true, Sedrot: true, Molad: true,
 	})
@@ -156,14 +156,14 @@ func TestDescAndBasename(t *testing.T) {
 	}
 	assert.Contains(t, got, "Omer 1 | Omer 1")
 	assert.Contains(t, got, "Pesach II | Pesach")
-	m := calendar(t, &hebcal.CalOptions{Start: hdate.New(5787, hdate.Cheshvan, 27), End: hdate.New(5787, hdate.Cheshvan, 27), Molad: true, NoHolidays: true})
+	m := calendar(t, &hebcal.Options{Start: hdate.New(5787, hdate.Cheshvan, 27), End: hdate.New(5787, hdate.Cheshvan, 27), Molad: true, NoHolidays: true})
 	if assert.Len(t, m, 1) {
 		assert.Equal(t, "Molad Kislev 5787", m[0].Desc())
 	}
 }
 
 func TestYomKippurKatanMemoSmartApostrophe(t *testing.T) {
-	evs, err := hebcal.HebrewCalendar(&hebcal.CalOptions{
+	evs, err := hebcal.HebrewCalendar(&hebcal.Options{
 		Start:          hdate.New(5786, hdate.Tevet, 1),
 		End:            hdate.New(5786, hdate.Shvat, 30),
 		YomKippurKatan: true,

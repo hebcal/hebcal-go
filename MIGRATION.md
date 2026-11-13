@@ -240,7 +240,7 @@ if te, ok := ev.(event.Timed); ok {
 `hebcal.AsTimedEvent` is removed.
 
 If your code asserted `hebcal.TimedEvent` and you generate Kiddush Levana
-events (`CalOptions.KiddushLevanaMaharil`), switching to `event.Timed` makes
+events (`Options.KiddushLevanaMaharil`), switching to `event.Timed` makes
 that event take your timed path for the first time. That is usually the fix
 you want, but check it.
 
@@ -288,7 +288,7 @@ case hebcal.CandleLighting, hebcal.Havdalah:
 
 The kinds are `CandleLighting`, `Havdalah`, `ChanukahCandles`, `FastBegins`,
 `FastEnds`, `FinishChametz`, `BiurChametz`, `KiddushLevana`, `Zman` (the daily
-zmanim of `CalOptions.DailyZmanim`) and the zero value `TimedOther`.
+zmanim of `Options.DailyZmanim`) and the zero value `TimedOther`.
 `TimedEvent.Kind()` and `KiddushLevanaEvent.Kind()` return it directly;
 `hebcal.TimedKindOf(ev)` reads it from any `CalEvent` and reports false for an
 event that is not timed.
@@ -308,7 +308,7 @@ is how it behaved before too.
 
 ### `NewTimedEvent`
 
-The signature is unchanged. Its `*CalOptions` argument now only chooses the
+The signature is unchanged. Its `*Options` argument now only chooses the
 clock format; the event does not keep the pointer. It may be nil.
 
 ## 6. Clock format
@@ -319,8 +319,8 @@ and `event.Clock24`.
 
 | Before | After |
 |---|---|
-| `CalOptions{Hour24: true}` | `CalOptions{Clock: event.Clock24}` |
-| `CalOptions{Hour12: true}` | `CalOptions{Clock: event.Clock12}` |
+| `CalOptions{Hour24: true}` | `Options{Clock: event.Clock24}` |
+| `CalOptions{Hour12: true}` | `Options{Clock: event.Clock12}` |
 | neither set | `Clock` left at its zero value |
 | `event.ReformatTimeStr(s, suffix, cc, nil)` | `event.ReformatTimeStr(s, suffix, cc, event.ClockAuto)` |
 | `event.ReformatTimeStr(s, suffix, cc, &yes)` | `event.ReformatTimeStr(s, suffix, cc, event.Clock12)` |
@@ -352,7 +352,7 @@ func clockFormat(hour12 *bool) event.ClockFormat {
 `HebrewCalendar(opts)` used to write its normalizations back into `*opts`, and
 every timed event kept a pointer to that struct. It now works on a private
 copy, and events keep only the clock format they were generated with. A nil
-`opts` is accepted and means the zero `CalOptions`.
+`opts` is accepted and means the zero `Options`.
 
 This is safer (one options value can be shared by concurrent calls), but two
 habits no longer work.
@@ -484,10 +484,11 @@ nil function with `dailylearning.AddCalendar`.
 | Before | After | Notes |
 |---|---|---|
 | `zmanim.Location.TimeZoneId` | `TimeZoneID` | field rename; also in struct literals |
+| `hebcal.CalOptions` | `hebcal.Options` | the type `HebrewCalendar` takes; its fields are unchanged apart from `Clock` (section 6) |
 | `hebcal.IsAssurBemlacha` | `hebcal.IsAssurBemelacha` | spelling |
 | `hebcal.GetHolidaysForYear(year, il)` | `hebcal.HolidaysForYear(year, il)` | |
 | `hebcal.GetHolidaysOnDate(hd, il)` | `hebcal.HolidaysOnDate(hd, il)` | |
-| `hebcal.UserEvent` | `hebcal.UserEventSpec` | the *input* in `CalOptions.UserEvents`; `event.UserEvent` is the event it produces. The `UserEvents` field keeps its name. |
+| `hebcal.UserEvent` | `hebcal.UserEventSpec` | the *input* in `Options.UserEvents`; `event.UserEvent` is the event it produces. The `UserEvents` field keeps its name. |
 | `hebcal.TimeOfDay(ev) int` | `hebcal.DayPartOf(ev) hebcal.DayPart` | typed result |
 | `hebcal.TimeOfDayDawn` ... `TimeOfDayNight` | `hebcal.DayPartDawn` ... `DayPartNight` | same values, same order |
 | `dailylearning.GetCalendars()` | `dailylearning.Calendars()` | |
@@ -589,6 +590,10 @@ gofmt -l -w -r 'event.HolidayFlags -> event.Flags' .
 ```
 
 ```bash
+gofmt -l -w -r 'hebcal.CalOptions -> hebcal.Options' .
+```
+
+```bash
 gofmt -l -w -r 'hebcal.GetHolidaysForYear -> hebcal.HolidaysForYear' .
 ```
 
@@ -643,7 +648,8 @@ values (section 8), and the `Hour12`/`Hour24` options (section 6). Finish with
 | `te.EventTime` | `te.Time()` |
 | `te.LinkedEvent`, `yizkor.LinkedEvent` | `ev.(event.Linked)`, then `.LinkedEvent()` |
 | `te.Desc == "Havdalah"` | `kind, _ := hebcal.TimedKindOf(ev); kind == hebcal.Havdalah` |
-| `CalOptions.Hour24` / `.Hour12` | `CalOptions.Clock` |
+| `hebcal.CalOptions` | `hebcal.Options` |
+| `CalOptions.Hour24` / `.Hour12` | `Options.Clock` |
 | `*bool` hour12 arguments and fields | `event.ClockFormat` |
 | `event.NewMoladEventHour12(...)` | `event.NewMoladEvent(..., clock)` |
 | reading `opts.IL`, `opts.Mask`, ... after `HebrewCalendar` | no longer written; compute them yourself |

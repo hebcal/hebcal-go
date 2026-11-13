@@ -35,7 +35,7 @@ func TestCandleLightingFlags(t *testing.T) {
 		t.Run(c.date+" "+c.label, func(t *testing.T) {
 			d, _ := time.Parse("2006-01-02", c.date)
 			hd := hdate.FromTime(d)
-			events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{
+			events, err := hebcal.HebrewCalendar(&hebcal.Options{
 				Start: hd, End: hd, CandleLighting: true, Location: loc,
 			})
 			assert.NoError(t, err)
@@ -57,7 +57,7 @@ func TestCandleLightingFlags(t *testing.T) {
 func TestCandleLightingNeverBothFlags(t *testing.T) {
 	both := event.LightCandles | event.LightCandlesTzeis
 	for _, city := range []string{"New York", "Jerusalem"} {
-		events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{
+		events, err := hebcal.HebrewCalendar(&hebcal.Options{
 			Year: 5780, IsHebrewYear: true, NumYears: 12, IL: city == "Jerusalem",
 			CandleLighting: true, Location: zmanim.LookupCity(city),
 		})

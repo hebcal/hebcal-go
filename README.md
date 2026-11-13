@@ -32,7 +32,8 @@ output is unchanged; the Go API around it is cleaner:
   - Timed events are found through the `event.Timed` interface and told apart
     with `hebcal.TimedKind`.
   - The 12/24-hour options became `event.ClockFormat`.
-  - `HebrewCalendar` no longer modifies the options it is given.
+  - `hebcal.CalOptions` is `hebcal.Options`, and `HebrewCalendar` no longer
+    modifies the options it is given.
   - `zmanim.New` and `zmanim.NewLocation` return an error instead of
     panicking, and `HebrewCalendar`'s option errors are exported values.
 

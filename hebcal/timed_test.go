@@ -13,7 +13,7 @@ import (
 // Every event with a clock time satisfies event.Timed, Kiddush Levana
 // included, and its kind agrees with its untranslated description.
 func TestTimedInterfaceAndKind(t *testing.T) {
-	opts := hebcal.CalOptions{
+	opts := hebcal.Options{
 		Year: 2026, Location: zmanim.LookupCity("Chicago"), CandleLighting: true,
 		KiddushLevanaMaharil: true, Sedrot: true, Yizkor: true, DailyZmanim: true,
 	}
@@ -68,7 +68,7 @@ func TestTimedInterfaceAndKind(t *testing.T) {
 
 // Linked events are reached through event.Linked, whatever their type.
 func TestLinkedInterface(t *testing.T) {
-	opts := hebcal.CalOptions{
+	opts := hebcal.Options{
 		Year: 2026, Location: zmanim.LookupCity("Chicago"), CandleLighting: true,
 		Sedrot: true, Yizkor: true,
 	}

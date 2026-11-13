@@ -54,7 +54,7 @@ const (
 	BiurChametz
 	// KiddushLevana is the latest time to recite Kiddush Levana.
 	KiddushLevana
-	// Zman is one of the daily halachic times of CalOptions.DailyZmanim.
+	// Zman is one of the daily halachic times of Options.DailyZmanim.
 	Zman
 )
 
@@ -214,7 +214,7 @@ func (ev TimedEvent) Desc() string {
 // clock format its time is rendered in (see ReformatTimeStr) and may be nil;
 // the event keeps that format, not a reference to opts.
 func NewTimedEvent(hd hdate.HDate, desc string, flags event.Flags, t time.Time,
-	sunsetOffset int, linkedEvent event.CalEvent, opts *CalOptions) TimedEvent {
+	sunsetOffset int, linkedEvent event.CalEvent, opts *Options) TimedEvent {
 	return newTimedEvent(hd, timedKindOf(desc, flags), desc, flags, t, sunsetOffset, linkedEvent, clockFor(opts))
 }
 

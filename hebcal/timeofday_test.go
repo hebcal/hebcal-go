@@ -18,7 +18,7 @@ func renderDayByTimeOfDay(t *testing.T, year int, month time.Month, day int) []s
 	})
 	toronto := zmanim.MustNewLocation("Toronto", "CA", 43.70011, -79.4163, 0, "America/Toronto")
 	hd := hdate.FromGregorian(year, month, day)
-	events, err := HebrewCalendar(&CalOptions{
+	events, err := HebrewCalendar(&Options{
 		Start:                hd,
 		End:                  hd,
 		Location:             &toronto,

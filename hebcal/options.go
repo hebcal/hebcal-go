@@ -37,7 +37,7 @@ const (
 )
 
 // UserEventSpec asks for a personal event that recurs on a Hebrew date every
-// year, such as a birthday or an anniversary (see CalOptions.UserEvents).
+// year, such as a birthday or an anniversary (see Options.UserEvents).
 // HebrewCalendar generates an event.UserEvent from it in each year.
 type UserEventSpec struct {
 	Month hdate.HMonth // Hebrew month
@@ -51,11 +51,11 @@ type UserYahrzeit struct {
 	Name string    // Name of deceased
 }
 
-// CalOptions configures which events HebrewCalendar returns. The zero value
+// Options configures which events HebrewCalendar returns. The zero value
 // asks for the holidays of the current Gregorian year in the Diaspora.
 //
-// HebrewCalendar does not modify the CalOptions it is given.
-type CalOptions struct {
+// HebrewCalendar does not modify the Options it is given.
+type Options struct {
 	// Location is the place candle-lighting and other times are calculated
 	// for: latitude, longitude, elevation and time zone. Its country also
 	// chooses the default clock format (see Clock).

@@ -14,7 +14,7 @@ import (
 
 func kiddushLevanaMonth(t *testing.T, loc *zmanim.Location, hyear int, hmonth hdate.HMonth) KiddushLevanaEvent {
 	t.Helper()
-	opts := CalOptions{
+	opts := Options{
 		Start:                hdate.New(hyear, hmonth, 1),
 		End:                  hdate.New(hyear, hmonth, hdate.DaysInMonth(hmonth, hyear)),
 		Location:             loc,
@@ -81,7 +81,7 @@ func TestKiddushLevanaAdjustmentString(t *testing.T) {
 func TestKiddushLevanaMatchesCandleLighting(t *testing.T) {
 	newYork := zmanim.LookupCity("New York")
 	ev := kiddushLevanaMonth(t, newYork, 5787, hdate.Tishrei)
-	opts := CalOptions{
+	opts := Options{
 		Start:          ev.Date(),
 		End:            ev.Date(),
 		Location:       newYork,
@@ -122,7 +122,7 @@ func TestKiddushLevanaEvent(t *testing.T) {
 }
 
 func TestKiddushLevanaOnePerMonth(t *testing.T) {
-	opts := CalOptions{
+	opts := Options{
 		Year:                 5787,
 		IsHebrewYear:         true,
 		Location:             zmanim.LookupCity("New York"),
@@ -139,7 +139,7 @@ func TestKiddushLevanaOnePerMonth(t *testing.T) {
 
 func TestKiddushLevanaOnlyInRange(t *testing.T) {
 	count := func(start, end int) int {
-		opts := CalOptions{
+		opts := Options{
 			Start:                hdate.New(5787, hdate.Tishrei, start),
 			End:                  hdate.New(5787, hdate.Tishrei, end),
 			Location:             zmanim.LookupCity("New York"),
@@ -156,7 +156,7 @@ func TestKiddushLevanaOnlyInRange(t *testing.T) {
 }
 
 func TestKiddushLevanaMask(t *testing.T) {
-	opts := CalOptions{
+	opts := Options{
 		Start:    hdate.New(5787, hdate.Cheshvan, 1),
 		End:      hdate.New(5787, hdate.Cheshvan, 29),
 		Location: zmanim.LookupCity("New York"),
@@ -169,14 +169,14 @@ func TestKiddushLevanaMask(t *testing.T) {
 }
 
 func TestKiddushLevanaRequiresLocation(t *testing.T) {
-	_, err := HebrewCalendar(&CalOptions{KiddushLevanaMaharil: true})
+	_, err := HebrewCalendar(&Options{KiddushLevanaMaharil: true})
 	assert.EqualError(t, err, "opts.KiddushLevanaMaharil requires opts.Location")
 }
 
 func TestKiddushLevanaIgnoresCandleOnlyOptions(t *testing.T) {
 	// Without CandleLighting these options do nothing, so conflicting
 	// pairs are ignored, as they are when no option needs a location
-	conflicting := func(opts CalOptions) *CalOptions {
+	conflicting := func(opts Options) *Options {
 		opts.HavdalahMins = 50
 		opts.HavdalahDeg = 8.5
 		opts.FastStartDeg = 16.1
@@ -188,7 +188,7 @@ func TestKiddushLevanaIgnoresCandleOnlyOptions(t *testing.T) {
 		return &opts
 	}
 	newYork := zmanim.LookupCity("New York")
-	events, err := HebrewCalendar(conflicting(CalOptions{
+	events, err := HebrewCalendar(conflicting(Options{
 		Start:                hdate.New(5787, hdate.Cheshvan, 1),
 		End:                  hdate.New(5787, hdate.Cheshvan, 29),
 		Location:             newYork,
@@ -198,7 +198,7 @@ func TestKiddushLevanaIgnoresCandleOnlyOptions(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, events, 1)
 	assert.Equal(t, "21:44", events[0].(KiddushLevanaEvent).Time().Format("15:04"))
-	_, err = HebrewCalendar(conflicting(CalOptions{
+	_, err = HebrewCalendar(conflicting(Options{
 		Year:                 5787,
 		IsHebrewYear:         true,
 		Location:             newYork,
@@ -211,7 +211,7 @@ func TestKiddushLevanaIgnoresCandleOnlyOptions(t *testing.T) {
 func TestKiddushLevanaSortedByTime(t *testing.T) {
 	boston := zmanim.LookupCity("Boston")
 	render := func(start, end hdate.HDate) []string {
-		events, err := HebrewCalendar(&CalOptions{
+		events, err := HebrewCalendar(&Options{
 			Start:                start,
 			End:                  end,
 			Location:             boston,

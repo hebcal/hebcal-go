@@ -15,7 +15,7 @@ import (
 func chametzEvents(t *testing.T, gregYear int, locale string) []string {
 	t.Helper()
 	loc := zmanim.LookupCity("Chicago")
-	opts := &hebcal.CalOptions{Year: gregYear, Location: loc, CandleLighting: true}
+	opts := &hebcal.Options{Year: gregYear, Location: loc, CandleLighting: true}
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(t, err)
 	var out []string
@@ -69,7 +69,7 @@ func TestErevPesachChametzHebrew(t *testing.T) {
 func TestErevPesachChametzRequiresCandleLighting(t *testing.T) {
 	assert := assert.New(t)
 	loc := zmanim.LookupCity("Chicago")
-	opts := &hebcal.CalOptions{Year: 2022, Location: loc}
+	opts := &hebcal.Options{Year: 2022, Location: loc}
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(err)
 	for _, ev := range events {
@@ -80,7 +80,7 @@ func TestErevPesachChametzRequiresCandleLighting(t *testing.T) {
 // The chametz deadlines are not part of Erev Pesach the way a fast's start and
 // end belong to the fast, so they link to no event.
 func TestChametzNotLinked(t *testing.T) {
-	opts := &hebcal.CalOptions{Year: 2022, Location: zmanim.LookupCity("Chicago"), CandleLighting: true}
+	opts := &hebcal.Options{Year: 2022, Location: zmanim.LookupCity("Chicago"), CandleLighting: true}
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(t, err)
 	n := 0

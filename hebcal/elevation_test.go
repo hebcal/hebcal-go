@@ -11,7 +11,7 @@ import (
 
 // findOnDate returns the first event rendered in English on the given Gregorian
 // date whose description starts with prefix, or "".
-func findOnDate(t *testing.T, opts *hebcal.CalOptions, y, m, d int, prefix string) string {
+func findOnDate(t *testing.T, opts *hebcal.Options, y, m, d int, prefix string) string {
 	t.Helper()
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(t, err)
@@ -27,15 +27,15 @@ func findOnDate(t *testing.T, opts *hebcal.CalOptions, y, m, d int, prefix strin
 	return ""
 }
 
-// TestUseElevationCalOption verifies that CalOptions.UseElevation flows through
+// TestUseElevationCalOption verifies that Options.UseElevation flows through
 // to candle-lighting and daily zmanim: sunrise/sunset-based times shift with the
 // location's elevation, while degree-based zmanim do not. Jerusalem has an
 // elevation of 786m.
 func TestUseElevationCalOption(t *testing.T) {
 	assert := assert.New(t)
 	loc := zmanim.LookupCity("Jerusalem")
-	newOpts := func(useElevation bool) *hebcal.CalOptions {
-		return &hebcal.CalOptions{
+	newOpts := func(useElevation bool) *hebcal.Options {
+		return &hebcal.Options{
 			Year: 2022, Month: 4, Location: loc,
 			CandleLighting: true, DailyZmanim: true, UseElevation: useElevation,
 		}
@@ -60,8 +60,8 @@ func TestUseElevationCalOption(t *testing.T) {
 func TestUseElevationDefaultFalse(t *testing.T) {
 	assert := assert.New(t)
 	loc := zmanim.LookupCity("Jerusalem")
-	dflt := &hebcal.CalOptions{Year: 2022, Month: 4, Location: loc, CandleLighting: true}
-	explicit := &hebcal.CalOptions{Year: 2022, Month: 4, Location: loc, CandleLighting: true, UseElevation: false}
+	dflt := &hebcal.Options{Year: 2022, Month: 4, Location: loc, CandleLighting: true}
+	explicit := &hebcal.Options{Year: 2022, Month: 4, Location: loc, CandleLighting: true, UseElevation: false}
 	assert.Equal(
 		findOnDate(t, dflt, 2022, 4, 8, "Candle lighting"),
 		findOnDate(t, explicit, 2022, 4, 8, "Candle lighting"),

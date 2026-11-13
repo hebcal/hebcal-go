@@ -16,7 +16,7 @@ func TestYizkor(t *testing.T) {
 		{false, []string{"Yom Kippur", "Shmini Atzeret", "Pesach VIII", "Shavuot II"}},
 		{true, []string{"Yom Kippur", "Shmini Atzeret", "Pesach VII", "Shavuot"}},
 	} {
-		events, err := HebrewCalendar(&CalOptions{Year: 5786, IsHebrewYear: true, IL: tc.il,
+		events, err := HebrewCalendar(&Options{Year: 5786, IsHebrewYear: true, IL: tc.il,
 			NoHolidays: true, Yizkor: true})
 		assert.NoError(t, err)
 		var got []string
@@ -36,7 +36,7 @@ func TestYizkor(t *testing.T) {
 }
 
 func TestYizkorFollowsItsHoliday(t *testing.T) {
-	events, err := HebrewCalendar(&CalOptions{
+	events, err := HebrewCalendar(&Options{
 		Start: hdate.New(5786, hdate.Tishrei, 10), End: hdate.New(5786, hdate.Tishrei, 10),
 		Mask: event.MajorFast | event.Yizkor,
 	})

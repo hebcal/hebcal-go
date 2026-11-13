@@ -17,8 +17,8 @@ import (
 // HebrewCalendar performs: an Israeli location (which implies the Israel
 // schedule and its own candle-lighting offset), a mask that switches event
 // streams on, default Havdalah and Yerushalmi settings, and negative offsets.
-func normalizingOptions() hebcal.CalOptions {
-	return hebcal.CalOptions{
+func normalizingOptions() hebcal.Options {
+	return hebcal.Options{
 		Year:             2026,
 		Location:         zmanim.LookupCity("Jerusalem"),
 		CandleLighting:   true,
@@ -58,7 +58,7 @@ func TestHebrewCalendarDoesNotModifyOptions(t *testing.T) {
 	assert.Equal(t, wantLoc, loc)
 
 	// An early year switches candle-lighting off internally; not for the caller.
-	early := hebcal.CalOptions{Year: 1700, CandleLighting: true, Location: zmanim.LookupCity("Boston")}
+	early := hebcal.Options{Year: 1700, CandleLighting: true, Location: zmanim.LookupCity("Boston")}
 	wantEarly := early
 	_, err = hebcal.HebrewCalendar(&early)
 	require.NoError(t, err)
@@ -68,7 +68,7 @@ func TestHebrewCalendarDoesNotModifyOptions(t *testing.T) {
 // Events keep the clock format they were generated with, not a reference to
 // the options: changing the options afterwards does not change how they render.
 func TestEventsDoNotFollowOptions(t *testing.T) {
-	opts := hebcal.CalOptions{
+	opts := hebcal.Options{
 		Year: 2026, Month: 4, Location: zmanim.LookupCity("Chicago"),
 		CandleLighting: true, Molad: true, ShabbatMevarchim: true,
 		KiddushLevanaMaharil: true, SunriseSunset: true,
@@ -124,11 +124,11 @@ func renderAll(events []event.CalEvent) []string {
 	return out
 }
 
-// A nil options pointer means the zero CalOptions.
+// A nil options pointer means the zero Options.
 func TestHebrewCalendarNilOptions(t *testing.T) {
 	events, err := hebcal.HebrewCalendar(nil)
 	require.NoError(t, err)
-	want, err := hebcal.HebrewCalendar(&hebcal.CalOptions{})
+	want, err := hebcal.HebrewCalendar(&hebcal.Options{})
 	require.NoError(t, err)
 	assert.Equal(t, len(want), len(events))
 }

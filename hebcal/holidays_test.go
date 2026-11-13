@@ -679,13 +679,13 @@ func TestHolidaysFor1752CE(t *testing.T) {
 func TestBeHaB(t *testing.T) {
 	assert := assert.New(t)
 	// omitted by default
-	events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{Year: 5784, IsHebrewYear: true})
+	events, err := hebcal.HebrewCalendar(&hebcal.Options{Year: 5784, IsHebrewYear: true})
 	assert.NoError(err)
 	for _, ev := range events {
 		assert.NotEqual("Ta’anit BeHaB", ev.Render("en"))
 	}
 
-	check := func(opts *hebcal.CalOptions, want []string) {
+	check := func(opts *hebcal.Options, want []string) {
 		t.Helper()
 		events, err := hebcal.HebrewCalendar(opts)
 		assert.NoError(err)
@@ -707,16 +707,16 @@ func TestBeHaB(t *testing.T) {
 		"2024-05-16 Ta’anit BeHaB",
 		"2024-05-20 Ta’anit BeHaB",
 	}
-	check(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5784, IsHebrewYear: true}, want5784)
-	check(&hebcal.CalOptions{Mask: event.BeHaB, Year: 5784, IsHebrewYear: true}, want5784)
+	check(&hebcal.Options{BeHaB: true, NoHolidays: true, Year: 5784, IsHebrewYear: true}, want5784)
+	check(&hebcal.Options{Mask: event.BeHaB, Year: 5784, IsHebrewYear: true}, want5784)
 	// Pesach Sheni (14 Iyyar) is skipped
-	check(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5785, IsHebrewYear: true,
+	check(&hebcal.Options{BeHaB: true, NoHolidays: true, Year: 5785, IsHebrewYear: true,
 		Start: hdate.New(5785, hdate.Iyyar, 1), End: hdate.New(5785, hdate.Iyyar, 29)}, []string{
 		"2025-05-05 Ta’anit BeHaB",
 		"2025-05-08 Ta’anit BeHaB",
 		"2025-05-15 Ta’anit BeHaB",
 	})
-	events, _ = hebcal.HebrewCalendar(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5784, IsHebrewYear: true})
+	events, _ = hebcal.HebrewCalendar(&hebcal.Options{BeHaB: true, NoHolidays: true, Year: 5784, IsHebrewYear: true})
 	assert.Equal("תַּעֲנִית בה״ב", events[0].Render("he"))
 	assert.Equal("Ta’anis BeHaB", events[0].Render("ashkenazi"))
 }
@@ -746,7 +746,7 @@ func TestAdarBasenameKeepsNumeral(t *testing.T) {
 		"Pesach II":                "Pesach",
 	}
 	seen := map[string]bool{}
-	events, err := hebcal.HebrewCalendar(&hebcal.CalOptions{Year: 5784, IsHebrewYear: true, YomKippurKatan: true})
+	events, err := hebcal.HebrewCalendar(&hebcal.Options{Year: 5784, IsHebrewYear: true, YomKippurKatan: true})
 	assert.NoError(t, err)
 	for _, ev := range events {
 		desc := ev.Desc()

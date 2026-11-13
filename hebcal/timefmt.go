@@ -17,7 +17,7 @@ import (
 // (event.Clock24). Otherwise the country of opts.Location decides (see event.Uses12HourClock),
 // falling back to Israel when opts.IL is set and to the United States when it
 // is not. opts may be nil, which means the United States.
-func ReformatTimeStr(timeStr, suffix string, opts *CalOptions) string {
+func ReformatTimeStr(timeStr, suffix string, opts *Options) string {
 	c := clockFor(opts)
 	return event.ReformatTimeStr(timeStr, suffix, c.cc, c.format)
 }
@@ -31,7 +31,7 @@ type clock struct {
 
 // clockFor resolves the clock format opts asks for. A nil opts means the
 // United States.
-func clockFor(opts *CalOptions) clock {
+func clockFor(opts *Options) clock {
 	if opts == nil {
 		return clock{cc: "US"}
 	}
@@ -44,7 +44,7 @@ func (c clock) formatTime(t time.Time) string {
 }
 
 // clockCountry is the country code whose clock convention applies to opts.
-func clockCountry(opts *CalOptions) string {
+func clockCountry(opts *Options) string {
 	if opts.Location != nil && opts.Location.CountryCode != "" {
 		return opts.Location.CountryCode
 	}

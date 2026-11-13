@@ -14,7 +14,7 @@ import (
 func shabbatWeekEvents(t *testing.T) []event.CalEvent {
 	t.Helper()
 	loc := zmanim.LookupCity("New York")
-	opts := &CalOptions{
+	opts := &Options{
 		Start:            hdate.FromGregorian(2026, time.June, 12),
 		End:              hdate.FromGregorian(2026, time.June, 13),
 		CandleLighting:   true,

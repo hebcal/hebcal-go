@@ -60,7 +60,7 @@ func TestCheckCandleOptions(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			opts := &CalOptions{
+			opts := &Options{
 				CandleLighting:     true,
 				Location:           tc.city,
 				CandleLightingMins: tc.candleLightingMins,
@@ -73,7 +73,7 @@ func TestCheckCandleOptions(t *testing.T) {
 }
 
 func TestCheckCandleOptions_NoCandleLighting(t *testing.T) {
-	opts := &CalOptions{
+	opts := &Options{
 		CandleLighting:     false,
 		CandleLightingMins: 0,
 	}
@@ -83,7 +83,7 @@ func TestCheckCandleOptions_NoCandleLighting(t *testing.T) {
 }
 
 func TestCheckCandleOptions_MissingLocation(t *testing.T) {
-	opts := &CalOptions{
+	opts := &Options{
 		CandleLighting: true,
 	}
 	err := checkCandleOptions(opts)
@@ -93,7 +93,7 @@ func TestCheckCandleOptions_MissingLocation(t *testing.T) {
 
 func TestCheckCandleOptions_MutuallyExclusiveHavdalah(t *testing.T) {
 	boston := zmanim.LookupCity("Boston")
-	opts := &CalOptions{
+	opts := &Options{
 		CandleLighting: true,
 		Location:       boston,
 		HavdalahMins:   50,

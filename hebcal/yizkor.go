@@ -24,7 +24,7 @@ import (
 
 // YizkorEvent is the Yizkor memorial prayer, recited on Yom Kippur, Shmini
 // Atzeret, the last day of Pesach and the last day of Shavuot. Generated when
-// CalOptions.Yizkor is set.
+// Options.Yizkor is set.
 //
 // It satisfies event.Linked: LinkedEvent is the holiday on which Yizkor is
 // recited, e.g. "Yom Kippur".

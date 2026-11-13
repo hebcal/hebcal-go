@@ -7,7 +7,7 @@ import (
 )
 
 // Flags is a bitmask of event attributes and categories. An event carries
-// the flags that apply to it, and CalOptions.Mask selects events by them.
+// the flags that apply to it, and Options.Mask selects events by them.
 type Flags uint32
 
 // When adding a flag, also add its name to flagNames below.

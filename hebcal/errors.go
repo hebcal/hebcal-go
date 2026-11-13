@@ -18,12 +18,12 @@ package hebcal
 
 import "errors"
 
-// The two kinds of mistake in a CalOptions that HebrewCalendar reports most
+// The two kinds of mistake in a Options that HebrewCalendar reports most
 // often. Each specific error below matches one of them with errors.Is, so a
 // caller can test for the kind or for the exact option.
 var (
 	// ErrLocationRequired means an option that needs a place was set without
-	// CalOptions.Location.
+	// Options.Location.
 	ErrLocationRequired = errors.New("option requires opts.Location")
 	// ErrMutuallyExclusive means two options that cannot be combined were
 	// both set: an offset in minutes and one in degrees for the same time.
