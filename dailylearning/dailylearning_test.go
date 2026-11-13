@@ -1,6 +1,8 @@
 package dailylearning
 
 import (
+	"strconv"
+	"sync"
 	"testing"
 
 	"github.com/hebcal/hdate"
@@ -40,7 +42,7 @@ func TestDailyLearningRegistry(t *testing.T) {
 	assert.False(t, Has("TestCal"))
 
 	// Test AddCalendar with start date
-	AddCalendar("TestCal", mockFn, startDate)
+	AddCalendarFrom("TestCal", mockFn, startDate)
 	assert.True(t, Has("TestCal"))
 	assert.True(t, Has("testcal")) // case insensitivity
 
@@ -73,4 +75,39 @@ func TestDailyLearningRegistry(t *testing.T) {
 	sd3, ok3 := StartDate("Unregistered")
 	assert.False(t, ok3)
 	assert.Equal(t, hdate.HDate{}, sd3)
+}
+
+// The registry may be written while it is read. Run with -race.
+func TestRegistryConcurrentUse(t *testing.T) {
+	fn := func(hd hdate.HDate, il bool) event.CalEvent {
+		return mockEvent{date: hd, desc: "Concurrent"}
+	}
+	hd := hdate.New(5786, hdate.Tishrei, 1)
+	var wg sync.WaitGroup
+	for i := 0; i < 8; i++ {
+		wg.Add(2)
+		go func(i int) {
+			defer wg.Done()
+			for j := 0; j < 200; j++ {
+				AddCalendarFrom("concurrent"+strconv.Itoa(i), fn, hd)
+				AddCalendar("concurrentPlain"+strconv.Itoa(i), fn)
+			}
+		}(i)
+		go func(i int) {
+			defer wg.Done()
+			for j := 0; j < 200; j++ {
+				_ = Lookup("concurrent"+strconv.Itoa(i), hd, false)
+				_ = Has("concurrent0")
+				_ = Calendars()
+				_, _ = StartDate("concurrent" + strconv.Itoa(i))
+			}
+		}(i)
+	}
+	wg.Wait()
+	assert.True(t, Has("Concurrent7"))
+	start, ok := StartDate("concurrent7")
+	assert.True(t, ok)
+	assert.Equal(t, hd, start)
+	_, ok = StartDate("concurrentPlain7")
+	assert.False(t, ok)
 }
