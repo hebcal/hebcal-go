@@ -82,6 +82,13 @@ https://github.com/hebcal/hebcal/issues/300 ("Add events of '929 daily bible
 chapter project'"); cite it in the v0.2.0 release notes. Ask the user for the
 issue link if a change clearly maps to a request but you don't have the number.
 
+## Breaking changes go in MIGRATION.md
+
+`MIGRATION.md` is the upgrade guide for library consumers, linked from the
+README. When a change breaks callers (a renamed or removed identifier, a
+changed signature, a field that became a method), add its before-and-after to
+the guide in the same commit, and to the quick-reference table at its end.
+
 ## Deliberate divergences from @hebcal/core
 
 Everything else should match `@hebcal/core`; these differences are on purpose:
