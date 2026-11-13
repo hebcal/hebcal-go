@@ -39,12 +39,12 @@ func Memo(ev CalEvent, locale string) string {
 
 func (ev HolidayEvent) GetDesc() string          { return ev.Desc }
 func (ev UserEvent) GetDesc() string             { return ev.Desc }
-func (ev hebrewDateEvent) GetDesc() string       { return ev.Date.String() }
+func (ev HebrewDateEvent) GetDesc() string       { return ev.date.String() }
 func (ev MevarchimChodeshEvent) GetDesc() string { return ev.Basename() }
 
 // GetDesc returns "Parashat " and the portion's untranslated name, e.g.
 // "Parashat Vayakhel-Pekudei".
-func (ev parshaEvent) GetDesc() string { return "Parashat " + ev.Basename() }
+func (ev ParshaEvent) GetDesc() string { return "Parashat " + ev.Basename() }
 
 // Memo returns the meaning of Yom Kippur Katan, untranslated, e.g. "Minor Day
 // of Atonement on the day preceeding Rosh Chodesh Sivan" (sic). The month

@@ -120,12 +120,12 @@ func (ev HolidayEvent) URL() string {
 // https://www.hebcal.com/sedrot/bereshit-20261010 . The date is the Saturday
 // on which the portion is read, which is what makes the URL unique across the
 // triennial and doubled-parsha variations.
-func (ev parshaEvent) URL() string {
-	hy := ev.Date.Year()
+func (ev ParshaEvent) URL() string {
+	hy := ev.date.Year()
 	if hy < 5513 || hy > 6260 {
 		return ""
 	}
-	gy, gm, gd := ev.Date.ProlepticGreg()
+	gy, gm, gd := ev.date.ProlepticGreg()
 	url := "https://www.hebcal.com/sedrot/" +
 		urlFriendly(strings.Join(ev.Parsha.Name, "-")) +
 		fmt.Sprintf("-%04d%02d%02d", gy, int(gm), gd)
@@ -137,8 +137,8 @@ func (ev parshaEvent) URL() string {
 
 // URL returns the Hebrew date's converter page, e.g.
 // https://www.hebcal.com/converter?hd=15&hm=Nisan&hy=5786&h2g=1 .
-func (ev hebrewDateEvent) URL() string {
-	hd := ev.Date
+func (ev HebrewDateEvent) URL() string {
+	hd := ev.date
 	if hd.Year() < 1 {
 		return ""
 	}

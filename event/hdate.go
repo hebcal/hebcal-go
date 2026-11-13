@@ -10,22 +10,25 @@ import (
 	"github.com/hebcal/locales"
 )
 
-type hebrewDateEvent struct {
-	Date hdate.HDate
+// HebrewDateEvent is a day's Hebrew date as an event of its own, e.g. "15th
+// of Cheshvan, 5769".
+type HebrewDateEvent struct {
+	date hdate.HDate
 }
 
-func (ev hebrewDateEvent) GetDate() hdate.HDate {
-	return ev.Date
+// GetDate returns the Hebrew date the event names.
+func (ev HebrewDateEvent) GetDate() hdate.HDate {
+	return ev.date
 }
 
-func (ev hebrewDateEvent) Render(locale string) string {
-	return renderHebrewDate(ev.Date, locale, true)
+func (ev HebrewDateEvent) Render(locale string) string {
+	return renderHebrewDate(ev.date, locale, true)
 }
 
 // RenderBrief returns the date without its year, e.g. "15th of Cheshvan" or
 // "ט״ו חֶשְׁוָן". 1 Tishrei, the first day of the year, keeps it.
-func (ev hebrewDateEvent) RenderBrief(locale string) string {
-	hd := ev.Date
+func (ev HebrewDateEvent) RenderBrief(locale string) string {
+	hd := ev.date
 	showYear := hd.Month() == hdate.Tishrei && hd.Day() == 1
 	return renderHebrewDate(hd, locale, showYear)
 }
@@ -75,22 +78,23 @@ func monthName(hd hdate.HDate, locale string) string {
 	return en
 }
 
-func (ev hebrewDateEvent) GetFlags() HolidayFlags {
+func (ev HebrewDateEvent) GetFlags() HolidayFlags {
 	return HEBREW_DATE
 }
 
-func (ev hebrewDateEvent) GetEmoji() string {
+func (ev HebrewDateEvent) GetEmoji() string {
 	return ""
 }
 
-func (ev hebrewDateEvent) Basename() string {
-	return ev.Date.String()
+func (ev HebrewDateEvent) Basename() string {
+	return ev.date.String()
 }
 
-func (ev hebrewDateEvent) GetCategories() []string {
+func (ev HebrewDateEvent) GetCategories() []string {
 	return CategoriesFromFlags(ev.GetFlags())
 }
 
-func NewHebrewDateEvent(hd hdate.HDate) CalEvent {
-	return hebrewDateEvent{Date: hd}
+// NewHebrewDateEvent constructs the Hebrew date event for hd.
+func NewHebrewDateEvent(hd hdate.HDate) HebrewDateEvent {
+	return HebrewDateEvent{date: hd}
 }

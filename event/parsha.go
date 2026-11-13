@@ -8,39 +8,45 @@ import (
 	"github.com/hebcal/locales"
 )
 
-// Represents one of 54 weekly Torah portions, always on a Saturday
-type parshaEvent struct {
-	Date   hdate.HDate
+// ParshaEvent is the weekly Torah portion (Parashat HaShavua), read on a
+// Saturday.
+type ParshaEvent struct {
+	date hdate.HDate
+	// Parsha is the portion read, or the two of a doubled portion.
 	Parsha sedra.Parsha
-	IL     bool
+	// IL is true for the Israel reading schedule, false for the Diaspora's.
+	IL bool
 }
 
-func NewParshaEvent(hd hdate.HDate, parsha sedra.Parsha, il bool) CalEvent {
-	return parshaEvent{Date: hd, Parsha: parsha, IL: il}
+// NewParshaEvent constructs the event for parsha, read on the Saturday hd
+// according to the Israel (il) or Diaspora schedule.
+func NewParshaEvent(hd hdate.HDate, parsha sedra.Parsha, il bool) ParshaEvent {
+	return ParshaEvent{date: hd, Parsha: parsha, IL: il}
 }
 
-func (ev parshaEvent) GetDate() hdate.HDate {
-	return ev.Date
+// GetDate returns the Saturday on which the portion is read.
+func (ev ParshaEvent) GetDate() hdate.HDate {
+	return ev.date
 }
 
-func (ev parshaEvent) Render(locale string) string {
+func (ev ParshaEvent) Render(locale string) string {
 	locale = strings.ToLower(locale)
 	prefix, _ := locales.LookupTranslation("Parashat", locale)
 	return prefix + " " + SmartApostrophe(ev.Parsha.Render(locale))
 }
 
-func (ev parshaEvent) GetFlags() HolidayFlags {
+func (ev ParshaEvent) GetFlags() HolidayFlags {
 	return PARSHA_HASHAVUA
 }
 
-func (ev parshaEvent) GetEmoji() string {
+func (ev ParshaEvent) GetEmoji() string {
 	return ""
 }
 
-func (ev parshaEvent) Basename() string {
+func (ev ParshaEvent) Basename() string {
 	return strings.Join(ev.Parsha.Name, "-")
 }
 
-func (ev parshaEvent) GetCategories() []string {
+func (ev ParshaEvent) GetCategories() []string {
 	return CategoriesFromFlags(ev.GetFlags())
 }
