@@ -22,8 +22,8 @@ func atLoc(t *testing.T, s, tzid string) time.Time {
 // Reference truth values come from @hebcal/core's isAssurBemlacha.
 func TestIsAssurBemlacha(t *testing.T) {
 	assert := assert.New(t)
-	jer := zmanim.NewLocation("Jerusalem", "IL", 31.76904, 35.21633, 786, "Asia/Jerusalem")
-	ny := zmanim.NewLocation("New York", "US", 40.71427, -74.00597, 0, "America/New_York")
+	jer := zmanim.MustNewLocation("Jerusalem", "IL", 31.76904, 35.21633, 786, "Asia/Jerusalem")
+	ny := zmanim.MustNewLocation("New York", "US", 40.71427, -74.00597, 0, "America/New_York")
 
 	tests := []struct {
 		loc  *zmanim.Location
@@ -40,7 +40,7 @@ func TestIsAssurBemlacha(t *testing.T) {
 		{&ny, false, "2024-04-24T21:00:00", "America/New_York", false}, // Wednesday
 	}
 	for _, tc := range tests {
-		got, err := hebcal.IsAssurBemlacha(atLoc(t, tc.when, tc.tzid), tc.loc, tc.il, false)
+		got, err := hebcal.IsAssurBemelacha(atLoc(t, tc.when, tc.tzid), tc.loc, tc.il, false)
 		assert.NoError(err, tc.when)
 		assert.Equal(tc.want, got, "%s %s", tc.loc.Name, tc.when)
 	}
@@ -48,9 +48,9 @@ func TestIsAssurBemlacha(t *testing.T) {
 
 func TestIsAssurBemlachaPolarError(t *testing.T) {
 	assert := assert.New(t)
-	tromso := zmanim.NewLocation("Tromso", "NO", 69.6489, 18.9551, 0, "Europe/Oslo")
+	tromso := zmanim.MustNewLocation("Tromso", "NO", 69.6489, 18.9551, 0, "Europe/Oslo")
 	// Midnight sun: sunset does not occur, so an error is returned.
-	_, err := hebcal.IsAssurBemlacha(atLoc(t, "2024-06-21T12:00:00", "Europe/Oslo"), &tromso, false, false)
+	_, err := hebcal.IsAssurBemelacha(atLoc(t, "2024-06-21T12:00:00", "Europe/Oslo"), &tromso, false, false)
 	assert.Error(err)
 }
 

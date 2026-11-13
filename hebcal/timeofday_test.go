@@ -16,7 +16,7 @@ func renderDayByTimeOfDay(t *testing.T, year int, month time.Month, day int) []s
 	dailylearning.AddCalendar("testTimeOfDay", func(hd hdate.HDate, il bool) event.CalEvent {
 		return event.NewHolidayEvent(hd, "Daily learning", event.DailyLearning, "")
 	})
-	toronto := zmanim.NewLocation("Toronto", "CA", 43.70011, -79.4163, 0, "America/Toronto")
+	toronto := zmanim.MustNewLocation("Toronto", "CA", 43.70011, -79.4163, 0, "America/Toronto")
 	hd := hdate.FromGregorian(year, month, day)
 	events, err := HebrewCalendar(&CalOptions{
 		Start:                hd,

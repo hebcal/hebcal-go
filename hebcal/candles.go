@@ -349,10 +349,13 @@ func (ev TimedEvent) Categories() []string {
 // Location, honoring opts.UseElevation so that sunrise/sunset-based times
 // account for the location's elevation when requested. Degree-based zmanim are
 // never affected by elevation.
+//
+// newCalConfig has already checked that the location can be used, so
+// constructing the Zmanim cannot fail here.
 func newZmanim(hd hdate.HDate, opts *calConfig) zmanim.Zmanim {
 	year, month, day := hd.Greg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-	z := zmanim.New(opts.Location, gregDate)
+	z := zmanim.MustNew(opts.Location, gregDate)
 	z.UseElevation = opts.UseElevation
 	return z
 }

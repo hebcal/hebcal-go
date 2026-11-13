@@ -202,7 +202,7 @@ func makeKiddushLevanaEvent(hyear int, hmonth hdate.HMonth, opts *calConfig) (Ki
 			continue
 		}
 		// Move a daytime time back to alot hashachar that morning.
-		// Same tzeit (8.5°) as IsAssurBemlacha()
+		// Same tzeit (8.5°) as IsAssurBemelacha()
 		t := z.SofZmanKidushLevanaBetweenMoldos(z.AlotHaShachar(), z.Tzeit(zmanim.Tzeit3SmallStars))
 		m := molad.New(hyear, hmonth)
 		adjustedTo := KiddushLevanaNotAdjusted

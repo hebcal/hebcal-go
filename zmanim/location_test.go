@@ -1,9 +1,13 @@
 package zmanim_test
 
 import (
+	"errors"
+	"math"
 	"testing"
+	"time"
 
 	"github.com/hebcal/hebcal-go/zmanim"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNoDuplicateCities(t *testing.T) {
@@ -53,4 +57,43 @@ func TestLoadLocation(t *testing.T) {
 	if _, err := zmanim.LoadLocation("Not/AZone"); err == nil {
 		t.Error("expected an error for an invalid timezone")
 	}
+}
+
+func TestNewLocationErrors(t *testing.T) {
+	_, err := zmanim.NewLocation("x", "US", 90.5, 0, 0, "America/New_York")
+	assert.True(t, errors.Is(err, zmanim.ErrLatitude))
+	_, err = zmanim.NewLocation("x", "US", 0, -181, 0, "America/New_York")
+	assert.True(t, errors.Is(err, zmanim.ErrLongitude))
+	_, err = zmanim.NewLocation("x", "US", math.NaN(), 0, 0, "America/New_York")
+	assert.True(t, errors.Is(err, zmanim.ErrLatitude))
+	loc, err := zmanim.NewLocation("x", "US", 40.7, -74, -5, "America/New_York")
+	assert.NoError(t, err)
+	assert.Equal(t, 0, loc.Elevation)
+	assert.Panics(t, func() { zmanim.MustNewLocation("x", "US", 91, 0, 0, "UTC") })
+}
+
+func TestNewErrors(t *testing.T) {
+	date := time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC)
+	_, err := zmanim.New(nil, date)
+	assert.Error(t, err)
+	_, err = zmanim.New(&zmanim.Location{Latitude: 40, Longitude: -74, TimeZoneID: "No/Such_Zone"}, date)
+	assert.True(t, errors.Is(err, zmanim.ErrTimeZone), "%v", err)
+	_, err = zmanim.New(&zmanim.Location{Latitude: -91, Longitude: -74, TimeZoneID: "UTC"}, date)
+	assert.True(t, errors.Is(err, zmanim.ErrLatitude), "%v", err)
+	_, err = zmanim.New(&zmanim.Location{Latitude: 40, Longitude: 181, TimeZoneID: "UTC"}, date)
+	assert.True(t, errors.Is(err, zmanim.ErrLongitude), "%v", err)
+	assert.Panics(t, func() { zmanim.MustNew(&zmanim.Location{TimeZoneID: "No/Such_Zone"}, date) })
+	z, err := zmanim.New(zmanim.LookupCity("Boston"), date)
+	assert.NoError(t, err)
+	assert.False(t, z.Sunset().IsZero())
+}
+
+// AllCities returns a copy: changing it does not change the built-in cities.
+func TestAllCitiesIsACopy(t *testing.T) {
+	cities := zmanim.AllCities()
+	assert.NotEmpty(t, cities)
+	name := cities[0].Name
+	cities[0].Name = "Atlantis"
+	assert.Equal(t, name, zmanim.AllCities()[0].Name)
+	assert.Nil(t, zmanim.LookupCity("Atlantis"))
 }

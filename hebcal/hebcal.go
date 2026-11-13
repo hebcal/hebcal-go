@@ -18,7 +18,6 @@ package hebcal
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import (
-	"errors"
 	"math"
 	"sort"
 	"strings"
@@ -349,14 +348,21 @@ func newCalConfig(options *CalOptions) (cfg *calConfig, startAbs, endAbs int64, 
 		return nil, 0, 0, err
 	}
 	if opts.SunriseSunset && opts.Location == nil {
-		return nil, 0, 0, errors.New("opts.SunriseSunset requires opts.Location")
+		return nil, 0, 0, ErrSunriseSunsetLocation
 	}
 	if opts.DailyZmanim && opts.Location == nil {
-		return nil, 0, 0, errors.New("opts.DailyZmanim requires opts.Location")
+		return nil, 0, 0, ErrDailyZmanimLocation
 	}
 	startAbs, endAbs, err = getStartAndEnd(opts)
 	if err != nil {
 		return nil, 0, 0, err
+	}
+	if opts.CandleLighting || opts.KiddushLevanaMaharil || opts.SunriseSunset || opts.DailyZmanim {
+		// The location is about to be used for times: check it once, here,
+		// rather than fail on the first day of the calendar.
+		if _, err = zmanim.New(opts.Location, time.Time{}); err != nil {
+			return nil, 0, 0, err
+		}
 	}
 	if opts.Location != nil && opts.Location.CountryCode == "IL" {
 		opts.IL = true
@@ -380,7 +386,7 @@ func getStartAndEnd(opts *CalOptions) (int64, int64, error) {
 	hasStart := opts.Start != hdate.HDate{}
 	hasEnd := opts.End != hdate.HDate{}
 	if hasStart != hasEnd {
-		return 0, 0, errors.New("opts.Start requires opts.End")
+		return 0, 0, ErrStartRequiresEnd
 	}
 	if hasStart && hasEnd {
 		return opts.Start.Abs(), opts.End.Abs(), nil
@@ -396,7 +402,7 @@ func getStartAndEnd(opts *CalOptions) (int64, int64, error) {
 			year = gy
 		}
 	} else if opts.IsHebrewYear && year < 1 {
-		return 0, 0, errors.New("invalid Hebrew year")
+		return 0, 0, ErrInvalidHebrewYear
 	}
 	numYears := opts.NumYears
 	if numYears == 0 {
@@ -505,9 +511,9 @@ func checkCandleOptions(opts *CalOptions) error {
 	}
 	if opts.Location == nil {
 		if opts.CandleLighting {
-			return errors.New("opts.CandleLighting requires opts.Location")
+			return ErrCandleLightingLocation
 		}
-		return errors.New("opts.KiddushLevanaMaharil requires opts.Location")
+		return ErrKiddushLevanaLocation
 	}
 	// Kiddush Levana needs candle-lighting time for Shabbat and Yom Tov
 	setCandleLightingMins(opts)
@@ -516,16 +522,16 @@ func checkCandleOptions(opts *CalOptions) error {
 		return nil
 	}
 	if opts.HavdalahMins != 0 && opts.HavdalahDeg != 0.0 {
-		return errors.New("opts.HavdalahMins and opts.HavdalahDeg are mutually exclusive")
+		return ErrHavdalahMinsAndDeg
 	}
 	if opts.FastStartMins != 0 && opts.FastStartDeg != 0.0 {
-		return errors.New("opts.FastStartMins and opts.FastStartDeg are mutually exclusive")
+		return ErrFastStartMinsAndDeg
 	}
 	if opts.FastEndMins != 0 && opts.FastEndDeg != 0.0 {
-		return errors.New("opts.FastEndMins and opts.FastEndDeg are mutually exclusive")
+		return ErrFastEndMinsAndDeg
 	}
 	if opts.TishaBavEndMins != 0 && opts.TishaBavEndDeg != 0.0 {
-		return errors.New("opts.TishaBavEndMins and opts.TishaBavEndDeg are mutually exclusive")
+		return ErrTishaBavEndMinsAndDeg
 	}
 	if opts.HavdalahMins != 0 {
 		opts.HavdalahMins = intAbs(opts.HavdalahMins)

@@ -13,7 +13,7 @@ import (
 // tolerance absorbs sub-second rounding differences between @hebcal/noaa and
 // noaa-go; the JSON API rounds to the minute, so these are effectively exact.
 func TestExtraZmanim(t *testing.T) {
-	loc := zmanim.NewLocation("Jerusalem", "IL", 31.76904, 35.21633, 786, "Asia/Jerusalem")
+	loc := zmanim.MustNewLocation("Jerusalem", "IL", 31.76904, 35.21633, 786, "Asia/Jerusalem")
 	tz, _ := time.LoadLocation("Asia/Jerusalem")
 	dt := time.Date(2024, time.April, 26, 12, 0, 0, 0, time.UTC)
 
@@ -32,7 +32,7 @@ func TestExtraZmanim(t *testing.T) {
 		}
 	}
 
-	z := zmanim.New(&loc, dt) // UseElevation defaults to false
+	z := zmanim.MustNew(&loc, dt) // UseElevation defaults to false
 	// The MGA "72 minute" sof zman is measured from sea level, so it is the
 	// same with or without elevation (see the ze assertions below).
 	assertClose(t, "sofZmanShmaMGA", z.SofZmanShmaMGA(), "2024-04-26T08:41:40")
@@ -54,7 +54,7 @@ func TestExtraZmanim(t *testing.T) {
 	assertClose(t, "tzaisBaalHatanya", z.TzaisBaalHatanya(), "2024-04-26T19:41:38")
 
 	// The MGA mincha zmanim use elevation-aware sunrise/sunset.
-	ze := zmanim.New(&loc, dt)
+	ze := zmanim.MustNew(&loc, dt)
 	ze.UseElevation = true
 	assertClose(t, "minchaGedolaMGA(elev)", ze.MinchaGedolaMGA(), "2024-04-26T13:16:42")
 	assertClose(t, "minchaKetanaMGA(elev)", ze.MinchaKetanaMGA(), "2024-04-26T17:14:21")
@@ -70,8 +70,8 @@ func TestExtraZmanim(t *testing.T) {
 // TestExtraZmanimPolar confirms the new zmanim return the zero time (rather than
 // panicking) where the sun does not reach the required depression.
 func TestExtraZmanimPolar(t *testing.T) {
-	loc := zmanim.NewLocation("Tromso", "NO", 69.6489, 18.9551, 0, "Europe/Oslo")
-	z := zmanim.New(&loc, time.Date(2024, time.June, 21, 12, 0, 0, 0, time.UTC))
+	loc := zmanim.MustNewLocation("Tromso", "NO", 69.6489, 18.9551, 0, "Europe/Oslo")
+	z := zmanim.MustNew(&loc, time.Date(2024, time.June, 21, 12, 0, 0, 0, time.UTC))
 	if got := z.AlosBaalHatanya(); !got.IsZero() {
 		t.Errorf("expected zero AlosBaalHatanya in polar summer, got %v", got)
 	}
@@ -84,8 +84,8 @@ func TestExtraZmanimPolar(t *testing.T) {
 // does not occur has to come back as the zero time -- not as an offset from it.
 // MinchaGedolaMGA and MinchaKetanaMGA once returned 0001-01-01T00:06 and 00:42.
 func TestPolarNightTimesAreZeroNotYearOne(t *testing.T) {
-	loc := zmanim.NewLocation("North Pole", "", 90, 0, 0, "UTC")
-	z := zmanim.New(&loc, time.Date(2026, time.November, 12, 12, 0, 0, 0, time.UTC))
+	loc := zmanim.MustNewLocation("North Pole", "", 90, 0, 0, "UTC")
+	z := zmanim.MustNew(&loc, time.Date(2026, time.November, 12, 12, 0, 0, 0, time.UTC))
 	times := map[string]func() time.Time{
 		"AlosBaalHatanya":          z.AlosBaalHatanya,
 		"AlotHaShachar":            z.AlotHaShachar,

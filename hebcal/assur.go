@@ -73,7 +73,7 @@ func isTodayAssurBemelacha(dow time.Weekday, events []event.HolidayEvent) bool {
 	return false
 }
 
-// IsAssurBemlacha reports whether the given moment (date and time) falls within a
+// IsAssurBemelacha reports whether the given moment (date and time) falls within a
 // period when melacha (work) is prohibited — that is, Shabbat or a Yom Tov.
 //
 // The Shabbat / Yom Tov window is taken to begin at sunset (shkiah) on the
@@ -87,10 +87,14 @@ func isTodayAssurBemelacha(dow time.Weekday, events []event.HolidayEvent) bool {
 // location's elevation when computing sunset (it has no effect on the
 // degree-based tzais calculation).
 //
-// It returns an error if sunset (or tzais) cannot be computed for the location
-// on that day, e.g. in polar regions.
-func IsAssurBemlacha(currentTime time.Time, loc *zmanim.Location, il bool, useElevation bool) (bool, error) {
-	z := zmanim.New(loc, currentTime)
+// It returns an error if the location cannot be used (see zmanim.New), or if
+// sunset (or tzais) cannot be computed for the location on that day, e.g. in
+// polar regions.
+func IsAssurBemelacha(currentTime time.Time, loc *zmanim.Location, il bool, useElevation bool) (bool, error) {
+	z, err := zmanim.New(loc, currentTime)
+	if err != nil {
+		return false, err
+	}
 	z.UseElevation = useElevation
 	sunset := z.Sunset()
 	if sunset.IsZero() {
