@@ -65,7 +65,7 @@ func TestChanukahJanuaryDaysUsePreviousYear(t *testing.T) {
 	}
 	// 5785: the last days fall in January 2025 but still belong to 2024.
 	jan := NewHolidayEvent(hdate.New(5785, hdate.Tevet, 2), "Chanukah: 8th Day", MinorHoliday, "")
-	gy, gm, _ := jan.GetDate().ProlepticGreg()
+	gy, gm, _ := jan.Date().ProlepticGreg()
 	if gm != 1 {
 		t.Fatalf("test precondition: expected a January date, got %d-%02d", gy, int(gm))
 	}
@@ -129,7 +129,7 @@ func TestTammuzSlugs(t *testing.T) {
 func TestOutOfRangeYearsHaveNoURL(t *testing.T) {
 	for _, hy := range []int{3000, 8000} {
 		ev := NewHolidayEvent(hdate.New(hy, hdate.Tishrei, 15), "Sukkot I", Chag, "")
-		gy, _, _ := ev.GetDate().ProlepticGreg()
+		gy, _, _ := ev.Date().ProlepticGreg()
 		if gy >= 100 && gy <= 2999 {
 			continue // still in range; nothing to assert
 		}

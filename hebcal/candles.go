@@ -211,7 +211,7 @@ func (ev TimedEvent) Memo(locale string) string {
 		s, _ := locales.LookupTranslation(ev.chagReading, locale)
 		return s
 	}
-	if ev.linked != nil && ev.linked.GetFlags() == event.ParshaHashavua {
+	if ev.linked != nil && ev.linked.Flags() == event.ParshaHashavua {
 		return ev.linked.Render(locale)
 	}
 	return ""
@@ -283,7 +283,7 @@ func roundToMinute(t time.Time) time.Time {
 	return time.Date(year, month, day, hour, min, 0, 0, t.Location())
 }
 
-func (ev TimedEvent) GetDate() hdate.HDate {
+func (ev TimedEvent) Date() hdate.HDate {
 	return ev.date
 }
 
@@ -305,11 +305,11 @@ func (ev TimedEvent) RenderBrief(locale string) string {
 	return desc
 }
 
-func (ev TimedEvent) GetFlags() event.Flags {
+func (ev TimedEvent) Flags() event.Flags {
 	return ev.flags
 }
 
-func (ev TimedEvent) GetEmoji() string {
+func (ev TimedEvent) Emoji() string {
 	return ev.emoji
 }
 
@@ -322,13 +322,13 @@ func (ev TimedEvent) Basename() string {
 	return ev.desc
 }
 
-// GetCategories returns the category and sub-categories for a timed event,
+// Categories returns the category and sub-categories for a timed event,
 // keyed by its kind, matching TimedEvent.getCategories() in @hebcal/core.
 //
 // Chanukah candle-lighting takes the holiday's categories.
-func (ev TimedEvent) GetCategories() []string {
+func (ev TimedEvent) Categories() []string {
 	if ev.isChanukah() {
-		return ev.linked.GetCategories()
+		return ev.linked.Categories()
 	}
 	switch ev.kind {
 	case CandleLighting:
@@ -366,7 +366,7 @@ func makeCandleEvent(hd hdate.HDate, opts *calConfig, ev event.CalEvent) TimedEv
 	}
 	flags := event.LightCandles
 	if ev != nil {
-		flags = ev.GetFlags()
+		flags = ev.Flags()
 		if dow != time.Friday {
 			if flags.HasAny(event.LightCandlesTzeis | event.ChanukahCandles) {
 				useHavdalahOffset = true
@@ -418,7 +418,7 @@ func makeCandleEvent(hd hdate.HDate, opts *calConfig, ev event.CalEvent) TimedEv
 // candles are lit: at regular candle-lighting time on Friday, at Havdalah
 // time on Saturday night, and at dusk on other days.
 func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEvent {
-	hd := ev.GetDate()
+	hd := ev.Date()
 	dow := hd.Weekday()
 	if dow == time.Friday || dow == time.Saturday {
 		timedEv := makeCandleEvent(hd, opts, ev)
@@ -427,7 +427,7 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEve
 		}
 		timedEv.kind = ChanukahCandles
 		timedEv.desc = ev.Desc()
-		timedEv.emoji = ev.GetEmoji()
+		timedEv.emoji = ev.Emoji()
 		timedEv.ChanukahDay = ev.ChanukahDay
 		return timedEv
 	}
@@ -437,10 +437,10 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEve
 		return TimedEvent{} // no sunset
 	}
 	return TimedEvent{
-		date:  ev.GetDate(),
+		date:  ev.Date(),
 		desc:  ev.Desc(),
-		flags: ev.GetFlags(),
-		emoji: ev.GetEmoji(),
+		flags: ev.Flags(),
+		emoji: ev.Emoji(),
 		kind:  ChanukahCandles,
 		// Round to the nearest minute, as NewTimedEvent does and as
 		// @hebcal/core's TimedChanukahEvent does with Zmanim.roundTime.
@@ -452,10 +452,10 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEve
 }
 
 func makeFastStartEnd(ev event.CalEvent, opts *calConfig) (TimedEvent, TimedEvent) {
-	hd := ev.GetDate()
+	hd := ev.Date()
 	z := newZmanim(hd, opts)
 	desc := ev.Desc()
-	flags := ev.GetFlags()
+	flags := ev.Flags()
 	var startEvent, endEvent TimedEvent
 	if desc == "Erev Tish'a B'Av" {
 		sunset := z.Sunset()
@@ -534,7 +534,7 @@ func fastEndTime(z *zmanim.Zmanim, isTishaBav bool, opts *calConfig) time.Time {
 // Chametz event is emitted on the Friday before instead (see makeBiurChametz)
 // and is omitted here.
 func makeErevPesachChametz(ev event.CalEvent, opts *calConfig) []event.CalEvent {
-	hd := ev.GetDate()
+	hd := ev.Date()
 	z := newZmanim(hd, opts)
 	events := make([]event.CalEvent, 0, 2)
 	achilas := z.SofZmanAchilasChametz()
@@ -577,7 +577,7 @@ func newRiseSetEvent(hd hdate.HDate, opts *calConfig) riseSetEvent {
 	return riseSetEvent{date: hd, sunrise: z.Sunrise(), sunset: z.Sunset(), clock: opts.clock}
 }
 
-func (ev riseSetEvent) GetDate() hdate.HDate {
+func (ev riseSetEvent) Date() hdate.HDate {
 	return ev.date
 }
 
@@ -587,11 +587,11 @@ func (ev riseSetEvent) Render(locale string) string {
 	return fmt.Sprintf("Sunrise: %s; Sunset %s", riseStr, setStr)
 }
 
-func (ev riseSetEvent) GetFlags() event.Flags {
+func (ev riseSetEvent) Flags() event.Flags {
 	return event.Zmanim
 }
 
-func (ev riseSetEvent) GetEmoji() string {
+func (ev riseSetEvent) Emoji() string {
 	return ""
 }
 
@@ -607,7 +607,7 @@ func (ev riseSetEvent) URL() string {
 	return ""
 }
 
-func (ev riseSetEvent) GetCategories() []string {
+func (ev riseSetEvent) Categories() []string {
 	return []string{"zmanim"}
 }
 

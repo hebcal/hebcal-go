@@ -16,7 +16,7 @@ func findOnDate(t *testing.T, opts *hebcal.CalOptions, y, m, d int, prefix strin
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(t, err)
 	for _, ev := range events {
-		gy, gm, gd := ev.GetDate().Greg()
+		gy, gm, gd := ev.Date().Greg()
 		if gy == y && int(gm) == m && gd == d {
 			r := ev.Render("en")
 			if strings.HasPrefix(r, prefix) {

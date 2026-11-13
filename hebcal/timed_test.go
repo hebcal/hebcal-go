@@ -51,10 +51,10 @@ func TestTimedInterfaceAndKind(t *testing.T) {
 		switch kind {
 		case hebcal.ChanukahCandles:
 			assert.Contains(t, ev.Desc(), "Chanukah: ")
-			assert.True(t, ev.GetFlags().Has(event.ChanukahCandles))
+			assert.True(t, ev.Flags().Has(event.ChanukahCandles))
 			assert.Equal(t, "Chanukah", ev.Basename())
 		case hebcal.Zman:
-			assert.Equal(t, event.Zmanim, ev.GetFlags())
+			assert.Equal(t, event.Zmanim, ev.Flags())
 		case hebcal.KiddushLevana:
 			_, isKL := ev.(hebcal.KiddushLevanaEvent)
 			assert.True(t, isKL)
@@ -82,9 +82,9 @@ func TestLinkedInterface(t *testing.T) {
 	linked := map[string]string{}
 	for _, ev := range events {
 		if l, ok := ev.(event.Linked); ok && l.LinkedEvent() != nil {
-			y, m, d := ev.GetDate().Greg()
+			y, m, d := ev.Date().Greg()
 			if y == 2026 && (m == 9 || m == 10 || m == 7) {
-				linked[ev.GetDate().String()+" "+ev.Desc()] = l.LinkedEvent().Desc()
+				linked[ev.Date().String()+" "+ev.Desc()] = l.LinkedEvent().Desc()
 			}
 			_ = d
 		}

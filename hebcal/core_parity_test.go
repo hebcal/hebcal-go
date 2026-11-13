@@ -40,17 +40,17 @@ func TestTimedEventEmoji(t *testing.T) {
 		if !ok {
 			continue
 		}
-		dow := te.GetDate().Weekday()
+		dow := te.Date().Weekday()
 		switch te.Desc() {
 		case "Candle lighting":
 			candles++
-			assert.Equal(t, "🕯️", ev.GetEmoji(), te.GetDate().String())
+			assert.Equal(t, "🕯️", ev.Emoji(), te.Date().String())
 			if dow != time.Friday {
 				erevYomTov++
 			}
 		case "Havdalah":
 			havdalah++
-			assert.Equal(t, "✨", ev.GetEmoji(), te.GetDate().String())
+			assert.Equal(t, "✨", ev.Emoji(), te.Date().String())
 			if dow != time.Saturday {
 				yomTovHavdalah++
 			}
@@ -73,7 +73,7 @@ func TestChanukahCandleLightingIsTheHoliday(t *testing.T) {
 		ev := find(events, desc)
 		if assert.NotNil(t, ev, desc) {
 			assert.Equal(t, "Chanukah", ev.Basename())
-			assert.Equal(t, []string{"holiday", "minor"}, ev.GetCategories())
+			assert.Equal(t, []string{"holiday", "minor"}, ev.Categories())
 			assert.Equal(t, "https://www.hebcal.com/holidays/chanukah-2022", event.URL(ev))
 		}
 	}

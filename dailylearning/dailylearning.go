@@ -49,7 +49,7 @@ var calendars = make(map[string]calendar)
 // AddCalendar registers a new learning calendar with a case-insensitive name.
 //
 // The optional startDate marks the first date for which the calendar is
-// valid; it is exposed via GetStartDate and is otherwise advisory (the
+// valid; it is exposed via StartDate and is otherwise advisory (the
 // CalendarFunc itself is responsible for returning nil before its cycle
 // begins).
 //
@@ -83,9 +83,9 @@ func Has(name string) bool {
 	return ok
 }
 
-// GetCalendars returns the names of all registered calendars (lowercased),
+// Calendars returns the names of all registered calendars (lowercased),
 // sorted alphabetically.
-func GetCalendars() []string {
+func Calendars() []string {
 	names := make([]string, 0, len(calendars))
 	for name := range calendars {
 		names = append(names, name)
@@ -94,10 +94,10 @@ func GetCalendars() []string {
 	return names
 }
 
-// GetStartDate returns the first Hebrew date a calendar is valid for, as
+// StartDate returns the first Hebrew date a calendar is valid for, as
 // registered. The boolean is false if the calendar is unregistered or was
 // registered without a start date.
-func GetStartDate(name string) (hdate.HDate, bool) {
+func StartDate(name string) (hdate.HDate, bool) {
 	c, ok := calendars[strings.ToLower(name)]
 	if !ok || c.startDate == nil {
 		return hdate.HDate{}, false

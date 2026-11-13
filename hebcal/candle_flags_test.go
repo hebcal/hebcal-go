@@ -47,7 +47,7 @@ func TestCandleLightingFlags(t *testing.T) {
 				}
 				found = true
 				assert.Equal(t, c.time, te.Time().Format("15:04"))
-				assert.Equal(t, c.flags, te.GetFlags(), te.GetFlags().String())
+				assert.Equal(t, c.flags, te.Flags(), te.Flags().String())
 			}
 			assert.True(t, found)
 		})
@@ -63,7 +63,7 @@ func TestCandleLightingNeverBothFlags(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		for _, ev := range events {
-			assert.False(t, ev.GetFlags().Has(both), ev.Render("en"))
+			assert.False(t, ev.Flags().Has(both), ev.Render("en"))
 		}
 	}
 }

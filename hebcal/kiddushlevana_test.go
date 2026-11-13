@@ -30,7 +30,7 @@ func kiddushLevanaMonth(t *testing.T, loc *zmanim.Location, hyear int, hmonth hd
 }
 
 func klSummary(ev KiddushLevanaEvent) string {
-	return ev.GetDate().String() + " | " + ev.GetDate().Gregorian().Format("Mon Jan 02 2006") +
+	return ev.Date().String() + " | " + ev.Date().Gregorian().Format("Mon Jan 02 2006") +
 		" | " + ev.Time().Format("15:04")
 }
 
@@ -82,8 +82,8 @@ func TestKiddushLevanaMatchesCandleLighting(t *testing.T) {
 	newYork := zmanim.LookupCity("New York")
 	ev := kiddushLevanaMonth(t, newYork, 5787, hdate.Tishrei)
 	opts := CalOptions{
-		Start:          ev.GetDate(),
-		End:            ev.GetDate(),
+		Start:          ev.Date(),
+		End:            ev.Date(),
 		Location:       newYork,
 		CandleLighting: true,
 		NoHolidays:     true,
@@ -114,10 +114,10 @@ func TestKiddushLevanaEvent(t *testing.T) {
 	assert.Equal("Latest Kiddush Levana: 9:44pm", ev.Render("en"))
 	assert.Equal("Latest Kiddush Levanah: 9:44pm", ev.Render("ashkenazi"))
 	assert.Equal("סוֹף זְמַן קִדּוּשׁ לְבָנָה: 9:44pm", ev.Render("he"))
-	assert.Equal([]string{"zmanim", "kiddushLevana"}, ev.GetCategories())
-	assert.Equal("🌔", ev.GetEmoji())
-	assert.Equal(event.KiddushLevana, ev.GetFlags())
-	assert.Equal("KIDDUSH_LEVANA", ev.GetFlags().String())
+	assert.Equal([]string{"zmanim", "kiddushLevana"}, ev.Categories())
+	assert.Equal("🌔", ev.Emoji())
+	assert.Equal(event.KiddushLevana, ev.Flags())
+	assert.Equal("KIDDUSH_LEVANA", ev.Flags().String())
 	assert.Equal(molad.New(5787, hdate.Cheshvan), ev.Molad)
 }
 
@@ -221,7 +221,7 @@ func TestKiddushLevanaSortedByTime(t *testing.T) {
 		require.NoError(t, err)
 		result := make([]string, len(events))
 		for i, ev := range events {
-			result[i] = ev.GetDate().String() + " " + ev.Render("en")
+			result[i] = ev.Date().String() + " " + ev.Render("en")
 		}
 		return result
 	}

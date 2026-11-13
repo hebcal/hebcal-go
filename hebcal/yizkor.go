@@ -59,7 +59,7 @@ func isYizkorDay(hd hdate.HDate, il bool) bool {
 func newYizkorEvent(hd hdate.HDate, holidays []event.HolidayEvent) YizkorEvent {
 	ev := YizkorEvent{date: hd}
 	for _, h := range holidays {
-		if h.GetDate() == hd {
+		if h.Date() == hd {
 			ev.linked = h
 			break
 		}
@@ -67,7 +67,7 @@ func newYizkorEvent(hd hdate.HDate, holidays []event.HolidayEvent) YizkorEvent {
 	return ev
 }
 
-func (ev YizkorEvent) GetDate() hdate.HDate { return ev.date }
+func (ev YizkorEvent) Date() hdate.HDate { return ev.date }
 
 // LinkedEvent returns the holiday on which Yizkor is recited, e.g. "Yom
 // Kippur".
@@ -81,9 +81,9 @@ func (ev YizkorEvent) Render(locale string) string {
 	return "Yizkor"
 }
 
-func (ev YizkorEvent) GetFlags() event.Flags { return event.Yizkor }
-func (ev YizkorEvent) GetEmoji() string      { return "🕯️" }
-func (ev YizkorEvent) Basename() string      { return "Yizkor" }
+func (ev YizkorEvent) Flags() event.Flags { return event.Yizkor }
+func (ev YizkorEvent) Emoji() string      { return "🕯️" }
+func (ev YizkorEvent) Basename() string   { return "Yizkor" }
 
 // Desc returns the untranslated description, "Yizkor".
 func (ev YizkorEvent) Desc() string { return "Yizkor" }
@@ -91,5 +91,5 @@ func (ev YizkorEvent) Desc() string { return "Yizkor" }
 // URL returns "": Yizkor has no page of its own on hebcal.com.
 func (ev YizkorEvent) URL() string { return "" }
 
-// GetCategories returns ["yizkor"].
-func (ev YizkorEvent) GetCategories() []string { return event.CategoriesFromFlags(event.Yizkor) }
+// Categories returns ["yizkor"].
+func (ev YizkorEvent) Categories() []string { return event.CategoriesFromFlags(event.Yizkor) }

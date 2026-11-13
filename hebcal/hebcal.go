@@ -201,7 +201,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 				opts.clock.cc, opts.clock.format))
 		}
 		for _, holidayEv := range holidaysYear {
-			if hd == holidayEv.GetDate() {
+			if hd == holidayEv.Date() {
 				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
 			}
 		}
@@ -216,7 +216,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 			events = append(events, newYizkorEvent(hd, holidaysYear))
 		}
 		for _, userEv := range userEvents {
-			if abs == userEv.GetDate().Abs() {
+			if abs == userEv.Date().Abs() {
 				events = append(events, userEv)
 			}
 		}
@@ -300,7 +300,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 				klMonthKey = monthKey
 				klEv, klOk = makeKiddushLevanaEvent(hyear, hd.Month(), opts)
 			}
-			if klOk && klEv.GetDate() == hd {
+			if klOk && klEv.Date() == hd {
 				events = append(events, klEv)
 			}
 		}
@@ -685,7 +685,7 @@ func getMaskFromOptions(opts *CalOptions) event.Flags {
 // makeMevarchimEvent upgrades a bare "Shabbat Mevarchim Chodesh" holiday event
 // to a MevarchimChodeshEvent carrying the molad of the upcoming month.
 func makeMevarchimEvent(ev event.HolidayEvent, opts *calConfig) event.MevarchimChodeshEvent {
-	hd := ev.GetDate()
+	hd := ev.Date()
 	nextName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 	m := molad.New(hd.Year(), nextMonth)
 	mev := event.NewMevarchimChodeshEvent(hd, nextName, m)
@@ -737,7 +737,7 @@ func sortTimedEvents(events []event.CalEvent) {
 }
 
 func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev event.CalEvent, opts *calConfig) ([]event.CalEvent, TimedEvent) {
-	mask := ev.GetFlags()
+	mask := ev.Flags()
 	if (!opts.YomKippurKatan && mask.Has(event.YomKippurKatan)) ||
 		(!opts.BeHaB && mask.Has(event.BeHaB)) ||
 		(opts.NoModern && mask.Has(event.ModernHoliday)) {
@@ -765,7 +765,7 @@ func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev e
 					ev = tmp
 				}
 			} else {
-				hd := ev.GetDate()
+				hd := ev.Date()
 				candlesEv = makeCandleEvent(hd, opts, ev)
 			}
 		}

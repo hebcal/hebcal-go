@@ -290,7 +290,7 @@ const learningFlags = event.DailyLearning | event.DafYomi | event.MishnaYomi |
 // holidayTimeOfDay returns the approximate time of day of a holiday, used to order
 // holidays on the same date. See TimeOfDay for the full list.
 func holidayTimeOfDay(ev event.HolidayEvent) int {
-	return untimedTimeOfDay(ev.GetFlags(), ev.Desc())
+	return untimedTimeOfDay(ev.Flags(), ev.Desc())
 }
 
 // untimedTimeOfDay ranks an event that has no clock time by its flags and
@@ -352,20 +352,20 @@ func TimeOfDay(ev event.CalEvent) int {
 	case TimedEvent:
 		return timedTimeOfDay(e.flags, e.kind, e.eventTime)
 	case KiddushLevanaEvent:
-		return timedTimeOfDay(e.GetFlags(), KiddushLevana, e.Time())
+		return timedTimeOfDay(e.Flags(), KiddushLevana, e.Time())
 	case event.HolidayEvent:
 		return holidayTimeOfDay(e)
 	case riseSetEvent:
 		return TimeOfDayDawn
 	}
-	return untimedTimeOfDay(ev.GetFlags(), "")
+	return untimedTimeOfDay(ev.Flags(), "")
 }
 
 // sortHolidays orders events by date, then by holidayTimeOfDay. Events on the same
 // date and at the same time of day keep the order in which they were added.
 func sortHolidays(events []event.HolidayEvent) {
 	sort.SliceStable(events, func(i, j int) bool {
-		abs1, abs2 := events[i].GetDate().Abs(), events[j].GetDate().Abs()
+		abs1, abs2 := events[i].Date().Abs(), events[j].Date().Abs()
 		if abs1 != abs2 {
 			return abs1 < abs2
 		}
@@ -812,8 +812,8 @@ func GetHolidaysForYear(year int, il bool) []event.HolidayEvent {
 	events := getAllHolidaysForYear(year)
 	result := make([]event.HolidayEvent, 0, len(events))
 	for _, ev := range events {
-		if (il && !ev.GetFlags().Has(event.ChulOnly)) ||
-			(!il && !ev.GetFlags().Has(event.ILOnly)) {
+		if (il && !ev.Flags().Has(event.ChulOnly)) ||
+			(!il && !ev.Flags().Has(event.ILOnly)) {
 			result = append(result, ev)
 		}
 	}

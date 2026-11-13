@@ -31,8 +31,8 @@ func NewMevarchimChodeshEvent(date hdate.HDate, monthName string, m molad.Molad)
 	return MevarchimChodeshEvent{date: date, MonthName: monthName, Molad: m}
 }
 
-// GetDate returns the Shabbat on which the month is blessed.
-func (ev MevarchimChodeshEvent) GetDate() hdate.HDate {
+// Date returns the Shabbat on which the month is blessed.
+func (ev MevarchimChodeshEvent) Date() hdate.HDate {
 	return ev.date
 }
 
@@ -46,15 +46,15 @@ func (ev MevarchimChodeshEvent) URL() string {
 	return ""
 }
 
-func (ev MevarchimChodeshEvent) GetFlags() Flags {
+func (ev MevarchimChodeshEvent) Flags() Flags {
 	return ShabbatMevarchim
 }
 
-func (ev MevarchimChodeshEvent) GetEmoji() string {
+func (ev MevarchimChodeshEvent) Emoji() string {
 	return ""
 }
 
-func (ev MevarchimChodeshEvent) GetCategories() []string {
+func (ev MevarchimChodeshEvent) Categories() []string {
 	return []string{"mevarchim"}
 }
 

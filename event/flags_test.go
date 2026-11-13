@@ -52,7 +52,7 @@ func TestHolidayFlagsString(t *testing.T) {
 
 // Every flag through Yizkor (currently the last one) must have a name.
 func TestHolidayFlagsStringCoversAllFlags(t *testing.T) {
-	last := bits.TrailingZeros32(uint32(event.BeHaB))
+	last := bits.TrailingZeros32(uint32(event.Yizkor))
 	for i := 0; i <= last; i++ {
 		s := (event.Flags(1) << i).String()
 		assert.NotContains(t, s, "0x", "bit %d has no name", i)

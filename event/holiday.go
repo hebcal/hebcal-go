@@ -24,13 +24,13 @@ type HolidayEvent struct {
 // NewHolidayEvent constructs a holiday on date. desc is its untranslated
 // description (e.g. "Pesach III (CH”M)"), which is also the key of its
 // translations. emoji is a holiday-specific emoji, or "" for the default
-// that GetEmoji chooses from flags.
+// that Emoji chooses from flags.
 func NewHolidayEvent(date hdate.HDate, desc string, flags Flags, emoji string) HolidayEvent {
 	return HolidayEvent{date: date, desc: desc, flags: flags, emoji: emoji}
 }
 
-// GetDate returns the Hebrew date on which the holiday occurs.
-func (ev HolidayEvent) GetDate() hdate.HDate {
+// Date returns the Hebrew date on which the holiday occurs.
+func (ev HolidayEvent) Date() hdate.HDate {
 	return ev.date
 }
 
@@ -92,11 +92,11 @@ func (ev HolidayEvent) RenderBrief(locale string) string {
 	return ev.Render(locale)
 }
 
-func (ev HolidayEvent) GetFlags() Flags {
+func (ev HolidayEvent) Flags() Flags {
 	return ev.flags
 }
 
-func (ev HolidayEvent) GetEmoji() string {
+func (ev HolidayEvent) Emoji() string {
 	if ev.emoji != "" {
 		return ev.emoji
 	}
@@ -153,11 +153,11 @@ var minorHolidays = map[string]bool{
 	"Rosh Hashana LaBehemot": true,
 }
 
-// GetCategories returns the category and sub-categories for a holiday,
+// Categories returns the category and sub-categories for a holiday,
 // mirroring HolidayEvent.getCategories() in @hebcal/core: chol hamoed days are
 // major, otherwise the flag-based category is used, falling back to a minor or
 // major holiday when the flags alone are inconclusive.
-func (ev HolidayEvent) GetCategories() []string {
+func (ev HolidayEvent) Categories() []string {
 	if ev.CholHaMoedDay != 0 {
 		return []string{"holiday", "major", "cholhamoed"}
 	}

@@ -96,9 +96,9 @@ var (
 	_ event.BriefRenderer = KiddushLevanaEvent{}
 )
 
-// GetDate returns the Hebrew date of the event, which is earlier than the
+// Date returns the Hebrew date of the event, which is earlier than the
 // date of the Maharil's time when that falls on Shabbat or a Yom Tov.
-func (ev KiddushLevanaEvent) GetDate() hdate.HDate { return ev.timed.date }
+func (ev KiddushLevanaEvent) Date() hdate.HDate { return ev.timed.date }
 
 // Time returns the latest time, adjusted as the type's documentation
 // describes, in the time zone of the calendar's location.
@@ -120,17 +120,17 @@ func (ev KiddushLevanaEvent) Render(locale string) string { return ev.timed.Rend
 // RenderBrief returns the translated description without its time.
 func (ev KiddushLevanaEvent) RenderBrief(locale string) string { return ev.timed.RenderBrief(locale) }
 
-// GetFlags returns event.KiddushLevana.
-func (ev KiddushLevanaEvent) GetFlags() event.Flags { return event.KiddushLevana }
+// Flags returns event.KiddushLevana.
+func (ev KiddushLevanaEvent) Flags() event.Flags { return event.KiddushLevana }
 
-// GetEmoji returns a waxing gibbous moon.
-func (ev KiddushLevanaEvent) GetEmoji() string { return "🌔" }
+// Emoji returns a waxing gibbous moon.
+func (ev KiddushLevanaEvent) Emoji() string { return "🌔" }
 
 // URL returns "": the event has no page on hebcal.com.
 func (ev KiddushLevanaEvent) URL() string { return "" }
 
-// GetCategories returns ["zmanim", "kiddushLevana"].
-func (ev KiddushLevanaEvent) GetCategories() []string {
+// Categories returns ["zmanim", "kiddushLevana"].
+func (ev KiddushLevanaEvent) Categories() []string {
 	return []string{"zmanim", "kiddushLevana"}
 }
 
@@ -173,7 +173,7 @@ func isShabbatOrChag(hd hdate.HDate, il bool) bool {
 		return true
 	}
 	for _, ev := range GetHolidaysOnDate(hd, il) {
-		if ev.GetFlags().Has(event.Chag) {
+		if ev.Flags().Has(event.Chag) {
 			return true
 		}
 	}

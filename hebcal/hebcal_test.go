@@ -30,7 +30,7 @@ func checkEvents(
 	assert.NoError(t, err)
 	got := make([]string, 0, len(events))
 	for _, ev := range events {
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render(locale))
+		line := fmt.Sprintf("%s %s", hd2iso(ev.Date()), ev.Render(locale))
 		got = append(got, line)
 	}
 	assert.Equal(t, want, got)
@@ -186,8 +186,8 @@ func TestHebrewCalendarSuppressHavdalah(t *testing.T) {
 		if isHavdalah(ev) {
 			continue
 		}
-		got := fmt.Sprintf("%s %s", hd2iso(suppressed[j].GetDate()), suppressed[j].Render("en"))
-		want := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
+		got := fmt.Sprintf("%s %s", hd2iso(suppressed[j].Date()), suppressed[j].Render("en"))
+		want := fmt.Sprintf("%s %s", hd2iso(ev.Date()), ev.Render("en"))
 		assert.Equal(t, want, got)
 		j++
 	}
@@ -265,7 +265,7 @@ func ExampleHebrewCalendar() {
 	events, _ := hebcal.HebrewCalendar(&opts)
 	for i := 0; i < 6; i++ {
 		ev := events[i]
-		dateStr := ev.GetDate().Gregorian().Format("Mon 02-Jan-2006")
+		dateStr := ev.Date().Gregorian().Format("Mon 02-Jan-2006")
 		title := ev.Render("en")
 		fmt.Println(dateStr, title)
 	}
@@ -540,8 +540,8 @@ func TestYearMinus1(t *testing.T) {
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, events)
-	first := events[0].GetDate()
-	last := events[len(events)-1].GetDate()
+	first := events[0].Date()
+	last := events[len(events)-1].Date()
 	fy, _, _ := first.Greg()
 	ly, _, _ := last.Greg()
 	assert.Equal(t, -1, fy)
@@ -556,8 +556,8 @@ func TestYearMinus1NumYears2(t *testing.T) {
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, events)
-	first := events[0].GetDate()
-	last := events[len(events)-1].GetDate()
+	first := events[0].Date()
+	last := events[len(events)-1].Date()
 	fy, _, _ := first.Greg()
 	ly, _, _ := last.Greg()
 	assert.Equal(t, -1, fy)
@@ -679,7 +679,7 @@ func TestShabbatMevarchimWithNoHolidays(t *testing.T) {
 	assert.NoError(t, err)
 	var actual []string
 	for _, ev := range events {
-		actual = append(actual, hd2iso(ev.GetDate())+" "+ev.Render("en"))
+		actual = append(actual, hd2iso(ev.Date())+" "+ev.Render("en"))
 		_, ok := ev.(event.MevarchimChodeshEvent)
 		assert.True(t, ok, "%T", ev)
 	}
@@ -701,8 +701,8 @@ func TestChanukahEmojiKeycap(t *testing.T) {
 	assert.NoError(t, err)
 	actual := map[string]string{}
 	for _, ev := range events {
-		if ev.GetFlags().Has(event.ChanukahCandles) || ev.Render("en") == "Chanukah: 8th Day" {
-			actual[ev.Render("en")] = ev.GetEmoji()
+		if ev.Flags().Has(event.ChanukahCandles) || ev.Render("en") == "Chanukah: 8th Day" {
+			actual[ev.Render("en")] = ev.Emoji()
 		}
 	}
 	assert.Equal(t, map[string]string{

@@ -34,7 +34,7 @@ func GetHolidaysOnDate(hd hdate.HDate, il bool) []event.HolidayEvent {
 	yearEvents := GetHolidaysForYear(hd.Year(), il)
 	var result []event.HolidayEvent
 	for _, ev := range yearEvents {
-		if ev.GetDate().Abs() == abs {
+		if ev.Date().Abs() == abs {
 			result = append(result, ev)
 		}
 	}
@@ -52,7 +52,7 @@ func isTomorrowShabbosOrYomTov(dow time.Weekday, events []event.HolidayEvent) bo
 		return true
 	}
 	for _, ev := range events {
-		if ev.GetFlags().HasAny(lightCandlesMask) {
+		if ev.Flags().HasAny(lightCandlesMask) {
 			return true
 		}
 	}
@@ -66,7 +66,7 @@ func isTodayAssurBemelacha(dow time.Weekday, events []event.HolidayEvent) bool {
 		return true
 	}
 	for _, ev := range events {
-		if ev.GetFlags().Has(event.Chag) {
+		if ev.Flags().Has(event.Chag) {
 			return true
 		}
 	}

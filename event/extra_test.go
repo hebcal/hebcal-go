@@ -13,10 +13,10 @@ import (
 func TestHebrewDateEvent_Extra(t *testing.T) {
 	hd := hdate.New(5781, hdate.Sivan, 3)
 	ev := event.NewHebrewDateEvent(hd)
-	assert.Equal(t, hd, ev.GetDate())
-	assert.Equal(t, event.HebrewDate, ev.GetFlags())
-	assert.Equal(t, "", ev.GetEmoji())
-	assert.Equal(t, []string{"hebdate"}, ev.GetCategories())
+	assert.Equal(t, hd, ev.Date())
+	assert.Equal(t, event.HebrewDate, ev.Flags())
+	assert.Equal(t, "", ev.Emoji())
+	assert.Equal(t, []string{"hebdate"}, ev.Categories())
 }
 
 func TestHolidayEvent_Extra(t *testing.T) {
@@ -26,49 +26,49 @@ func TestHolidayEvent_Extra(t *testing.T) {
 		"Shavuot I",
 		event.Chag,
 		"")
-	assert.Equal(t, hd, ev.GetDate())
-	assert.Equal(t, event.Chag, ev.GetFlags())
-	assert.Equal(t, "✡️", ev.GetEmoji())
+	assert.Equal(t, hd, ev.Date())
+	assert.Equal(t, event.Chag, ev.Flags())
+	assert.Equal(t, "✡️", ev.Emoji())
 
 	ev2 := event.NewHolidayEvent(
 		hd,
 		"Shabbat Shekalim",
 		event.SpecialShabbat,
 		"")
-	assert.Equal(t, "🕍", ev2.GetEmoji())
+	assert.Equal(t, "🕍", ev2.Emoji())
 
 	ev3 := event.NewHolidayEvent(
 		hd,
 		"Rosh Chodesh Tamuz",
 		event.RoshChodesh,
 		"")
-	assert.Equal(t, "🌒", ev3.GetEmoji())
+	assert.Equal(t, "🌒", ev3.Emoji())
 
 	ev4 := event.NewHolidayEvent(
 		hd,
 		"My Custom Holiday",
 		event.Chag,
 		"🎉")
-	assert.Equal(t, "🎉", ev4.GetEmoji())
+	assert.Equal(t, "🎉", ev4.Emoji())
 
 	// Test Categories
 	evChol := event.NewHolidayEvent(hd, "Pesach III (CH''M)", event.CholHamoed, "")
 	evChol.CholHaMoedDay = 3
-	assert.Equal(t, []string{"holiday", "major", "cholhamoed"}, evChol.GetCategories())
+	assert.Equal(t, []string{"holiday", "major", "cholhamoed"}, evChol.Categories())
 
 	evMinor := event.NewHolidayEvent(
 		hd,
 		"Lag BaOmer",
 		0,
 		"")
-	assert.Equal(t, []string{"holiday", "minor"}, evMinor.GetCategories())
+	assert.Equal(t, []string{"holiday", "minor"}, evMinor.Categories())
 
 	evMajorFall := event.NewHolidayEvent(
 		hd,
 		"Some Unknown Major",
 		0,
 		"")
-	assert.Equal(t, []string{"holiday", "major"}, evMajorFall.GetCategories())
+	assert.Equal(t, []string{"holiday", "major"}, evMajorFall.Categories())
 
 	// Test Render for Rosh Chodesh
 	evRoshChodesh := event.NewHolidayEvent(
@@ -104,20 +104,20 @@ func TestHolidayEvent_Extra(t *testing.T) {
 		"")
 	assert.Equal(t, "Yom Kippur Katan Sivan", evYKK.Render("en"))
 
-	// Test GetEmoji edge cases
+	// Test Emoji edge cases
 	evMevarchimEmoji := event.NewHolidayEvent(
 		hd,
 		"Shabbat Mevarchim Chodesh Kislev",
 		event.ShabbatMevarchim,
 		"")
-	assert.Equal(t, "", evMevarchimEmoji.GetEmoji())
+	assert.Equal(t, "", evMevarchimEmoji.Emoji())
 
 	evYKKEmoji := event.NewHolidayEvent(
 		hd,
 		"Yom Kippur Katan Sivan",
 		event.YomKippurKatan|event.MinorFast,
 		"")
-	assert.Equal(t, "", evYKKEmoji.GetEmoji())
+	assert.Equal(t, "", evYKKEmoji.Emoji())
 }
 
 func TestMevarchimChodeshEvent(t *testing.T) {
@@ -125,10 +125,10 @@ func TestMevarchimChodeshEvent(t *testing.T) {
 	m := molad.New(5786, hdate.Tamuz)
 	ev := event.NewMevarchimChodeshEvent(hd, "Tammuz", m)
 
-	assert.Equal(t, hd, ev.GetDate())
-	assert.Equal(t, event.ShabbatMevarchim, ev.GetFlags())
-	assert.Equal(t, "", ev.GetEmoji())
-	assert.Equal(t, []string{"mevarchim"}, ev.GetCategories())
+	assert.Equal(t, hd, ev.Date())
+	assert.Equal(t, event.ShabbatMevarchim, ev.Flags())
+	assert.Equal(t, "", ev.Emoji())
+	assert.Equal(t, []string{"mevarchim"}, ev.Categories())
 	assert.Equal(t, "Shabbat Mevarchim Chodesh Tammuz", ev.Basename())
 	assert.Equal(t, "Shabbat Mevarchim Chodesh Tammuz", ev.Render("en"))
 	assert.Equal(t, "Mevarchim Chodesh Tammuz", ev.RenderBrief("en"))
@@ -143,10 +143,10 @@ func TestMoladEvent(t *testing.T) {
 	m := molad.New(5786, hdate.Tamuz)
 
 	ev := event.NewMoladEvent(hd, m, "Tammuz", "US", event.ClockAuto)
-	assert.Equal(t, hd, ev.GetDate())
-	assert.Equal(t, event.Molad, ev.GetFlags())
-	assert.Equal(t, "", ev.GetEmoji())
-	assert.Equal(t, []string{"molad"}, ev.GetCategories())
+	assert.Equal(t, hd, ev.Date())
+	assert.Equal(t, event.Molad, ev.Flags())
+	assert.Equal(t, "", ev.Emoji())
+	assert.Equal(t, []string{"molad"}, ev.Categories())
 	assert.Equal(t, "Molad Tammuz 5786", ev.Basename())
 
 	// Test renderings for different locales and country codes
@@ -208,12 +208,12 @@ func TestUserEvent(t *testing.T) {
 		hd,
 		"My Event")
 
-	assert.Equal(t, hd, ev.GetDate())
-	assert.Equal(t, event.User, ev.GetFlags())
-	assert.Equal(t, "", ev.GetEmoji())
+	assert.Equal(t, hd, ev.Date())
+	assert.Equal(t, event.User, ev.Flags())
+	assert.Equal(t, "", ev.Emoji())
 	assert.Equal(t, "My Event", ev.Basename())
 	assert.Equal(t, "My Event", ev.Render("en"))
-	assert.Equal(t, []string{"user"}, ev.GetCategories())
+	assert.Equal(t, []string{"user"}, ev.Categories())
 }
 
 func TestParshaEvent_Extra(t *testing.T) {
@@ -225,11 +225,11 @@ func TestParshaEvent_Extra(t *testing.T) {
 	}
 	ev := event.NewParshaEvent(hd, p, false)
 
-	assert.Equal(t, hd, ev.GetDate())
-	assert.Equal(t, event.ParshaHashavua, ev.GetFlags())
-	assert.Equal(t, "", ev.GetEmoji())
+	assert.Equal(t, hd, ev.Date())
+	assert.Equal(t, event.ParshaHashavua, ev.Flags())
+	assert.Equal(t, "", ev.Emoji())
 	assert.Equal(t, "Noach", ev.Basename())
-	assert.Equal(t, []string{"parashat"}, ev.GetCategories())
+	assert.Equal(t, []string{"parashat"}, ev.Categories())
 }
 
 func TestSmartApostrophe(t *testing.T) {

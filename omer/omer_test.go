@@ -92,14 +92,14 @@ func TestEmoji(t *testing.T) {
 	for i := 1; i <= 49; i++ {
 		abs := startAbs + int64(i) - 1
 		ev := omer.NewOmerEvent(hdate.FromRD(abs), i)
-		actual[i] = ev.GetEmoji()
+		actual[i] = ev.Emoji()
 	}
 	assert.Equal(t, expected, actual)
 }
 
-func ExampleOmerEvent_GetEmoji() {
+func ExampleOmerEvent_Emoji() {
 	omer := omer.NewOmerEvent(hdate.New(5770, hdate.Nisan, 28), 13)
-	fmt.Println(omer.GetEmoji())
+	fmt.Println(omer.Emoji())
 	// Output: ⑬
 }
 

@@ -119,7 +119,7 @@ func TestHebrewCalendarConcurrent(t *testing.T) {
 func renderAll(events []event.CalEvent) []string {
 	out := make([]string, len(events))
 	for i, ev := range events {
-		out[i] = ev.GetDate().String() + " " + ev.Render("en")
+		out[i] = ev.Date().String() + " " + ev.Render("en")
 	}
 	return out
 }

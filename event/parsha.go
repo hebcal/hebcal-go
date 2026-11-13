@@ -24,8 +24,8 @@ func NewParshaEvent(hd hdate.HDate, parsha sedra.Parsha, il bool) ParshaEvent {
 	return ParshaEvent{date: hd, Parsha: parsha, IL: il}
 }
 
-// GetDate returns the Saturday on which the portion is read.
-func (ev ParshaEvent) GetDate() hdate.HDate {
+// Date returns the Saturday on which the portion is read.
+func (ev ParshaEvent) Date() hdate.HDate {
 	return ev.date
 }
 
@@ -35,11 +35,11 @@ func (ev ParshaEvent) Render(locale string) string {
 	return prefix + " " + SmartApostrophe(ev.Parsha.Render(locale))
 }
 
-func (ev ParshaEvent) GetFlags() Flags {
+func (ev ParshaEvent) Flags() Flags {
 	return ParshaHashavua
 }
 
-func (ev ParshaEvent) GetEmoji() string {
+func (ev ParshaEvent) Emoji() string {
 	return ""
 }
 
@@ -54,6 +54,6 @@ func (ev ParshaEvent) Basename() string {
 	return strings.Join(ev.Parsha.Name, "-")
 }
 
-func (ev ParshaEvent) GetCategories() []string {
-	return CategoriesFromFlags(ev.GetFlags())
+func (ev ParshaEvent) Categories() []string {
+	return CategoriesFromFlags(ev.Flags())
 }

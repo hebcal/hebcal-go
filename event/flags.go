@@ -80,14 +80,14 @@ const (
 )
 
 // Has reports whether f contains every flag set in flags.
-// For a single flag, e.g. ev.GetFlags().Has(event.Chag), this is
+// For a single flag, e.g. ev.Flags().Has(event.Chag), this is
 // simply "is this flag set". Has(0) is always true.
 func (f Flags) Has(flags Flags) bool {
 	return f&flags == flags
 }
 
 // HasAny reports whether f contains at least one of the flags set in flags,
-// e.g. ev.GetFlags().HasAny(event.MajorFast | event.MinorFast).
+// e.g. ev.Flags().HasAny(event.MajorFast | event.MinorFast).
 // HasAny(0) is always false.
 func (f Flags) HasAny(flags Flags) bool {
 	return f&flags != 0

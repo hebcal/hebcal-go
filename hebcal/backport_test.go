@@ -73,7 +73,7 @@ func TestMevarchimChodeshEvent(t *testing.T) {
 	if got := mev.RenderBrief("en"); got != "Mevarchim Chodesh Tammuz" {
 		t.Errorf("RenderBrief = %q", got)
 	}
-	if got := mev.GetCategories(); len(got) != 1 || got[0] != "mevarchim" {
+	if got := mev.Categories(); len(got) != 1 || got[0] != "mevarchim" {
 		t.Errorf("GetCategories = %v", got)
 	}
 	// molad of Tammuz 5786: Monday, 6h 46m 16 chalakim

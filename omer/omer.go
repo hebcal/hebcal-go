@@ -51,8 +51,8 @@ func NewOmerEvent(hd hdate.HDate, omerDay int) OmerEvent {
 	return OmerEvent{date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
 }
 
-// GetDate returns the Hebrew date of the day counted.
-func (ev OmerEvent) GetDate() hdate.HDate {
+// Date returns the Hebrew date of the day counted.
+func (ev OmerEvent) Date() hdate.HDate {
 	return ev.date
 }
 
@@ -85,11 +85,11 @@ func translate(s, locale string) string {
 	return s
 }
 
-func (ev OmerEvent) GetFlags() event.Flags {
+func (ev OmerEvent) Flags() event.Flags {
 	return event.OmerCount
 }
 
-func (ev OmerEvent) GetEmoji() string {
+func (ev OmerEvent) Emoji() string {
 	number := ev.OmerDay
 	var r rune
 	if number <= 20 {
@@ -114,11 +114,12 @@ func (ev OmerEvent) Desc() string {
 	return "Omer " + strconv.Itoa(ev.OmerDay)
 }
 
-func (ev OmerEvent) GetCategories() []string {
-	return event.CategoriesFromFlags(ev.GetFlags())
+func (ev OmerEvent) Categories() []string {
+	return event.CategoriesFromFlags(ev.Flags())
 }
 
-func (ev OmerEvent) GetWeeks() int {
+// Weeks returns the number of complete weeks counted so far, 0 through 7.
+func (ev OmerEvent) Weeks() int {
 	if ev.DaysWithinWeeks == 7 {
 		return ev.WeekNumber
 	}

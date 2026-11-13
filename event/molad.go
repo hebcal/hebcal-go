@@ -34,8 +34,8 @@ func NewMoladEvent(date hdate.HDate, m molad.Molad, monthName string, countryCod
 	}
 }
 
-// GetDate returns the Shabbat on which the molad is announced.
-func (ev MoladEvent) GetDate() hdate.HDate {
+// Date returns the Shabbat on which the molad is announced.
+func (ev MoladEvent) Date() hdate.HDate {
 	return ev.date
 }
 
@@ -111,11 +111,11 @@ func RenderMolad(m molad.Molad, monthName, locale, countryCode string, clock Clo
 	return result
 }
 
-func (ev MoladEvent) GetFlags() Flags {
+func (ev MoladEvent) Flags() Flags {
 	return Molad
 }
 
-func (ev MoladEvent) GetEmoji() string {
+func (ev MoladEvent) Emoji() string {
 	return ""
 }
 
@@ -136,6 +136,6 @@ func (ev MoladEvent) URL() string {
 	return ""
 }
 
-func (ev MoladEvent) GetCategories() []string {
-	return CategoriesFromFlags(ev.GetFlags())
+func (ev MoladEvent) Categories() []string {
+	return CategoriesFromFlags(ev.Flags())
 }

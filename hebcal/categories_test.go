@@ -26,7 +26,7 @@ func TestTimedEventGetCategories(t *testing.T) {
 	}
 	for _, tc := range tests {
 		ev := NewTimedEvent(hd, tc.desc, event.LightCandles, when, 0, nil, opts)
-		if got := ev.GetCategories(); !reflect.DeepEqual(got, tc.want) {
+		if got := ev.Categories(); !reflect.DeepEqual(got, tc.want) {
 			t.Errorf("%q: GetCategories() = %v, want %v", tc.desc, got, tc.want)
 		}
 	}

@@ -22,10 +22,10 @@ func chametzEvents(t *testing.T, gregYear int, locale string) []string {
 	for _, ev := range events {
 		r := ev.Render(locale)
 		if strings.Contains(strings.ToLower(r), "chametz") || strings.Contains(r, "חָמֵץ") {
-			hd := ev.GetDate()
+			hd := ev.Date()
 			y, m, d := hd.Greg()
 			dow := hd.Weekday().String()[:3]
-			out = append(out, fmt.Sprintf("%s %04d-%02d-%02d %s %s", dow, y, m, d, ev.GetEmoji(), r))
+			out = append(out, fmt.Sprintf("%s %04d-%02d-%02d %s %s", dow, y, m, d, ev.Emoji(), r))
 		}
 	}
 	return out

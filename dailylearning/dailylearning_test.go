@@ -14,14 +14,14 @@ type mockEvent struct {
 	desc string
 }
 
-func (m mockEvent) GetDate() hdate.HDate        { return m.date }
+func (m mockEvent) Date() hdate.HDate           { return m.date }
 func (m mockEvent) Render(locale string) string { return m.desc }
-func (m mockEvent) GetFlags() event.Flags       { return event.DailyLearning }
-func (m mockEvent) GetEmoji() string            { return "" }
+func (m mockEvent) Flags() event.Flags          { return event.DailyLearning }
+func (m mockEvent) Emoji() string               { return "" }
 func (m mockEvent) Basename() string            { return m.desc }
 func (m mockEvent) Desc() string                { return m.desc }
 func (m mockEvent) URL() string                 { return "" }
-func (m mockEvent) GetCategories() []string     { return []string{"learning"} }
+func (m mockEvent) Categories() []string        { return []string{"learning"} }
 
 func TestDailyLearningRegistry(t *testing.T) {
 	// Backup and reset calendars map
@@ -49,28 +49,28 @@ func TestDailyLearningRegistry(t *testing.T) {
 	ev := Lookup("TestCal", hd, false)
 	assert.NotNil(t, ev)
 	assert.Equal(t, "Mock Learning", ev.Render("en"))
-	assert.Equal(t, hd, ev.GetDate())
+	assert.Equal(t, hd, ev.Date())
 
 	// Test Lookup for missing calendar
 	assert.Nil(t, Lookup("MissingCal", hd, false))
 
-	// Test GetCalendars
+	// Test Calendars
 	AddCalendar("AlphaCal", mockFn)
-	cals := GetCalendars()
+	cals := Calendars()
 	assert.Equal(t, []string{"alphacal", "testcal"}, cals)
 
-	// Test GetStartDate
-	sd, ok := GetStartDate("TestCal")
+	// Test StartDate
+	sd, ok := StartDate("TestCal")
 	assert.True(t, ok)
 	assert.Equal(t, startDate, sd)
 
-	// Test GetStartDate for calendar registered without start date
-	sd2, ok2 := GetStartDate("AlphaCal")
+	// Test StartDate for calendar registered without start date
+	sd2, ok2 := StartDate("AlphaCal")
 	assert.False(t, ok2)
 	assert.Equal(t, hdate.HDate{}, sd2)
 
-	// Test GetStartDate for unregistered calendar
-	sd3, ok3 := GetStartDate("Unregistered")
+	// Test StartDate for unregistered calendar
+	sd3, ok3 := StartDate("Unregistered")
 	assert.False(t, ok3)
 	assert.Equal(t, hdate.HDate{}, sd3)
 }

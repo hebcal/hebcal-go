@@ -17,8 +17,8 @@ func NewUserEvent(date hdate.HDate, desc string) UserEvent {
 	return UserEvent{date: date, desc: desc}
 }
 
-// GetDate returns the Hebrew date on which the event occurs.
-func (ev UserEvent) GetDate() hdate.HDate {
+// Date returns the Hebrew date on which the event occurs.
+func (ev UserEvent) Date() hdate.HDate {
 	return ev.date
 }
 
@@ -37,11 +37,11 @@ func (ev UserEvent) URL() string {
 	return ""
 }
 
-func (ev UserEvent) GetFlags() Flags {
+func (ev UserEvent) Flags() Flags {
 	return User
 }
 
-func (ev UserEvent) GetEmoji() string {
+func (ev UserEvent) Emoji() string {
 	return ""
 }
 
@@ -49,6 +49,6 @@ func (ev UserEvent) Basename() string {
 	return ev.desc
 }
 
-func (ev UserEvent) GetCategories() []string {
-	return CategoriesFromFlags(ev.GetFlags())
+func (ev UserEvent) Categories() []string {
+	return CategoriesFromFlags(ev.Flags())
 }

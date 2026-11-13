@@ -16,8 +16,8 @@ type HebrewDateEvent struct {
 	date hdate.HDate
 }
 
-// GetDate returns the Hebrew date the event names.
-func (ev HebrewDateEvent) GetDate() hdate.HDate {
+// Date returns the Hebrew date the event names.
+func (ev HebrewDateEvent) Date() hdate.HDate {
 	return ev.date
 }
 
@@ -78,11 +78,11 @@ func monthName(hd hdate.HDate, locale string) string {
 	return en
 }
 
-func (ev HebrewDateEvent) GetFlags() Flags {
+func (ev HebrewDateEvent) Flags() Flags {
 	return HebrewDate
 }
 
-func (ev HebrewDateEvent) GetEmoji() string {
+func (ev HebrewDateEvent) Emoji() string {
 	return ""
 }
 
@@ -95,8 +95,8 @@ func (ev HebrewDateEvent) Basename() string {
 	return ev.date.String()
 }
 
-func (ev HebrewDateEvent) GetCategories() []string {
-	return CategoriesFromFlags(ev.GetFlags())
+func (ev HebrewDateEvent) Categories() []string {
+	return CategoriesFromFlags(ev.Flags())
 }
 
 // NewHebrewDateEvent constructs the Hebrew date event for hd.

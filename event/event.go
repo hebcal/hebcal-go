@@ -32,8 +32,8 @@ import (
 // Some events can do more, through the optional interfaces BriefRenderer,
 // Memoer, Timed and Linked.
 type CalEvent interface {
-	// GetDate returns the Hebrew date on which the event occurs.
-	GetDate() hdate.HDate
+	// Date returns the Hebrew date on which the event occurs.
+	Date() hdate.HDate
 	// Desc returns the untranslated description, the event's stable
 	// identifier: "Erev Pesach", "Sukkot III (CH''M)", "Parashat Bereshit",
 	// "Omer 7", "29 Elul 5786", "Molad Cheshvan 5787", "Candle lighting".
@@ -46,14 +46,14 @@ type CalEvent interface {
 	// Render returns the description translated to locale, e.g. "Pesach
 	// III (CH’’M)".
 	Render(locale string) string
-	// GetFlags returns the event's flag bitmask.
-	GetFlags() Flags
-	// GetEmoji returns the event's emoji, or "" if it has none.
-	GetEmoji() string
-	// GetCategories returns the category and optional sub-categories for this
+	// Flags returns the event's flag bitmask.
+	Flags() Flags
+	// Emoji returns the event's emoji, or "" if it has none.
+	Emoji() string
+	// Categories returns the category and optional sub-categories for this
 	// event, e.g. ["holiday", "major", "fast"] or ["roshchodesh"]. The first
 	// element is the primary category.
-	GetCategories() []string
+	Categories() []string
 	// URL returns the absolute URL of the event's page (on hebcal.com for
 	// the events of this module), or "" if it has none: a Molad, for
 	// example, or a date outside the range the website covers.
