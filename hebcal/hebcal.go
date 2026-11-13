@@ -219,8 +219,8 @@ func HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error) {
 		if opts.Molad && dow == time.Saturday && hd.Month() != hdate.Elul && hd.Day() >= 23 && hd.Day() <= 29 {
 			nextMonthName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 			molad := molad.New(hd.Year(), nextMonth)
-			events = append(events, event.NewMoladEventHour12(hd, molad, nextMonthName,
-				clockCountry(opts), hour12Override(opts)))
+			events = append(events, event.NewMoladEvent(hd, molad, nextMonthName,
+				clockCountry(opts), opts.Clock))
 		}
 		for _, holidayEv := range holidaysYear {
 			if hd == holidayEv.Date {
@@ -657,7 +657,7 @@ func makeMevarchimEvent(ev event.HolidayEvent, opts *CalOptions) event.Mevarchim
 	m := molad.New(hd.Year(), nextMonth)
 	mev := event.NewMevarchimChodeshEvent(hd, nextName, m)
 	mev.CountryCode = clockCountry(opts)
-	mev.Hour12 = hour12Override(opts)
+	mev.Clock = opts.Clock
 	return mev
 }
 

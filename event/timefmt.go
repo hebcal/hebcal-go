@@ -6,6 +6,33 @@ import (
 	"strings"
 )
 
+// ClockFormat chooses between 12-hour and 24-hour wall-clock times in
+// rendered text. The zero value, ClockAuto, follows the country's convention.
+type ClockFormat int
+
+const (
+	// ClockAuto uses 12-hour time with an am/pm suffix in countries that
+	// conventionally use a 12-hour clock (see Uses12HourClock), and 24-hour
+	// time elsewhere.
+	ClockAuto ClockFormat = iota
+	// Clock12 always uses 12-hour time with an am/pm suffix ("8:13pm").
+	Clock12
+	// Clock24 always uses 24-hour time ("20:13").
+	Clock24
+)
+
+// String returns "auto", "12h" or "24h".
+func (c ClockFormat) String() string {
+	switch c {
+	case Clock12:
+		return "12h"
+	case Clock24:
+		return "24h"
+	default:
+		return "auto"
+	}
+}
+
 // hour12Countries lists the ISO country codes that conventionally use a
 // 12-hour clock, matching the hour12cc table in @hebcal/core reformatTimeStr.
 var hour12Countries = map[string]bool{
@@ -27,21 +54,21 @@ func Uses12HourClock(cc string) bool {
 // leading space if you want one); for a morning time its "p" or "P" is
 // replaced by "a" or "A", so "pm" becomes "am".
 //
-// cc is the ISO 3166 country code of the location. When hour12 is nil, the
+// cc is the ISO 3166 country code of the location. With ClockAuto, the
 // 12-hour form is used only for countries that conventionally use a 12-hour
-// clock (see Uses12HourClock). A non-nil hour12 overrides the country: true
-// always yields 12-hour time and false always yields 24-hour time.
+// clock (see Uses12HourClock). Clock12 and Clock24 override the country:
+// Clock12 always yields 12-hour time and Clock24 always yields 24-hour time.
 //
 // Pass cc "" to mean the United States; a caller with an Israel schedule
 // should pass "IL".
-func ReformatTimeStr(timeStr, suffix, cc string, hour12 *bool) string {
-	if hour12 != nil && !*hour12 {
+func ReformatTimeStr(timeStr, suffix, cc string, clock ClockFormat) string {
+	if clock == Clock24 {
 		return timeStr
 	}
 	if cc == "" {
 		cc = "US"
 	}
-	if hour12 == nil && !hour12Countries[cc] {
+	if clock != Clock12 && !hour12Countries[cc] {
 		return timeStr
 	}
 	hm := strings.SplitN(timeStr, ":", 2)

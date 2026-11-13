@@ -9,15 +9,15 @@ import "github.com/hebcal/hebcal-go/event"
 // suffix is the afternoon marker, such as "p", "pm" or " P.M."; a morning time
 // gets "a", "am" or " A.M." instead.
 //
-// opts.Hour24 forces 24-hour time and opts.Hour12 forces 12-hour time.
-// Otherwise the country of opts.Location decides (see event.Uses12HourClock),
+// opts.Clock forces 12-hour time (event.Clock12) or 24-hour time
+// (event.Clock24). Otherwise the country of opts.Location decides (see event.Uses12HourClock),
 // falling back to Israel when opts.IL is set and to the United States when it
 // is not. opts may be nil, which means the United States.
 func ReformatTimeStr(timeStr, suffix string, opts *CalOptions) string {
 	if opts == nil {
 		opts = &CalOptions{}
 	}
-	return event.ReformatTimeStr(timeStr, suffix, clockCountry(opts), hour12Override(opts))
+	return event.ReformatTimeStr(timeStr, suffix, clockCountry(opts), opts.Clock)
 }
 
 // clockCountry is the country code whose clock convention applies to opts.
@@ -29,19 +29,4 @@ func clockCountry(opts *CalOptions) string {
 		return "IL"
 	}
 	return "US"
-}
-
-// hour12Override turns Hour24 and Hour12 into event.ReformatTimeStr's
-// optional override: nil when neither is set.
-func hour12Override(opts *CalOptions) *bool {
-	var b bool
-	switch {
-	case opts.Hour24:
-		b = false
-	case opts.Hour12:
-		b = true
-	default:
-		return nil
-	}
-	return &b
 }

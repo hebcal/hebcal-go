@@ -367,7 +367,7 @@ func TestDailyZemanim(t *testing.T) {
 		NoHolidays:  true,
 		DailyZmanim: true,
 		Location:    loc,
-		Hour24:      true,
+		Clock:       event.Clock24,
 	}
 	checkEvents(t, "en", opts, []string{
 		"2021-11-27 Alot HaShachar: 05:21",
@@ -397,7 +397,7 @@ func TestDailyZemanimSortedByTime(t *testing.T) {
 		DailyZmanim:          true,
 		KiddushLevanaMaharil: true,
 		Location:             zmanim.LookupCity("Boston"),
-		Hour24:               true,
+		Clock:                event.Clock24,
 	}
 	checkEvents(t, "en", opts, []string{
 		"2020-03-09 Ta’anit Esther",
@@ -461,7 +461,7 @@ func TestDailyZemanim_He(t *testing.T) {
 		NoHolidays:  true,
 		DailyZmanim: true,
 		Location:    loc,
-		Hour24:      true,
+		Clock:       event.Clock24,
 	}
 	checkEvents(t, "he", opts, []string{
 		"2021-11-27 עֲלוֹת הַשַּׁחַר: 05:21",
@@ -491,7 +491,7 @@ func TestDailyZemanim_Ashkenazi(t *testing.T) {
 		NoHolidays:  true,
 		DailyZmanim: true,
 		Location:    loc,
-		Hour24:      true,
+		Clock:       event.Clock24,
 	}
 	checkEvents(t, "ashkenazi", opts, []string{
 		"2021-11-27 Alos HaShachar: 05:21",

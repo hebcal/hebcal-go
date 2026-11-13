@@ -147,7 +147,7 @@ func TestMoladEvent(t *testing.T) {
 	hd := hdate.New(5786, hdate.Sivan, 29)
 	m := molad.New(5786, hdate.Tamuz)
 
-	ev := event.NewMoladEvent(hd, m, "Tammuz", "US")
+	ev := event.NewMoladEvent(hd, m, "Tammuz", "US", event.ClockAuto)
 	assert.Equal(t, hd, ev.GetDate())
 	assert.Equal(t, event.MOLAD, ev.GetFlags())
 	assert.Equal(t, "", ev.GetEmoji())
@@ -157,10 +157,10 @@ func TestMoladEvent(t *testing.T) {
 	// Test renderings for different locales and country codes
 	assert.Contains(t, ev.Render("en"), "Molad Tammuz: Monday, 6:46am and 16 chalakim")
 
-	evGB := event.NewMoladEvent(hd, m, "Tammuz", "GB")
+	evGB := event.NewMoladEvent(hd, m, "Tammuz", "GB", event.ClockAuto)
 	assert.Contains(t, evGB.Render("en"), "Molad Tammuz: Monday, 6:46 and 16 chalakim")
 
-	evDefaultCC := event.NewMoladEvent(hd, m, "Tammuz", "")
+	evDefaultCC := event.NewMoladEvent(hd, m, "Tammuz", "", event.ClockAuto)
 	assert.Contains(t, evDefaultCC.Render("en"), "Molad Tammuz: Monday, 6:46am and 16 chalakim")
 
 	// Test hebrew rendering (various hours / periods of day)
@@ -168,42 +168,42 @@ func TestMoladEvent(t *testing.T) {
 
 	mAfternoon := m
 	mAfternoon.Hours = 14
-	evAfternoon := event.NewMoladEvent(hd, mAfternoon, "Tammuz", "US")
+	evAfternoon := event.NewMoladEvent(hd, mAfternoon, "Tammuz", "US", event.ClockAuto)
 	assert.Contains(t, evAfternoon.Render("he"), "בַּצׇּהֳרַיִים")
 	assert.Contains(t, evAfternoon.Render("he-x-nonikud"), "בצהריים")
 
 	mEvening := m
 	mEvening.Hours = 19
-	evEvening := event.NewMoladEvent(hd, mEvening, "Tammuz", "US")
+	evEvening := event.NewMoladEvent(hd, mEvening, "Tammuz", "US", event.ClockAuto)
 	assert.Contains(t, evEvening.Render("he"), "בָּעֶרֶב")
 
 	mNight := m
 	mNight.Hours = 23
-	evNight := event.NewMoladEvent(hd, mNight, "Tammuz", "US")
+	evNight := event.NewMoladEvent(hd, mNight, "Tammuz", "US", event.ClockAuto)
 	assert.Contains(t, evNight.Render("he"), "בַּלַּ֥יְלָה")
 
 	mNight2 := m
 	mNight2.Hours = 2
-	evNight2 := event.NewMoladEvent(hd, mNight2, "Tammuz", "US")
+	evNight2 := event.NewMoladEvent(hd, mNight2, "Tammuz", "US", event.ClockAuto)
 	assert.Contains(t, evNight2.Render("he"), "בַּלַּ֥יְלָה")
 
 	// 12-hour clock boundary cases: 0:00 (12:00am) and 12:00 (12:00pm)
 	mMidnight := m
 	mMidnight.Hours = 0
 	mMidnight.Minutes = 0
-	evMidnight := event.NewMoladEvent(hd, mMidnight, "Tammuz", "US")
+	evMidnight := event.NewMoladEvent(hd, mMidnight, "Tammuz", "US", event.ClockAuto)
 	assert.Contains(t, evMidnight.Render("en"), "12:00am")
 
 	mNoon := m
 	mNoon.Hours = 12
 	mNoon.Minutes = 0
-	evNoon := event.NewMoladEvent(hd, mNoon, "Tammuz", "US")
+	evNoon := event.NewMoladEvent(hd, mNoon, "Tammuz", "US", event.ClockAuto)
 	assert.Contains(t, evNoon.Render("en"), "12:00pm")
 
 	mPM := m
 	mPM.Hours = 13
 	mPM.Minutes = 30
-	evPM := event.NewMoladEvent(hd, mPM, "Tammuz", "US")
+	evPM := event.NewMoladEvent(hd, mPM, "Tammuz", "US", event.ClockAuto)
 	assert.Contains(t, evPM.Render("en"), "1:30pm")
 }
 

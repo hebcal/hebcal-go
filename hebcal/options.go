@@ -191,18 +191,14 @@ type CalOptions struct {
 	// Pesach VII in Israel) and the last day of Shavuot (Shavuot II, or
 	// Shavuot in Israel). See YizkorEvent.
 	Yizkor bool
-	// Clock format for TimedEvent.Render(), the molad announcement and the
-	// Kiddush Levana memo. By default it follows the location's country (or
-	// Israel when IL is set and there is no location, else the United States):
-	// 12-hour time with an "am"/"pm" suffix (e.g. "5:19am", "7:42pm") in
-	// countries that conventionally use it, 24-hour "15:04" elsewhere.
-	// See ReformatTimeStr.
-	//
-	// Hour24 forces 24-hour time everywhere.
-	Hour24 bool
-	// Hour12 forces 12-hour time with an am/pm suffix everywhere. Hour24 wins
-	// if both are set.
-	Hour12 bool
+	// Clock is the clock format for TimedEvent.Render(), the molad
+	// announcement and the Kiddush Levana memo. The default, event.ClockAuto,
+	// follows the location's country (or Israel when IL is set and there is no
+	// location, else the United States): 12-hour time with an "am"/"pm" suffix
+	// (e.g. "5:19am", "7:42pm") in countries that conventionally use it,
+	// 24-hour "15:04" elsewhere. event.Clock12 and event.Clock24 force one or
+	// the other everywhere. See ReformatTimeStr.
+	Clock event.ClockFormat
 
 	//	-------- Begin: CLI legacy compatibility options  --------
 	//  These options are primarily here for the command-line interface.

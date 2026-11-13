@@ -22,7 +22,7 @@ type MevarchimChodeshEvent struct {
 	MonthName   string      // untranslated English name of the upcoming month
 	Molad       molad.Molad // molad of the upcoming month
 	CountryCode string      // picks the memo's 12- or 24-hour clock; see ReformatTimeStr
-	Hour12      *bool       // overrides CountryCode when non-nil
+	Clock       ClockFormat // overrides CountryCode unless ClockAuto
 }
 
 // NewMevarchimChodeshEvent constructs a MevarchimChodeshEvent for the given
@@ -62,7 +62,7 @@ func (ev MevarchimChodeshEvent) Render(locale string) string {
 // Memo returns the announcement of the molad, e.g. "Molad Sivan: Friday,
 // 2:16pm and 5 chalakim" (see RenderMolad).
 func (ev MevarchimChodeshEvent) Memo(locale string) string {
-	return RenderMolad(ev.Molad, ev.MonthName, locale, ev.CountryCode, ev.Hour12)
+	return RenderMolad(ev.Molad, ev.MonthName, locale, ev.CountryCode, ev.Clock)
 }
 
 // RenderBrief returns the title without the leading "Shabbat" word, e.g.

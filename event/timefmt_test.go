@@ -10,31 +10,30 @@ import (
 )
 
 func TestReformatTimeStr(t *testing.T) {
-	yes, no := true, false
 	tests := []struct {
 		timeStr, suffix, cc string
-		hour12              *bool
+		clock               event.ClockFormat
 		want                string
 	}{
-		{"20:30", "pm", "US", nil, "8:30pm"},
-		{"05:19", "pm", "US", nil, "5:19am"},
-		{"00:05", "pm", "US", nil, "12:05am"},
-		{"12:00", "pm", "US", nil, "12:00pm"},
-		{"20:30", "p", "CA", nil, "8:30p"},
-		{"05:19", "p", "CA", nil, "5:19a"},
-		{"05:19", " P.M.", "US", nil, "5:19 A.M."},
-		{"20:30", "pm", "", nil, "8:30pm"},
-		{"20:30", "pm", "IL", nil, "20:30"},
-		{"05:19", "pm", "GB", nil, "05:19"},
-		{"20:30", "pm", "US", &no, "20:30"},
-		{"05:19", "pm", "IL", &yes, "5:19am"},
-		{"20:30", "", "US", nil, "8:30"},
-		{"05:19", "", "US", nil, "5:19"},
-		{"00:05", "", "US", nil, "00:05"},
-		{"bogus", "pm", "US", nil, "bogus"},
+		{"20:30", "pm", "US", event.ClockAuto, "8:30pm"},
+		{"05:19", "pm", "US", event.ClockAuto, "5:19am"},
+		{"00:05", "pm", "US", event.ClockAuto, "12:05am"},
+		{"12:00", "pm", "US", event.ClockAuto, "12:00pm"},
+		{"20:30", "p", "CA", event.ClockAuto, "8:30p"},
+		{"05:19", "p", "CA", event.ClockAuto, "5:19a"},
+		{"05:19", " P.M.", "US", event.ClockAuto, "5:19 A.M."},
+		{"20:30", "pm", "", event.ClockAuto, "8:30pm"},
+		{"20:30", "pm", "IL", event.ClockAuto, "20:30"},
+		{"05:19", "pm", "GB", event.ClockAuto, "05:19"},
+		{"20:30", "pm", "US", event.Clock24, "20:30"},
+		{"05:19", "pm", "IL", event.Clock12, "5:19am"},
+		{"20:30", "", "US", event.ClockAuto, "8:30"},
+		{"05:19", "", "US", event.ClockAuto, "5:19"},
+		{"00:05", "", "US", event.ClockAuto, "00:05"},
+		{"bogus", "pm", "US", event.ClockAuto, "bogus"},
 	}
 	for _, tt := range tests {
-		got := event.ReformatTimeStr(tt.timeStr, tt.suffix, tt.cc, tt.hour12)
+		got := event.ReformatTimeStr(tt.timeStr, tt.suffix, tt.cc, tt.clock)
 		assert.Equal(t, tt.want, got, "%q %q %q", tt.timeStr, tt.suffix, tt.cc)
 	}
 }
@@ -47,14 +46,13 @@ func TestUses12HourClock(t *testing.T) {
 	assert.False(t, event.Uses12HourClock(""))
 }
 
-func TestMoladEventHour12(t *testing.T) {
+func TestMoladEventClock(t *testing.T) {
 	hd := hdate.New(5786, hdate.Sivan, 29)
 	m := molad.New(5786, hdate.Tamuz)
-	yes, no := true, false
-	assert.Contains(t, event.NewMoladEventHour12(hd, m, "Tammuz", "US", nil).Render("en"),
+	assert.Contains(t, event.NewMoladEvent(hd, m, "Tammuz", "US", event.ClockAuto).Render("en"),
 		"Molad Tammuz: Monday, 6:46am")
-	assert.Contains(t, event.NewMoladEventHour12(hd, m, "Tammuz", "US", &no).Render("en"),
+	assert.Contains(t, event.NewMoladEvent(hd, m, "Tammuz", "US", event.Clock24).Render("en"),
 		"Molad Tammuz: Monday, 6:46 and")
-	assert.Contains(t, event.NewMoladEventHour12(hd, m, "Tammuz", "GB", &yes).Render("en"),
+	assert.Contains(t, event.NewMoladEvent(hd, m, "Tammuz", "GB", event.Clock12).Render("en"),
 		"Molad Tammuz: Monday, 6:46am")
 }
