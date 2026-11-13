@@ -14,11 +14,11 @@ import (
 
 func renderDayByTimeOfDay(t *testing.T, year int, month time.Month, day int) []string {
 	dailylearning.AddCalendar("testTimeOfDay", func(hd hdate.HDate, il bool) event.CalEvent {
-		return event.HolidayEvent{Date: hd, Desc: "Daily learning", Flags: event.DAILY_LEARNING}
+		return event.NewHolidayEvent(hd, "Daily learning", event.DailyLearning, "")
 	})
-	toronto := zmanim.NewLocation("Toronto", "CA", 43.70011, -79.4163, 0, "America/Toronto")
+	toronto := zmanim.MustNewLocation("Toronto", "CA", 43.70011, -79.4163, 0, "America/Toronto")
 	hd := hdate.FromGregorian(year, month, day)
-	events, err := HebrewCalendar(&CalOptions{
+	events, err := HebrewCalendar(&Options{
 		Start:                hd,
 		End:                  hd,
 		Location:             &toronto,
@@ -89,9 +89,9 @@ func TestTimeOfDayErevTishaBav(t *testing.T) {
 
 func TestTimeOfDayExported(t *testing.T) {
 	hd := hdate.New(5787, hdate.Tishrei, 14)
-	assert.Equal(t, TimeOfDayLearning,
-		TimeOfDay(event.HolidayEvent{Date: hd, Desc: "Psalms 1", Flags: event.DAILY_LEARNING}))
-	assert.Equal(t, TimeOfDayEvening,
-		TimeOfDay(event.HolidayEvent{Date: hd, Desc: "Erev Sukkot", Flags: event.EREV | event.LIGHT_CANDLES}))
-	assert.Equal(t, TimeOfDayDay, TimeOfDay(event.UserEvent{Date: hd, Desc: "Birthday"}))
+	assert.Equal(t, DayPartLearning,
+		DayPartOf(event.NewHolidayEvent(hd, "Psalms 1", event.DailyLearning, "")))
+	assert.Equal(t, DayPartEvening,
+		DayPartOf(event.NewHolidayEvent(hd, "Erev Sukkot", event.Erev|event.LightCandles, "")))
+	assert.Equal(t, DayPartDay, DayPartOf(event.NewUserEvent(hd, "Birthday")))
 }

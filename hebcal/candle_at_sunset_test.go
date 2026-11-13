@@ -12,7 +12,7 @@ import (
 
 // candleTimes returns the candle-lighting and Havdalah events between start
 // and end, as "MM-DD HH:MM desc" in local time.
-func candleTimes(t *testing.T, opts CalOptions, start, end string) string {
+func candleTimes(t *testing.T, opts Options, start, end string) string {
 	t.Helper()
 	s, _ := time.Parse("2006-01-02", start)
 	e, _ := time.Parse("2006-01-02", end)
@@ -25,11 +25,11 @@ func candleTimes(t *testing.T, opts CalOptions, start, end string) string {
 	var out []string
 	for _, ev := range events {
 		te, ok := ev.(TimedEvent)
-		if !ok || strings.HasPrefix(te.Desc, "Fast ") || strings.Contains(te.Desc, "Chametz") ||
-			te.Desc == "Finish eating chametz" {
+		if !ok || strings.HasPrefix(te.Desc(), "Fast ") || strings.Contains(te.Desc(), "Chametz") ||
+			te.Desc() == "Finish eating chametz" {
 			continue
 		}
-		out = append(out, te.EventTime.Format("01-02 15:04 ")+te.Desc)
+		out = append(out, te.Time().Format("01-02 15:04 ")+te.Desc())
 	}
 	return strings.Join(out, ",")
 }
@@ -38,7 +38,7 @@ func candleTimes(t *testing.T, opts CalOptions, start, end string) string {
 // night of Pesach lights at sunset, the second night at tzeit (Havdalah rules),
 // and Chanukah on Friday at sunset with Shabbat.
 func TestCandleLightingAtSunset(t *testing.T) {
-	ny := CalOptions{Location: zmanim.LookupCity("New York"), CandleLightingAtSunset: true}
+	ny := Options{Location: zmanim.LookupCity("New York"), CandleLightingAtSunset: true}
 	assert.Equal(t,
 		"03-27 19:15 Candle lighting,03-28 19:58 Havdalah,04-01 19:20 Candle lighting,"+
 			"04-02 20:03 Candle lighting,04-03 19:22 Candle lighting,04-04 20:05 Havdalah,"+
@@ -51,7 +51,7 @@ func TestCandleLightingAtSunset(t *testing.T) {
 		candleTimes(t, ny, "2026-12-04", "2026-12-05"))
 
 	// The Israeli city custom (40 minutes in Jerusalem) does not apply.
-	jlm := CalOptions{Location: zmanim.LookupCity("Jerusalem"), IL: true, CandleLightingAtSunset: true}
+	jlm := Options{Location: zmanim.LookupCity("Jerusalem"), IL: true, CandleLightingAtSunset: true}
 	assert.Equal(t,
 		"03-27 18:55 Candle lighting,03-28 19:32 Havdalah,04-01 18:58 Candle lighting,"+
 			"04-02 19:36 Havdalah",

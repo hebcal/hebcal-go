@@ -18,6 +18,30 @@ This Golang implementation was released in 2022 by Michael J. Radwin.
 Many users of this library will utilize the HebrewCalendar and HDate
 interfaces.
 
+## Upgrading to v0.50
+
+v0.50 changes the API in ways that break existing callers. The calendar's
+output is unchanged; the Go API around it is cleaner:
+
+  - `event.CalEvent` gained `Desc()` and `URL()`, and its getters lost their
+    `Get` prefix: `Date()`, `Flags()`, `Emoji()`, `Categories()`.
+  - `event.HolidayFlags` is `event.Flags`, with MixedCaps constants
+    (`event.Chag`, `event.LightCandles`), which `String()` prints too.
+  - Several event fields became methods, and events are built with
+    constructors such as `event.NewHolidayEvent`.
+  - Timed events are found through the `event.Timed` interface and told apart
+    with `hebcal.TimedKind`.
+  - The 12/24-hour options became `event.ClockFormat`.
+  - `hebcal.CalOptions` is `hebcal.Options`, and `HebrewCalendar` no longer
+    modifies the options it is given.
+  - `zmanim.New` and `zmanim.NewLocation` return an error instead of
+    panicking, and `HebrewCalendar`'s option errors are exported values.
+
+See [MIGRATION.md](MIGRATION.md) for every change, with before-and-after code
+and commands that do most of the renaming. Read its first section even if your
+code compiles after the upgrade: a few old field reads still compile and are
+wrong.
+
 Hebcal incorporates and uses several related packages:
 
   - dailylearning: a plugin registry for daily learning schedules

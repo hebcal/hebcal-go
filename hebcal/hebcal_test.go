@@ -23,21 +23,21 @@ func hd2iso(hd hdate.HDate) string {
 func checkEvents(
 	t *testing.T,
 	locale string,
-	opts *hebcal.CalOptions,
+	opts *hebcal.Options,
 	want []string,
 ) {
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(t, err)
 	got := make([]string, 0, len(events))
 	for _, ev := range events {
-		line := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render(locale))
+		line := fmt.Sprintf("%s %s", hd2iso(ev.Date()), ev.Render(locale))
 		got = append(got, line)
 	}
 	assert.Equal(t, want, got)
 }
 
 func TestHebrewCalendar(t *testing.T) {
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Year:         2022,
 		Month:        time.April,
 		IsHebrewYear: false,
@@ -62,7 +62,7 @@ func TestHebrewCalendar(t *testing.T) {
 }
 
 func TestHebrewCalendarSedrotOnly(t *testing.T) {
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		NoHolidays:   true,
 		Sedrot:       true,
 		Year:         5783,
@@ -121,7 +121,7 @@ func TestHebrewCalendarSedrotOnly(t *testing.T) {
 
 func TestHebrewCalendarCandles(t *testing.T) {
 	loc := zmanim.LookupCity("Chicago")
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:          hdate.New(5782, hdate.Elul, 25),
 		End:            hdate.New(5783, hdate.Tishrei, 8),
 		CandleLighting: true,
@@ -151,7 +151,7 @@ func TestHebrewCalendarCandles(t *testing.T) {
 // @hebcal/core's behavior when havdalahMins===0.
 func TestHebrewCalendarSuppressHavdalah(t *testing.T) {
 	loc := zmanim.LookupCity("Chicago")
-	base := hebcal.CalOptions{
+	base := hebcal.Options{
 		Start:          hdate.New(5782, hdate.Elul, 25),
 		End:            hdate.New(5783, hdate.Tishrei, 8),
 		CandleLighting: true,
@@ -166,7 +166,7 @@ func TestHebrewCalendarSuppressHavdalah(t *testing.T) {
 
 	isHavdalah := func(ev event.CalEvent) bool {
 		te, ok := ev.(hebcal.TimedEvent)
-		return ok && te.Desc == "Havdalah"
+		return ok && te.Desc() == "Havdalah"
 	}
 	// Suppressing must remove at least one Havdalah, and leave no Havdalah behind.
 	var removed int
@@ -186,8 +186,8 @@ func TestHebrewCalendarSuppressHavdalah(t *testing.T) {
 		if isHavdalah(ev) {
 			continue
 		}
-		got := fmt.Sprintf("%s %s", hd2iso(suppressed[j].GetDate()), suppressed[j].Render("en"))
-		want := fmt.Sprintf("%s %s", hd2iso(ev.GetDate()), ev.Render("en"))
+		got := fmt.Sprintf("%s %s", hd2iso(suppressed[j].Date()), suppressed[j].Render("en"))
+		want := fmt.Sprintf("%s %s", hd2iso(ev.Date()), ev.Render("en"))
 		assert.Equal(t, want, got)
 		j++
 	}
@@ -195,7 +195,7 @@ func TestHebrewCalendarSuppressHavdalah(t *testing.T) {
 
 func TestHebrewCalendarChanukahCandles(t *testing.T) {
 	loc := zmanim.LookupCity("Jerusalem")
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:          hdate.New(5783, hdate.Kislev, 24),
 		End:            hdate.New(5783, hdate.Tevet, 2),
 		CandleLighting: true,
@@ -220,9 +220,9 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 }
 
 func TestHebrewCalendarMask(t *testing.T) {
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Year: 2020,
-		Mask: event.ROSH_CHODESH | event.SPECIAL_SHABBAT,
+		Mask: event.RoshChodesh | event.SpecialShabbat,
 	}
 	checkEvents(t, "en", opts, []string{
 		"2020-01-27 Rosh Chodesh Sh’vat",
@@ -255,7 +255,7 @@ func TestHebrewCalendarMask(t *testing.T) {
 
 func ExampleHebrewCalendar() {
 	loc := zmanim.LookupCity("Providence")
-	opts := hebcal.CalOptions{
+	opts := hebcal.Options{
 		Year:           2022,
 		Sedrot:         true,
 		CandleLighting: true,
@@ -265,7 +265,7 @@ func ExampleHebrewCalendar() {
 	events, _ := hebcal.HebrewCalendar(&opts)
 	for i := 0; i < 6; i++ {
 		ev := events[i]
-		dateStr := ev.GetDate().Gregorian().Format("Mon 02-Jan-2006")
+		dateStr := ev.Date().Gregorian().Format("Mon 02-Jan-2006")
 		title := ev.Render("en")
 		fmt.Println(dateStr, title)
 	}
@@ -280,7 +280,7 @@ func ExampleHebrewCalendar() {
 
 func TestHebrewCalendarLocale(t *testing.T) {
 	loc := zmanim.LookupCity("Providence")
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Sedrot:         true,
 		CandleLighting: true,
 		Location:       loc,
@@ -299,7 +299,7 @@ func TestHebrewCalendarLocale(t *testing.T) {
 }
 
 func TestNoModern(t *testing.T) {
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Year:             2022,
 		IL:               true,
 		NoMinorFast:      true,
@@ -361,13 +361,13 @@ func TestNoModern(t *testing.T) {
 func TestDailyZemanim(t *testing.T) {
 	hd := hdate.New(5782, hdate.Kislev, 23)
 	loc := zmanim.LookupCity("Providence")
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:       hd,
 		End:         hd,
 		NoHolidays:  true,
 		DailyZmanim: true,
 		Location:    loc,
-		Hour24:      true,
+		Clock:       event.Clock24,
 	}
 	checkEvents(t, "en", opts, []string{
 		"2021-11-27 Alot HaShachar: 05:21",
@@ -390,14 +390,14 @@ func TestDailyZemanim(t *testing.T) {
 
 func TestDailyZemanimSortedByTime(t *testing.T) {
 	hd := hdate.New(5780, hdate.Adar1, 13)
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:                hd,
 		End:                  hd,
 		CandleLighting:       true,
 		DailyZmanim:          true,
 		KiddushLevanaMaharil: true,
 		Location:             zmanim.LookupCity("Boston"),
-		Hour24:               true,
+		Clock:                event.Clock24,
 	}
 	checkEvents(t, "en", opts, []string{
 		"2020-03-09 Ta’anit Esther",
@@ -425,8 +425,8 @@ func TestDailyZemanimSortedByTime(t *testing.T) {
 
 func TestShabbatOrder(t *testing.T) {
 	boston := zmanim.LookupCity("Boston")
-	opts := func(hd hdate.HDate) *hebcal.CalOptions {
-		return &hebcal.CalOptions{
+	opts := func(hd hdate.HDate) *hebcal.Options {
+		return &hebcal.Options{
 			Start:            hd,
 			End:              hd,
 			CandleLighting:   true,
@@ -455,13 +455,13 @@ func TestShabbatOrder(t *testing.T) {
 func TestDailyZemanim_He(t *testing.T) {
 	hd := hdate.New(5782, hdate.Kislev, 23)
 	loc := zmanim.LookupCity("Providence")
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:       hd,
 		End:         hd,
 		NoHolidays:  true,
 		DailyZmanim: true,
 		Location:    loc,
-		Hour24:      true,
+		Clock:       event.Clock24,
 	}
 	checkEvents(t, "he", opts, []string{
 		"2021-11-27 עֲלוֹת הַשַּׁחַר: 05:21",
@@ -485,13 +485,13 @@ func TestDailyZemanim_He(t *testing.T) {
 func TestDailyZemanim_Ashkenazi(t *testing.T) {
 	hd := hdate.New(5782, hdate.Kislev, 23)
 	loc := zmanim.LookupCity("Providence")
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:       hd,
 		End:         hd,
 		NoHolidays:  true,
 		DailyZmanim: true,
 		Location:    loc,
-		Hour24:      true,
+		Clock:       event.Clock24,
 	}
 	checkEvents(t, "ashkenazi", opts, []string{
 		"2021-11-27 Alos HaShachar: 05:21",
@@ -513,7 +513,7 @@ func TestDailyZemanim_Ashkenazi(t *testing.T) {
 }
 
 func TestYear2(t *testing.T) {
-	opts := hebcal.CalOptions{
+	opts := hebcal.Options{
 		Year:         2,
 		IsHebrewYear: true,
 		Sedrot:       true,
@@ -524,7 +524,7 @@ func TestYear2(t *testing.T) {
 }
 
 func TestYear1(t *testing.T) {
-	opts := hebcal.CalOptions{
+	opts := hebcal.Options{
 		Year:         1,
 		IsHebrewYear: true,
 	}
@@ -534,14 +534,14 @@ func TestYear1(t *testing.T) {
 }
 
 func TestYearMinus1(t *testing.T) {
-	opts := hebcal.CalOptions{
+	opts := hebcal.Options{
 		Year: -1,
 	}
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, events)
-	first := events[0].GetDate()
-	last := events[len(events)-1].GetDate()
+	first := events[0].Date()
+	last := events[len(events)-1].Date()
 	fy, _, _ := first.Greg()
 	ly, _, _ := last.Greg()
 	assert.Equal(t, -1, fy)
@@ -549,15 +549,15 @@ func TestYearMinus1(t *testing.T) {
 }
 
 func TestYearMinus1NumYears2(t *testing.T) {
-	opts := hebcal.CalOptions{
+	opts := hebcal.Options{
 		Year:     -1,
 		NumYears: 2,
 	}
 	events, err := hebcal.HebrewCalendar(&opts)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, events)
-	first := events[0].GetDate()
-	last := events[len(events)-1].GetDate()
+	first := events[0].Date()
+	last := events[len(events)-1].Date()
 	fy, _, _ := first.Greg()
 	ly, _, _ := last.Greg()
 	assert.Equal(t, -1, fy)
@@ -567,7 +567,7 @@ func TestYearMinus1NumYears2(t *testing.T) {
 func TestHebrewCalendarZmanimOnly(t *testing.T) {
 	assert := assert.New(t)
 	loc := zmanim.LookupCity("Amsterdam")
-	opts := hebcal.CalOptions{
+	opts := hebcal.Options{
 		Start:       hdate.New(5783, hdate.Sivan, 9),
 		End:         hdate.New(5783, hdate.Sivan, 9),
 		Location:    loc,
@@ -579,7 +579,7 @@ func TestHebrewCalendarZmanimOnly(t *testing.T) {
 }
 
 func TestHebrewCalendar1752CE(t *testing.T) {
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		AddHebrewDates: true,
 		Start:          hdate.New(5512, hdate.Elul, 29),
 		End:            hdate.New(5513, hdate.Tishrei, 10),
@@ -607,7 +607,7 @@ func TestHebrewCalendar1752CE(t *testing.T) {
 }
 
 func TestHebrewCalendarYahrzeit(t *testing.T) {
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:                   hdate.New(5728, hdate.Tishrei, 1),
 		End:                     hdate.New(5728, hdate.Tishrei, 30),
 		AddHebrewDatesForEvents: true,
@@ -626,12 +626,12 @@ func TestHebrewCalendarYahrzeit(t *testing.T) {
 }
 
 func TestHebrewCalendarInfile(t *testing.T) {
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:                   hdate.New(5728, hdate.Tishrei, 1),
 		End:                     hdate.New(5728, hdate.Tishrei, 30),
 		AddHebrewDatesForEvents: true,
 		NoHolidays:              true,
-		UserEvents: []hebcal.UserEvent{
+		UserEvents: []hebcal.UserEventSpec{
 			// This date was chosen because of an observed bug,
 			// where ev.Render("en") would replace the HolidayEvent.Desc field
 			// with "Rosh Hashnanah 5728", etc. on certain special days.
@@ -648,9 +648,9 @@ func TestHebrewCalendarInfile(t *testing.T) {
 // day has a reading, and AddHebrewDatesForEvents would otherwise date them all.
 func TestAddHebrewDatesForEventsIgnoresLearning(t *testing.T) {
 	dailylearning.AddCalendar("testLearningEveryDay", func(hd hdate.HDate, il bool) event.CalEvent {
-		return event.HolidayEvent{Date: hd, Desc: "Reading", Flags: event.DAILY_LEARNING}
+		return event.NewHolidayEvent(hd, "Reading", event.DailyLearning, "")
 	})
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:                   hdate.New(5787, hdate.Tishrei, 9),
 		End:                     hdate.New(5787, hdate.Tishrei, 12),
 		AddHebrewDatesForEvents: true,
@@ -669,7 +669,7 @@ func TestAddHebrewDatesForEventsIgnoresLearning(t *testing.T) {
 }
 
 func TestShabbatMevarchimWithNoHolidays(t *testing.T) {
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:            hdate.New(5787, hdate.Tishrei, 1),
 		End:              hdate.New(5787, hdate.Kislev, 30),
 		NoHolidays:       true,
@@ -679,7 +679,7 @@ func TestShabbatMevarchimWithNoHolidays(t *testing.T) {
 	assert.NoError(t, err)
 	var actual []string
 	for _, ev := range events {
-		actual = append(actual, hd2iso(ev.GetDate())+" "+ev.Render("en"))
+		actual = append(actual, hd2iso(ev.Date())+" "+ev.Render("en"))
 		_, ok := ev.(event.MevarchimChodeshEvent)
 		assert.True(t, ok, "%T", ev)
 	}
@@ -691,7 +691,7 @@ func TestShabbatMevarchimWithNoHolidays(t *testing.T) {
 }
 
 func TestChanukahEmojiKeycap(t *testing.T) {
-	opts := &hebcal.CalOptions{
+	opts := &hebcal.Options{
 		Start:          hdate.New(5783, hdate.Kislev, 24),
 		End:            hdate.New(5783, hdate.Tevet, 3),
 		CandleLighting: true,
@@ -701,8 +701,8 @@ func TestChanukahEmojiKeycap(t *testing.T) {
 	assert.NoError(t, err)
 	actual := map[string]string{}
 	for _, ev := range events {
-		if ev.GetFlags().Has(event.CHANUKAH_CANDLES) || ev.Render("en") == "Chanukah: 8th Day" {
-			actual[ev.Render("en")] = ev.GetEmoji()
+		if ev.Flags().Has(event.ChanukahCandles) || ev.Render("en") == "Chanukah: 8th Day" {
+			actual[ev.Render("en")] = ev.Emoji()
 		}
 	}
 	assert.Equal(t, map[string]string{

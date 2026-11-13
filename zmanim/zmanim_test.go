@@ -12,8 +12,8 @@ import (
 func TestZmanimChicago(t *testing.T) {
 	assert := assert.New(t)
 	dt := time.Date(2020, time.June, 5, 12, 0, 0, 0, time.UTC)
-	location := zmanim.NewLocation("Chicago", "US", 41.85003, -87.65005, 180, "America/Chicago")
-	zman := zmanim.New(&location, dt)
+	location := zmanim.MustNewLocation("Chicago", "US", 41.85003, -87.65005, 180, "America/Chicago")
+	zman := zmanim.MustNew(&location, dt)
 	expected := []string{
 		"Thu, 04 Jun 2020 20:21:48 -0500",
 		"Fri, 05 Jun 2020 00:49:04 -0500",
@@ -48,8 +48,8 @@ func TestZmanimChicago(t *testing.T) {
 func TestZmanimTelAviv(t *testing.T) {
 	assert := assert.New(t)
 	dt := time.Date(2021, time.March, 6, 12, 0, 0, 0, time.UTC)
-	location := zmanim.NewLocation("Tel Aviv", "IL", 32.08088, 34.78057, 15, "Asia/Jerusalem")
-	zman := zmanim.New(&location, dt)
+	location := zmanim.MustNewLocation("Tel Aviv", "IL", 32.08088, 34.78057, 15, "Asia/Jerusalem")
+	zman := zmanim.MustNew(&location, dt)
 	expected := []string{
 		"Fri, 05 Mar 2021 17:41:37 +0200",
 		"Fri, 05 Mar 2021 23:51:56 +0200",
@@ -104,7 +104,7 @@ func makeTestTimes(zman zmanim.Zmanim) []time.Time {
 
 func TestZmanimHelsinki(t *testing.T) {
 	assert := assert.New(t)
-	location := zmanim.NewLocation("Helsinki", "FI", 60.16952, 24.93545, 26, "Europe/Helsinki")
+	location := zmanim.MustNewLocation("Helsinki", "FI", 60.16952, 24.93545, 26, "Europe/Helsinki")
 	dates := []struct {
 		yy int
 		mm time.Month
@@ -124,7 +124,7 @@ func TestZmanimHelsinki(t *testing.T) {
 	actual := make([]string, len(dates))
 	for idx, date := range dates {
 		dt := time.Date(date.yy, date.mm, date.dd, 12, 0, 0, 0, time.UTC)
-		zman := zmanim.New(&location, dt)
+		zman := zmanim.MustNew(&location, dt)
 		var t time.Time
 		if dt.Weekday() == time.Friday {
 			t = zman.SunsetOffset(-18, true)
@@ -154,8 +154,8 @@ func TestZmanimHelsinki(t *testing.T) {
 
 func ExampleZmanim_SunsetOffset() {
 	dt := time.Date(2020, time.June, 5, 12, 0, 0, 0, time.UTC)
-	location := zmanim.NewLocation("Chicago", "US", 41.85003, -87.65005, 180, "America/Chicago")
-	zman := zmanim.New(&location, dt)
+	location := zmanim.MustNewLocation("Chicago", "US", 41.85003, -87.65005, 180, "America/Chicago")
+	zman := zmanim.MustNew(&location, dt)
 	fmt.Println(zman.SunsetOffset(-18, true))
 	fmt.Println(zman.SunsetOffset(50, true))
 	// Output:
@@ -166,8 +166,8 @@ func ExampleZmanim_SunsetOffset() {
 func TestZmanimAmsterdam(t *testing.T) {
 	assert := assert.New(t)
 	dt := time.Date(2023, time.May, 29, 12, 0, 0, 0, time.UTC)
-	location := zmanim.NewLocation("Amsterdam", "NL", 52.37403, 4.88969, 12, "Europe/Amsterdam")
-	zman := zmanim.New(&location, dt)
+	location := zmanim.MustNewLocation("Amsterdam", "NL", 52.37403, 4.88969, 12, "Europe/Amsterdam")
+	zman := zmanim.MustNew(&location, dt)
 	alot := zman.AlotHaShachar()
 	assert.Equal(alot.IsZero(), true)
 	assert.Equal(time.Time{}, alot)
@@ -181,15 +181,15 @@ func TestZmanimAmsterdam(t *testing.T) {
 func TestZmanimElevation(t *testing.T) {
 	assert := assert.New(t)
 	dt := time.Date(2022, time.June, 21, 12, 0, 0, 0, time.UTC)
-	location := zmanim.NewLocation("Jerusalem", "IL", 31.76904, 35.21633, 786, "Asia/Jerusalem")
+	location := zmanim.MustNewLocation("Jerusalem", "IL", 31.76904, 35.21633, 786, "Asia/Jerusalem")
 
-	sea := zmanim.New(&location, dt)
+	sea := zmanim.MustNew(&location, dt)
 	assert.False(sea.UseElevation)
 	seaSunrise := sea.Sunrise()
 	seaSunset := sea.Sunset()
 	seaAlot := sea.AlotHaShachar()
 
-	elev := zmanim.New(&location, dt)
+	elev := zmanim.MustNew(&location, dt)
 	elev.UseElevation = true
 	elevSunrise := elev.Sunrise()
 	elevSunset := elev.Sunset()

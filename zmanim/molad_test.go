@@ -17,10 +17,10 @@ func fmtZman(t time.Time) string {
 }
 
 func TestMoladBasedZmanim(t *testing.T) {
-	jerusalem := NewLocation("Jerusalem", "IL", 31.76904, 35.21633, 0, "Asia/Jerusalem")
+	jerusalem := MustNewLocation("Jerusalem", "IL", 31.76904, 35.21633, 0, "Asia/Jerusalem")
 	// Rapa Iti in Dec 2027 is an extreme case from Shaarei Zmanim: the molad
 	// falls on 27 Kislev and the 3-day time on the evening of the 30th.
-	rapaIti := NewLocation("Rapa Iti", "PF", -27.61, -144.33, 0, "Pacific/Tahiti")
+	rapaIti := MustNewLocation("Rapa Iti", "PF", -27.61, -144.33, 0, "Pacific/Tahiti")
 	tests := []struct {
 		loc  *Location
 		date string
@@ -45,7 +45,7 @@ func TestMoladBasedZmanim(t *testing.T) {
 	}
 	for _, tc := range tests {
 		dt, _ := time.Parse("2006-01-02", tc.date)
-		z := New(tc.loc, dt)
+		z := MustNew(tc.loc, dt)
 		var zero time.Time
 		got := [5]string{
 			fmtZman(z.ZmanMolad()),
@@ -59,9 +59,9 @@ func TestMoladBasedZmanim(t *testing.T) {
 }
 
 func TestMoladBasedZmanimDaytimeAdjustment(t *testing.T) {
-	jerusalem := NewLocation("Jerusalem", "IL", 31.76904, 35.21633, 0, "Asia/Jerusalem")
+	jerusalem := MustNewLocation("Jerusalem", "IL", 31.76904, 35.21633, 0, "Asia/Jerusalem")
 	dt, _ := time.Parse("2006-01-02", "2026-11-24")
-	z := New(&jerusalem, dt)
+	z := MustNew(&jerusalem, dt)
 	alos, tzeit := z.AlotHaShachar(), z.Tzeit(Tzeit3SmallStars)
 	// 16:28 is daytime, so the latest time moves back to that morning's alos
 	assert.Equal(t, alos, z.SofZmanKidushLevanaBetweenMoldos(alos, tzeit))
@@ -70,7 +70,7 @@ func TestMoladBasedZmanimDaytimeAdjustment(t *testing.T) {
 
 	// a daytime start (14:45) moves forward to that evening's tzeit
 	dt, _ = time.Parse("2006-01-02", "2026-01-21")
-	z = New(&jerusalem, dt)
+	z = MustNew(&jerusalem, dt)
 	assert.Equal(t, "2026-01-21T14:45:40.170+02:00",
 		fmtZman(z.TchilasZmanKidushLevana3Days(time.Time{}, time.Time{})))
 	tzeit = z.Tzeit(Tzeit3SmallStars)

@@ -14,7 +14,7 @@ import (
 func shabbatWeekEvents(t *testing.T) []event.CalEvent {
 	t.Helper()
 	loc := zmanim.LookupCity("New York")
-	opts := &CalOptions{
+	opts := &Options{
 		Start:            hdate.FromGregorian(2026, time.June, 12),
 		End:              hdate.FromGregorian(2026, time.June, 13),
 		CandleLighting:   true,
@@ -35,14 +35,14 @@ func TestCandleParshaLink(t *testing.T) {
 	var found bool
 	for _, ev := range shabbatWeekEvents(t) {
 		te, ok := ev.(TimedEvent)
-		if !ok || te.Desc != "Candle lighting" {
+		if !ok || te.Desc() != "Candle lighting" {
 			continue
 		}
 		found = true
-		if te.LinkedEvent == nil {
+		if te.LinkedEvent() == nil {
 			t.Fatal("Candle lighting has no LinkedEvent")
 		}
-		if got := te.LinkedEvent.Render("en"); got != "Parashat Sh’lach" {
+		if got := te.LinkedEvent().Render("en"); got != "Parashat Sh’lach" {
 			t.Errorf("candle LinkedEvent.Render = %q, want Parashat Sh’lach", got)
 		}
 	}
@@ -73,7 +73,7 @@ func TestMevarchimChodeshEvent(t *testing.T) {
 	if got := mev.RenderBrief("en"); got != "Mevarchim Chodesh Tammuz" {
 		t.Errorf("RenderBrief = %q", got)
 	}
-	if got := mev.GetCategories(); len(got) != 1 || got[0] != "mevarchim" {
+	if got := mev.Categories(); len(got) != 1 || got[0] != "mevarchim" {
 		t.Errorf("GetCategories = %v", got)
 	}
 	// molad of Tammuz 5786: Monday, 6h 46m 16 chalakim

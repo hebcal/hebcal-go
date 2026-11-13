@@ -15,17 +15,17 @@ import (
 func chametzEvents(t *testing.T, gregYear int, locale string) []string {
 	t.Helper()
 	loc := zmanim.LookupCity("Chicago")
-	opts := &hebcal.CalOptions{Year: gregYear, Location: loc, CandleLighting: true}
+	opts := &hebcal.Options{Year: gregYear, Location: loc, CandleLighting: true}
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(t, err)
 	var out []string
 	for _, ev := range events {
 		r := ev.Render(locale)
 		if strings.Contains(strings.ToLower(r), "chametz") || strings.Contains(r, "חָמֵץ") {
-			hd := ev.GetDate()
+			hd := ev.Date()
 			y, m, d := hd.Greg()
 			dow := hd.Weekday().String()[:3]
-			out = append(out, fmt.Sprintf("%s %04d-%02d-%02d %s %s", dow, y, m, d, ev.GetEmoji(), r))
+			out = append(out, fmt.Sprintf("%s %04d-%02d-%02d %s %s", dow, y, m, d, ev.Emoji(), r))
 		}
 	}
 	return out
@@ -69,7 +69,7 @@ func TestErevPesachChametzHebrew(t *testing.T) {
 func TestErevPesachChametzRequiresCandleLighting(t *testing.T) {
 	assert := assert.New(t)
 	loc := zmanim.LookupCity("Chicago")
-	opts := &hebcal.CalOptions{Year: 2022, Location: loc}
+	opts := &hebcal.Options{Year: 2022, Location: loc}
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(err)
 	for _, ev := range events {
@@ -80,14 +80,14 @@ func TestErevPesachChametzRequiresCandleLighting(t *testing.T) {
 // The chametz deadlines are not part of Erev Pesach the way a fast's start and
 // end belong to the fast, so they link to no event.
 func TestChametzNotLinked(t *testing.T) {
-	opts := &hebcal.CalOptions{Year: 2022, Location: zmanim.LookupCity("Chicago"), CandleLighting: true}
+	opts := &hebcal.Options{Year: 2022, Location: zmanim.LookupCity("Chicago"), CandleLighting: true}
 	events, err := hebcal.HebrewCalendar(opts)
 	assert.NoError(t, err)
 	n := 0
 	for _, ev := range events {
 		if te, ok := ev.(hebcal.TimedEvent); ok &&
-			(te.Desc == "Finish eating chametz" || te.Desc == "Biur Chametz") {
-			assert.Nil(t, te.LinkedEvent, te.Desc)
+			(te.Desc() == "Finish eating chametz" || te.Desc() == "Biur Chametz") {
+			assert.Nil(t, te.LinkedEvent(), te.Desc())
 			n++
 		}
 	}

@@ -21,24 +21,47 @@ This is a **library** (no `main`, no `cmd/`), published as `github.com/hebcal/he
 
 ### The event model (`event/`)
 
-Everything the calendar emits satisfies `event.CalEvent`: `GetDate`, `Render(locale)`, `GetFlags`, `GetEmoji`, `Basename`, `GetCategories`. `HolidayFlags` is a bitmask (`event/flags.go`) — `CHAG`, `LIGHT_CANDLES`, `YOM_TOV_ENDS`, `CHUL_ONLY`/`IL_ONLY`, `CHANUKAH_CANDLES`, `PARSHA_HASHAVUA`, `DAF_YOMI`, `EREV`, `CHOL_HAMOED`, etc. Flags drive downstream filtering and rendering; adding a flag means touching `flagNames` (same file, for `String()`) and `getMaskFromOptions` in `hebcal/hebcal.go`.
+Everything the calendar emits satisfies `event.CalEvent`, which has eight methods: `Date`, `Desc`, `Basename`, `Render(locale)`, `Flags`, `Emoji`, `Categories`, `URL`. Getters have no `Get` prefix. `Desc()` is the untranslated description and the event's stable identifier ("Sukkot III (CH''M)"; consumers hash it into iCalendar UIDs, so never change what an event returns). `Basename()` groups related events ("Sukkot"). `URL()` is `""` for an event with no page. `CalEvent` is also implemented outside this module (the schedules in `github.com/hebcal/learning`), so adding a method to it is a breaking change for them.
 
-Concrete event types live in `event/`: `HolidayEvent`, `parshaEvent`, `hebrewDateEvent`, `MevarchimChodeshEvent`, `moladEvent`, user events (yahrzeit/birthday) in `user.go`. URL generation is a separate concern: `event.URL(ev)` dispatches through the optional `URLer` interface (`event/url.go`); only some event types carry a URL, and `gregYearInRange` gates it.
+Four abilities are optional interfaces, found with a type assertion or a helper:
+
+| Interface | Method | Helper | Who has it |
+|---|---|---|---|
+| `event.BriefRenderer` | `RenderBrief(locale)` | `event.RenderBrief(ev, l)` falls back to `Render` | holidays, Hebrew dates, Mevarchim, Omer, timed events |
+| `event.Memoer` | `Memo(locale)` | `event.Memo(ev, l)` falls back to `""` | Yom Kippur Katan, Mevarchim, timed events, Kiddush Levana |
+| `event.Timed` | `Time() time.Time` | — | `hebcal.TimedEvent`, `hebcal.KiddushLevanaEvent` |
+| `event.Linked` | `LinkedEvent() CalEvent` | — | `hebcal.TimedEvent`, `hebcal.YizkorEvent` |
+
+To find the events with a clock time, assert `event.Timed`, never the concrete `hebcal.TimedEvent`: that assertion misses Kiddush Levana.
+
+`event.Flags` is a bitmask (`event/flags.go`) with MixedCaps constants — `Chag`, `LightCandles`, `YomTovEnds`, `ChulOnly`/`ILOnly`, `ChanukahCandles`, `ParshaHashavua`, `DafYomi`, `Erev`, `CholHamoed`, etc. (`User`, not `UserEvent`, because that is the event type). Flags drive downstream filtering and rendering. `Flags.String()` prints the constants' names (`"Chag|LightCandles"`), for logs and test failures; nothing should parse it. Adding a flag means adding its name to `flagNames` (same file) and handling it in `getMaskFromOptions` in `hebcal/hebcal.go`.
+
+Concrete event types live in `event/`: `HolidayEvent`, `ParshaEvent`, `HebrewDateEvent`, `MevarchimChodeshEvent`, `MoladEvent`, `UserEvent` (yahrzeit/birthday). Conventions for an event type:
+
+- What the interface reads (date, description, flags, emoji) is an **unexported field** behind the interface method, and the type is built with a constructor that returns the concrete type (`NewHolidayEvent`, `NewUserEvent`, `NewParshaEvent`, `NewHebrewDateEvent`, `NewMoladEvent`, `NewMevarchimChodeshEvent`, `omer.NewOmerEvent`). A `Desc()` method cannot coexist with a `Desc` field. Fields with no method of the same name stay exported (`HolidayEvent.ChanukahDay`, `ParshaEvent.Parsha`, `MoladEvent.Molad`).
+- **Never embed one concrete event type in another.** Embedding promotes every method, present and future: `TimedEvent` once embedded `HolidayEvent` and had to override `URL()` to avoid `/holidays/havdalah-2026`. Hold the other event in an unexported field and write each method out, as `KiddushLevanaEvent` does with its `TimedEvent`.
+- Clock times are rendered through `event.ClockFormat` (`ClockAuto`, `Clock12`, `Clock24`) and a country code; see `event.ReformatTimeStr`.
+
+URL generation lives in `event/url.go` (holidays, parsha, Hebrew date) and `omer/url.go`; Hebrew years outside 5513-6260 have no page.
 
 ### The calendar engine (`hebcal/`)
 
-`hebcal.HebrewCalendar(opts *CalOptions) ([]event.CalEvent, error)` in `hebcal/hebcal.go` is the primary entry point. `CalOptions` (`hebcal/options.go`) is large and toggles nearly all behavior: date range (`Year`/`IsHebrewYear`/`NumYears`, or explicit `Start`/`End` HDates), `IL` (Israel vs. Diaspora schedule — affects both holidays and Torah readings), suppression flags (`NoHolidays`, `NoMinorFast`, `NoModern`, `NoRoshChodesh`, …), and opt-in event streams (`Sedrot`, `Omer`, `DafYomi`, `YerushalmiYomi`, `MishnaYomi`, `NachYomi`, `ShabbatMevarchim`, `Molad`, `YomKippurKatan`, `CandleLighting`).
+`hebcal.HebrewCalendar(opts *Options) ([]event.CalEvent, error)` in `hebcal/hebcal.go` is the primary entry point. `Options` (`hebcal/options.go`) is large and toggles nearly all behavior: date range (`Year`/`IsHebrewYear`/`NumYears`, or explicit `Start`/`End` HDates), `IL` (Israel vs. Diaspora schedule — affects both holidays and Torah readings), suppression flags (`NoHolidays`, `NoMinorFast`, `NoModern`, `NoRoshChodesh`, …), opt-in event streams (`Sedrot`, `Omer`, `DafYomi`, `YerushalmiYomi`, `MishnaYomi`, `NachYomi`, `ShabbatMevarchim`, `Molad`, `YomKippurKatan`, `CandleLighting`), and `Clock` (an `event.ClockFormat`).
 
-- `holidays.go` — `GetHolidaysForYear(year, il)` / `getAllHolidaysForYear` build the fixed holiday set for a Hebrew year, including computed dates (`tzomGedaliahDate`, `taanitEstherDate`, Birkat HaChama).
-- `candles.go` — candle-lighting / havdalah / fast start-end / Chanukah / biur chametz. `TimedEvent` is the timed `CalEvent`; times come from `zmanim`. `checkCandleOptions` validates location config.
+**`HebrewCalendar` never writes to the caller's `Options`.** `newCalConfig` copies it and normalizes the copy into the unexported `calConfig` (defaults, the Israel schedule implied by an Israeli location, the resolved mask, a negated candle-lighting offset), and the internal helpers take `*calConfig`. Events keep only the resolved `clock` (country code and `ClockFormat`), never a pointer to the options, so one options value can be shared by concurrent calls. `options_immutable_test.go` guards this, including under `-race`; a new normalization must go on the copy.
+
+- `holidays.go` — `HolidaysForYear(year, il)` / `getAllHolidaysForYear` build the fixed holiday set for a Hebrew year, including computed dates (`tzomGedaliahDate`, `taanitEstherDate`, Birkat HaChama).
+- `candles.go` — candle-lighting / havdalah / fast start-end / Chanukah / biur chametz. `TimedEvent` is the timed `CalEvent`; times come from `zmanim`. Its `Kind()` is a `TimedKind` (`CandleLighting`, `Havdalah`, `ChanukahCandles`, `FastBegins`, `FastEnds`, `FinishChametz`, `BiurChametz`, `KiddushLevana`, `Zman`): switch on the kind, not on the description string, which is only the translation key and identifier. `TimedKindOf(ev)` reads it from a `CalEvent`. `checkCandleOptions` validates location config.
 - Holiday "related" events (candle-lighting, havdalah, mevarchim, chametz) are appended by `appendHolidayAndRelated`.
+- `errors.go` — the option errors `HebrewCalendar` returns, as exported values (`ErrCandleLightingLocation`, `ErrHavdalahMinsAndDeg`, ...). Each also matches its kind, `ErrLocationRequired` or `ErrMutuallyExclusive`, with `errors.Is`. Their messages are part of the observable output; do not reword them.
+- `DayPartOf(ev)` (in `holidays.go`) returns the `DayPart` that orders the events of one day.
 
 ### Supporting packages
 
 - `sedra/` — `sedra.New(year, il)` then `Lookup(hd)` / `LookupByRD(rd)` for weekly Torah reading; encodes the fixed parsha schedules for all year types.
-- `zmanim/` — halachic times from lat/long/elevation; `zmanim/cities.go` + `location.go` hold the small built-in city database with timezones.
+- `zmanim/` — halachic times from lat/long/elevation. `zmanim.New` and `zmanim.NewLocation` return an error (`ErrLatitude`, `ErrLongitude`, `ErrTimeZone`) rather than panic; `MustNew`/`MustNewLocation` are for locations known to be good. `HebrewCalendar` checks the location once in `newCalConfig`, which is what lets the internal `newZmanim` use `MustNew`. `zmanim/cities.go` + `location.go` hold the small built-in city database with timezones.
 - `omer/`, `molad/` — Sefirat HaOmer and molad (new-moon) calculations.
-- `dailylearning/` — a **plugin registry** only. `AddCalendar(name, fn, [startDate])` registers a schedule; `Lookup(name, hd, il)` retrieves an event. Names are case-insensitive. The actual schedules (929, Daily Rambam, etc.) live in the separate module `github.com/hebcal/learning`, which calls `AddCalendar` from its `init`; importing that module is what enables `DAILY_LEARNING` events here.
+- `dailylearning/` — a **plugin registry** only, guarded by a `sync.RWMutex`. `AddCalendar(name, fn)` or `AddCalendarFrom(name, fn, startDate)` registers a schedule; `Lookup(name, hd, il)` retrieves an event. Names are case-insensitive. The actual schedules (929, Daily Rambam, etc.) live in the separate module `github.com/hebcal/learning`, which calls `AddCalendar` from its `init`; importing that module is what enables `event.DailyLearning` events here.
 
 ### External hebcal modules this depends on
 
@@ -58,6 +81,40 @@ github.com/hebcal/learning addresses
 https://github.com/hebcal/hebcal/issues/300 ("Add events of '929 daily bible
 chapter project'"); cite it in the v0.2.0 release notes. Ask the user for the
 issue link if a change clearly maps to a request but you don't have the number.
+
+## When to panic and when to return an error
+
+The rule this module follows, after an audit of every `panic`:
+
+- **Return an error** for anything a caller's data can get wrong: coordinates,
+  a time zone name, a day of the Omer, a month number, a date range, options
+  that contradict each other. The errors a caller might branch on are
+  exported values (`zmanim.ErrLatitude`, `omer.ErrOmerDay`,
+  `hebcal.ErrInvalidMonth`, ...), tested with `errors.Is`.
+- **Offer a `Must...` twin** where the value is often known to be good
+  (`zmanim.MustNew`, `zmanim.MustNewLocation`, `omer.MustNewOmerEvent`). It
+  panics, by name and on purpose, and is for tests and for values the code has
+  just computed or checked.
+- **Make the function total** when there is a right answer after all: a
+  `Sedra` asked about a date outside its year delegates to that year, and
+  rendering a holiday trims a prefix rather than slicing at a fixed offset.
+- **Panic** only for a broken invariant or a misuse no input can cause: the
+  sedra tables not covering a year type (they cover all fourteen), a lookup on
+  a zero `sedra.Sedra`, registering a nil `dailylearning.CalendarFunc` (found
+  at start-up, like `database/sql.Register`).
+
+One panic is inherited rather than chosen: `github.com/hebcal/hdate` panics on
+a Hebrew year below 1 and on an R.D. day before the Hebrew epoch, so
+`sedra.New`, `molad.New` and `HolidaysForYear` do too for such a year.
+`HebrewCalendar` checks its range first and returns `ErrInvalidHebrewYear` or
+`ErrBeforeHebrewEpoch`. Changing the rest belongs in `hdate`.
+
+## Breaking changes go in MIGRATION.md
+
+`MIGRATION.md` is the upgrade guide for library consumers, linked from the
+README. When a change breaks callers (a renamed or removed identifier, a
+changed signature, a field that became a method), add its before-and-after to
+the guide in the same commit, and to the quick-reference table at its end.
 
 ## Deliberate divergences from @hebcal/core
 

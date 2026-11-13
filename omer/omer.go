@@ -1,4 +1,4 @@
-// Hebcal's omer package calculates the Sefirat HaOmer.
+// Package omer calculates the Sefirat HaOmer.
 package omer
 
 // Hebcal - A Jewish Calendar Generator
@@ -18,6 +18,7 @@ package omer
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 
@@ -31,28 +32,46 @@ import (
 
 // OmerEvent represents a single day of the Counting of the Omer.
 type OmerEvent struct {
-	Date            hdate.HDate
+	date            hdate.HDate
 	OmerDay         int
 	WeekNumber      int
 	DaysWithinWeeks int
 }
 
+// ErrOmerDay means a day of the Omer is outside the range 1-49.
+var ErrOmerDay = errors.New("omer: day out of range [1,49]")
+
 // NewOmerEvent constructs an OmerEvent for the given Hebrew date and day of the
-// Omer. It panics if omerDay is outside the range 1-49.
-func NewOmerEvent(hd hdate.HDate, omerDay int) OmerEvent {
+// Omer. It returns ErrOmerDay if omerDay is outside the range 1-49.
+func NewOmerEvent(hd hdate.HDate, omerDay int) (OmerEvent, error) {
 	if omerDay < 1 || omerDay > 49 {
-		panic("invalid omerDay")
+		return OmerEvent{}, ErrOmerDay
 	}
+	return newOmerEvent(hd, omerDay), nil
+}
+
+// MustNewOmerEvent is like NewOmerEvent but panics if omerDay is out of
+// range. It is meant for a day computed from the calendar, which cannot be.
+func MustNewOmerEvent(hd hdate.HDate, omerDay int) OmerEvent {
+	ev, err := NewOmerEvent(hd, omerDay)
+	if err != nil {
+		panic(err)
+	}
+	return ev
+}
+
+func newOmerEvent(hd hdate.HDate, omerDay int) OmerEvent {
 	week := ((omerDay - 1) / 7) + 1
 	days := (omerDay % 7)
 	if days == 0 {
 		days = 7
 	}
-	return OmerEvent{Date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
+	return OmerEvent{date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
 }
 
-func (ev OmerEvent) GetDate() hdate.HDate {
-	return ev.Date
+// Date returns the Hebrew date of the day counted.
+func (ev OmerEvent) Date() hdate.HDate {
+	return ev.date
 }
 
 func (ev OmerEvent) Render(locale string) string {
@@ -84,11 +103,11 @@ func translate(s, locale string) string {
 	return s
 }
 
-func (ev OmerEvent) GetFlags() event.HolidayFlags {
-	return event.OMER_COUNT
+func (ev OmerEvent) Flags() event.Flags {
+	return event.OmerCount
 }
 
-func (ev OmerEvent) GetEmoji() string {
+func (ev OmerEvent) Emoji() string {
 	number := ev.OmerDay
 	var r rune
 	if number <= 20 {
@@ -105,19 +124,20 @@ func (ev OmerEvent) GetEmoji() string {
 
 // Basename returns the untranslated description, e.g. "Omer 22".
 func (ev OmerEvent) Basename() string {
-	return ev.GetDesc()
+	return ev.Desc()
 }
 
-// GetDesc returns the untranslated description, e.g. "Omer 22".
-func (ev OmerEvent) GetDesc() string {
+// Desc returns the untranslated description, e.g. "Omer 22".
+func (ev OmerEvent) Desc() string {
 	return "Omer " + strconv.Itoa(ev.OmerDay)
 }
 
-func (ev OmerEvent) GetCategories() []string {
-	return event.CategoriesFromFlags(ev.GetFlags())
+func (ev OmerEvent) Categories() []string {
+	return event.CategoriesFromFlags(ev.Flags())
 }
 
-func (ev OmerEvent) GetWeeks() int {
+// Weeks returns the number of complete weeks counted so far, 0 through 7.
+func (ev OmerEvent) Weeks() int {
 	if ev.DaysWithinWeeks == 7 {
 		return ev.WeekNumber
 	}

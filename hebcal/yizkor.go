@@ -24,12 +24,16 @@ import (
 
 // YizkorEvent is the Yizkor memorial prayer, recited on Yom Kippur, Shmini
 // Atzeret, the last day of Pesach and the last day of Shavuot. Generated when
-// CalOptions.Yizkor is set.
+// Options.Yizkor is set.
+//
+// It satisfies event.Linked: LinkedEvent is the holiday on which Yizkor is
+// recited, e.g. "Yom Kippur".
 type YizkorEvent struct {
-	Date hdate.HDate
-	// LinkedEvent is the holiday on which Yizkor is recited, e.g. "Yom Kippur".
-	LinkedEvent event.CalEvent
+	date   hdate.HDate
+	linked event.CalEvent
 }
+
+var _ event.Linked = YizkorEvent{}
 
 // isYizkorDay reports whether Yizkor is recited on hd: Yom Kippur, Shmini
 // Atzeret, Pesach VIII (Pesach VII in Israel) and Shavuot II (Shavuot in
@@ -53,17 +57,21 @@ func isYizkorDay(hd hdate.HDate, il bool) bool {
 // newYizkorEvent builds the Yizkor event for hd, linked to the first of that
 // day's holidays.
 func newYizkorEvent(hd hdate.HDate, holidays []event.HolidayEvent) YizkorEvent {
-	ev := YizkorEvent{Date: hd}
+	ev := YizkorEvent{date: hd}
 	for _, h := range holidays {
-		if h.Date == hd {
-			ev.LinkedEvent = h
+		if h.Date() == hd {
+			ev.linked = h
 			break
 		}
 	}
 	return ev
 }
 
-func (ev YizkorEvent) GetDate() hdate.HDate { return ev.Date }
+func (ev YizkorEvent) Date() hdate.HDate { return ev.date }
+
+// LinkedEvent returns the holiday on which Yizkor is recited, e.g. "Yom
+// Kippur".
+func (ev YizkorEvent) LinkedEvent() event.CalEvent { return ev.linked }
 
 // Render returns "Yizkor", translated to locale.
 func (ev YizkorEvent) Render(locale string) string {
@@ -73,10 +81,15 @@ func (ev YizkorEvent) Render(locale string) string {
 	return "Yizkor"
 }
 
-func (ev YizkorEvent) GetFlags() event.HolidayFlags { return event.YIZKOR }
-func (ev YizkorEvent) GetEmoji() string             { return "🕯️" }
-func (ev YizkorEvent) Basename() string             { return "Yizkor" }
-func (ev YizkorEvent) GetDesc() string              { return "Yizkor" }
+func (ev YizkorEvent) Flags() event.Flags { return event.Yizkor }
+func (ev YizkorEvent) Emoji() string      { return "🕯️" }
+func (ev YizkorEvent) Basename() string   { return "Yizkor" }
 
-// GetCategories returns ["yizkor"].
-func (ev YizkorEvent) GetCategories() []string { return event.CategoriesFromFlags(event.YIZKOR) }
+// Desc returns the untranslated description, "Yizkor".
+func (ev YizkorEvent) Desc() string { return "Yizkor" }
+
+// URL returns "": Yizkor has no page of its own on hebcal.com.
+func (ev YizkorEvent) URL() string { return "" }
+
+// Categories returns ["yizkor"].
+func (ev YizkorEvent) Categories() []string { return event.CategoriesFromFlags(event.Yizkor) }
