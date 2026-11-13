@@ -166,19 +166,17 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 					origDate := hdate.FromTime(yahrzeit.Date)
 					observedDate, err := hdate.GetYahrzeit(currentYear, origDate)
 					if err == nil {
-						userEvents = append(userEvents, event.UserEvent{
-							Date: observedDate,
-							Desc: yahrzeit.Name,
-						})
+						userEvents = append(userEvents, event.NewUserEvent(
+							observedDate,
+							yahrzeit.Name))
 					}
 				}
 				for _, userEv := range opts.UserEvents {
 					// Watch for ShortKislev and LongCheshvan
 					if userEv.Day <= hdate.DaysInMonth(userEv.Month, hyear) {
-						userEvents = append(userEvents, event.UserEvent{
-							Date: hdate.New(hyear, userEv.Month, userEv.Day),
-							Desc: userEv.Desc,
-						})
+						userEvents = append(userEvents, event.NewUserEvent(
+							hdate.New(hyear, userEv.Month, userEv.Day),
+							userEv.Desc))
 					}
 				}
 			}
@@ -203,7 +201,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 				opts.clock.cc, opts.clock.format))
 		}
 		for _, holidayEv := range holidaysYear {
-			if hd == holidayEv.Date {
+			if hd == holidayEv.GetDate() {
 				events, candlesEv = appendHolidayAndRelated(events, candlesEv, holidayEv, opts)
 			}
 		}
@@ -218,7 +216,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 			events = append(events, newYizkorEvent(hd, holidaysYear))
 		}
 		for _, userEv := range userEvents {
-			if abs == userEv.Date.Abs() {
+			if abs == userEv.GetDate().Abs() {
 				events = append(events, userEv)
 			}
 		}
@@ -687,7 +685,7 @@ func getMaskFromOptions(opts *CalOptions) event.HolidayFlags {
 // makeMevarchimEvent upgrades a bare "Shabbat Mevarchim Chodesh" holiday event
 // to a MevarchimChodeshEvent carrying the molad of the upcoming month.
 func makeMevarchimEvent(ev event.HolidayEvent, opts *calConfig) event.MevarchimChodeshEvent {
-	hd := ev.Date
+	hd := ev.GetDate()
 	nextName, nextMonth := nextMonthName(hd.Year(), hd.Month())
 	m := molad.New(hd.Year(), nextMonth)
 	mev := event.NewMevarchimChodeshEvent(hd, nextName, m)
@@ -745,13 +743,13 @@ func appendHolidayAndRelated(events []event.CalEvent, candlesEv TimedEvent, ev e
 		(opts.NoModern && mask.Has(event.MODERN_HOLIDAY)) {
 		return events, candlesEv // bail out early
 	}
-	if opts.CandleLighting && event.Desc(ev) == "Erev Pesach" {
+	if opts.CandleLighting && ev.Desc() == "Erev Pesach" {
 		events = append(events, makeErevPesachChametz(ev, opts)...)
 	}
 	isMajorFast := mask.Has(event.MAJOR_FAST)
 	isMinorFast := mask.Has(event.MINOR_FAST)
 	var startEvent, endEvent TimedEvent
-	if opts.CandleLighting && (isMajorFast || isMinorFast) && event.Desc(ev) != "Yom Kippur" {
+	if opts.CandleLighting && (isMajorFast || isMinorFast) && ev.Desc() != "Yom Kippur" {
 		startEvent, endEvent = makeFastStartEnd(ev, opts)
 		if (startEvent != TimedEvent{}) && (isMajorFast || (isMinorFast && !opts.NoMinorFast)) {
 			events = append(events, startEvent)

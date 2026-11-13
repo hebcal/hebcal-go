@@ -86,6 +86,11 @@ func (ev HebrewDateEvent) GetEmoji() string {
 	return ""
 }
 
+// Desc returns the untranslated date with its year, e.g. "29 Elul 5786".
+func (ev HebrewDateEvent) Desc() string {
+	return ev.date.String()
+}
+
 func (ev HebrewDateEvent) Basename() string {
 	return ev.date.String()
 }

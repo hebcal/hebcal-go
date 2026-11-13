@@ -61,7 +61,7 @@ func TestGetHolidaysOnDate(t *testing.T) {
 	events := hebcal.GetHolidaysOnDate(hd, false)
 	found := false
 	for _, ev := range events {
-		if ev.Desc == "Pesach I" {
+		if ev.Desc() == "Pesach I" {
 			found = true
 		}
 	}

@@ -21,107 +21,102 @@ func TestHebrewDateEvent_Extra(t *testing.T) {
 
 func TestHolidayEvent_Extra(t *testing.T) {
 	hd := hdate.New(5781, hdate.Sivan, 6)
-	ev := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Shavuot I",
-		Flags: event.CHAG,
-	}
+	ev := event.NewHolidayEvent(
+		hd,
+		"Shavuot I",
+		event.CHAG,
+		"")
 	assert.Equal(t, hd, ev.GetDate())
 	assert.Equal(t, event.CHAG, ev.GetFlags())
 	assert.Equal(t, "✡️", ev.GetEmoji())
 
-	ev2 := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Shabbat Shekalim",
-		Flags: event.SPECIAL_SHABBAT,
-	}
+	ev2 := event.NewHolidayEvent(
+		hd,
+		"Shabbat Shekalim",
+		event.SPECIAL_SHABBAT,
+		"")
 	assert.Equal(t, "🕍", ev2.GetEmoji())
 
-	ev3 := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Rosh Chodesh Tamuz",
-		Flags: event.ROSH_CHODESH,
-	}
+	ev3 := event.NewHolidayEvent(
+		hd,
+		"Rosh Chodesh Tamuz",
+		event.ROSH_CHODESH,
+		"")
 	assert.Equal(t, "🌒", ev3.GetEmoji())
 
-	ev4 := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "My Custom Holiday",
-		Flags: event.CHAG,
-		Emoji: "🎉",
-	}
+	ev4 := event.NewHolidayEvent(
+		hd,
+		"My Custom Holiday",
+		event.CHAG,
+		"🎉")
 	assert.Equal(t, "🎉", ev4.GetEmoji())
 
 	// Test Categories
-	evChol := event.HolidayEvent{
-		Date:          hd,
-		Desc:          "Pesach III (CH''M)",
-		Flags:         event.CHOL_HAMOED,
-		CholHaMoedDay: 3,
-	}
+	evChol := event.NewHolidayEvent(hd, "Pesach III (CH''M)", event.CHOL_HAMOED, "")
+	evChol.CholHaMoedDay = 3
 	assert.Equal(t, []string{"holiday", "major", "cholhamoed"}, evChol.GetCategories())
 
-	evMinor := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Lag BaOmer",
-		Flags: 0,
-	}
+	evMinor := event.NewHolidayEvent(
+		hd,
+		"Lag BaOmer",
+		0,
+		"")
 	assert.Equal(t, []string{"holiday", "minor"}, evMinor.GetCategories())
 
-	evMajorFall := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Some Unknown Major",
-		Flags: 0,
-	}
+	evMajorFall := event.NewHolidayEvent(
+		hd,
+		"Some Unknown Major",
+		0,
+		"")
 	assert.Equal(t, []string{"holiday", "major"}, evMajorFall.GetCategories())
 
 	// Test Render for Rosh Chodesh
-	evRoshChodesh := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Rosh Chodesh Sh'vat",
-		Flags: event.ROSH_CHODESH,
-	}
+	evRoshChodesh := event.NewHolidayEvent(
+		hd,
+		"Rosh Chodesh Sh'vat",
+		event.ROSH_CHODESH,
+		"")
 	assert.Equal(t, "Rosh Chodesh Sh’vat", evRoshChodesh.Render("en"))
 	assert.Equal(t, "ראש חודש שבט", evRoshChodesh.Render("he-x-nonikud"))
 
 	// Test Render for Shabbat Mevarchim
-	evMevarchim := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Shabbat Mevarchim Chodesh Kislev",
-		Flags: event.SHABBAT_MEVARCHIM,
-	}
+	evMevarchim := event.NewHolidayEvent(
+		hd,
+		"Shabbat Mevarchim Chodesh Kislev",
+		event.SHABBAT_MEVARCHIM,
+		"")
 	assert.Equal(t, "Shabbat Mevarchim Chodesh Kislev", evMevarchim.Render("en"))
 
 	// Test Render for Rosh Hashana Hebrew
-	evRoshHashana := event.HolidayEvent{
-		Date:  hdate.New(5781, hdate.Tishrei, 1),
-		Desc:  "Rosh Hashana 5781",
-		Flags: event.CHAG,
-	}
+	evRoshHashana := event.NewHolidayEvent(
+		hdate.New(5781, hdate.Tishrei, 1),
+		"Rosh Hashana 5781",
+		event.CHAG,
+		"")
 	assert.Equal(t, "רֹאשׁ הַשָּׁנָה תשפ״א", evRoshHashana.Render("he"))
 	assert.Equal(t, "Rosh Hashana 5781", evRoshHashana.Render("en"))
 
 	// Test Render for Yom Kippur Katan
-	evYKK := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Yom Kippur Katan Sivan",
-		Flags: event.MINOR_FAST | event.YOM_KIPPUR_KATAN,
-	}
+	evYKK := event.NewHolidayEvent(
+		hd,
+		"Yom Kippur Katan Sivan",
+		event.MINOR_FAST|event.YOM_KIPPUR_KATAN,
+		"")
 	assert.Equal(t, "Yom Kippur Katan Sivan", evYKK.Render("en"))
 
 	// Test GetEmoji edge cases
-	evMevarchimEmoji := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Shabbat Mevarchim Chodesh Kislev",
-		Flags: event.SHABBAT_MEVARCHIM,
-	}
+	evMevarchimEmoji := event.NewHolidayEvent(
+		hd,
+		"Shabbat Mevarchim Chodesh Kislev",
+		event.SHABBAT_MEVARCHIM,
+		"")
 	assert.Equal(t, "", evMevarchimEmoji.GetEmoji())
 
-	evYKKEmoji := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Yom Kippur Katan Sivan",
-		Flags: event.YOM_KIPPUR_KATAN | event.MINOR_FAST,
-	}
+	evYKKEmoji := event.NewHolidayEvent(
+		hd,
+		"Yom Kippur Katan Sivan",
+		event.YOM_KIPPUR_KATAN|event.MINOR_FAST,
+		"")
 	assert.Equal(t, "", evYKKEmoji.GetEmoji())
 }
 
@@ -209,10 +204,9 @@ func TestMoladEvent(t *testing.T) {
 
 func TestUserEvent(t *testing.T) {
 	hd := hdate.New(5780, hdate.Nisan, 15)
-	ev := event.UserEvent{
-		Date: hd,
-		Desc: "My Event",
-	}
+	ev := event.NewUserEvent(
+		hd,
+		"My Event")
 
 	assert.Equal(t, hd, ev.GetDate())
 	assert.Equal(t, event.USER_EVENT, ev.GetFlags())

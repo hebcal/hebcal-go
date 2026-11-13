@@ -30,7 +30,8 @@ func TestHolidayEventGetCategories(t *testing.T) {
 		{"Some Random Holiday", 0, 0, []string{"holiday", "major"}},
 	}
 	for _, tc := range tests {
-		ev := HolidayEvent{Date: hdate.New(5784, hdate.Sivan, 1), Desc: tc.desc, Flags: tc.flags, CholHaMoedDay: tc.chm}
+		ev := NewHolidayEvent(hdate.New(5784, hdate.Sivan, 1), tc.desc, tc.flags, "")
+		ev.CholHaMoedDay = tc.chm
 		if got := ev.GetCategories(); !reflect.DeepEqual(got, tc.want) {
 			t.Errorf("%q %b: GetCategories() = %v, want %v", tc.desc, tc.flags, got, tc.want)
 		}

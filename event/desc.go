@@ -1,23 +1,18 @@
 package event
 
-// Descer is implemented by events that can report their untranslated
-// description, the stable identifier @hebcal/core calls getDesc(): "Erev
-// Pesach", "Parashat Bereshit", "Omer 7", "29 Elul 5786", "Molad Cheshvan
-// 5787". Unlike Basename, it tells apart the days of one holiday.
+// Descer is the Desc method of CalEvent.
 //
-// Like URLer, it is a separate interface rather than a method on CalEvent,
-// which is implemented outside this package; use the Desc helper.
+// Deprecated: every CalEvent has a Desc method. Descer will be removed in the
+// next minor release.
 type Descer interface {
-	GetDesc() string
+	Desc() string
 }
 
-// Desc returns ev's untranslated description, or its Basename when ev does
-// not implement Descer.
+// Desc returns ev's untranslated description.
+//
+// Deprecated: call ev.desc(). Desc will be removed in the next minor release.
 func Desc(ev CalEvent) string {
-	if d, ok := ev.(Descer); ok {
-		return d.GetDesc()
-	}
-	return ev.Basename()
+	return ev.Desc()
 }
 
 // Memoer is implemented by events that carry a longer note of their own: the
@@ -37,25 +32,16 @@ func Memo(ev CalEvent, locale string) string {
 	return ""
 }
 
-func (ev HolidayEvent) GetDesc() string          { return ev.Desc }
-func (ev UserEvent) GetDesc() string             { return ev.Desc }
-func (ev HebrewDateEvent) GetDesc() string       { return ev.date.String() }
-func (ev MevarchimChodeshEvent) GetDesc() string { return ev.Basename() }
-
-// GetDesc returns "Parashat " and the portion's untranslated name, e.g.
-// "Parashat Vayakhel-Pekudei".
-func (ev ParshaEvent) GetDesc() string { return "Parashat " + ev.Basename() }
-
 // Memo returns the meaning of Yom Kippur Katan, untranslated, e.g. "Minor Day
 // of Atonement on the day preceeding Rosh Chodesh Sivan" (sic). The month
 // name carries a typographic apostrophe, as in a rendered title ("Sh’vat").
 // Other holidays have no memo of their own.
 func (ev HolidayEvent) Memo(locale string) string {
-	if !ev.Flags.Has(YOM_KIPPUR_KATAN) || len(ev.Desc) <= len(yomKippurKatanPrefix) {
+	if !ev.flags.Has(YOM_KIPPUR_KATAN) || len(ev.desc) <= len(yomKippurKatanPrefix) {
 		return ""
 	}
 	return "Minor Day of Atonement on the day preceeding Rosh Chodesh " +
-		SmartApostrophe(ev.Desc[len(yomKippurKatanPrefix):])
+		SmartApostrophe(ev.desc[len(yomKippurKatanPrefix):])
 }
 
 const yomKippurKatanPrefix = "Yom Kippur Katan "

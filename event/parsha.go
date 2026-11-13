@@ -43,6 +43,13 @@ func (ev ParshaEvent) GetEmoji() string {
 	return ""
 }
 
+// Desc returns "Parashat " and the portion's untranslated name, e.g.
+// "Parashat Vayakhel-Pekudei".
+func (ev ParshaEvent) Desc() string {
+	return "Parashat " + ev.Basename()
+}
+
+// Basename returns the portion's untranslated name, e.g. "Vayakhel-Pekudei".
 func (ev ParshaEvent) Basename() string {
 	return strings.Join(ev.Parsha.Name, "-")
 }

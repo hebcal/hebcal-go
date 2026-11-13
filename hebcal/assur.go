@@ -34,7 +34,7 @@ func GetHolidaysOnDate(hd hdate.HDate, il bool) []event.HolidayEvent {
 	yearEvents := GetHolidaysForYear(hd.Year(), il)
 	var result []event.HolidayEvent
 	for _, ev := range yearEvents {
-		if ev.Date.Abs() == abs {
+		if ev.GetDate().Abs() == abs {
 			result = append(result, ev)
 		}
 	}

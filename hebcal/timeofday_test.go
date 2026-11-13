@@ -14,7 +14,7 @@ import (
 
 func renderDayByTimeOfDay(t *testing.T, year int, month time.Month, day int) []string {
 	dailylearning.AddCalendar("testTimeOfDay", func(hd hdate.HDate, il bool) event.CalEvent {
-		return event.HolidayEvent{Date: hd, Desc: "Daily learning", Flags: event.DAILY_LEARNING}
+		return event.NewHolidayEvent(hd, "Daily learning", event.DAILY_LEARNING, "")
 	})
 	toronto := zmanim.NewLocation("Toronto", "CA", 43.70011, -79.4163, 0, "America/Toronto")
 	hd := hdate.FromGregorian(year, month, day)
@@ -90,8 +90,8 @@ func TestTimeOfDayErevTishaBav(t *testing.T) {
 func TestTimeOfDayExported(t *testing.T) {
 	hd := hdate.New(5787, hdate.Tishrei, 14)
 	assert.Equal(t, TimeOfDayLearning,
-		TimeOfDay(event.HolidayEvent{Date: hd, Desc: "Psalms 1", Flags: event.DAILY_LEARNING}))
+		TimeOfDay(event.NewHolidayEvent(hd, "Psalms 1", event.DAILY_LEARNING, "")))
 	assert.Equal(t, TimeOfDayEvening,
-		TimeOfDay(event.HolidayEvent{Date: hd, Desc: "Erev Sukkot", Flags: event.EREV | event.LIGHT_CANDLES}))
-	assert.Equal(t, TimeOfDayDay, TimeOfDay(event.UserEvent{Date: hd, Desc: "Birthday"}))
+		TimeOfDay(event.NewHolidayEvent(hd, "Erev Sukkot", event.EREV|event.LIGHT_CANDLES, "")))
+	assert.Equal(t, TimeOfDayDay, TimeOfDay(event.NewUserEvent(hd, "Birthday")))
 }

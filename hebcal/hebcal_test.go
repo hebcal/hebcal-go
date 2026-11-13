@@ -648,7 +648,7 @@ func TestHebrewCalendarInfile(t *testing.T) {
 // day has a reading, and AddHebrewDatesForEvents would otherwise date them all.
 func TestAddHebrewDatesForEventsIgnoresLearning(t *testing.T) {
 	dailylearning.AddCalendar("testLearningEveryDay", func(hd hdate.HDate, il bool) event.CalEvent {
-		return event.HolidayEvent{Date: hd, Desc: "Reading", Flags: event.DAILY_LEARNING}
+		return event.NewHolidayEvent(hd, "Reading", event.DAILY_LEARNING, "")
 	})
 	opts := &hebcal.CalOptions{
 		Start:                   hdate.New(5787, hdate.Tishrei, 9),

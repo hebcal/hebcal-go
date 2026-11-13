@@ -24,21 +24,40 @@ import (
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+// CalEvent is an event on the Hebrew calendar: a holiday, a Torah portion, a
+// candle-lighting time, a day of the Omer, a daily-learning reading. It is
+// implemented in this module and by schedule providers such as
+// github.com/hebcal/learning.
+//
+// Some events can do more, through the optional interfaces BriefRenderer,
+// Memoer, Timed and Linked.
 type CalEvent interface {
-	GetDate() hdate.HDate        // Holiday date of occurrence
-	Render(locale string) string // Description (e.g. "Pesach III (CH''M)")
-	GetFlags() HolidayFlags      // Event flag bitmask
-	GetEmoji() string            // Holiday-specific emoji
-	// Returns a simplified (untranslated) description for this event.
-	// For example, HolidayEvent supports "Erev Pesach" => "Pesach",
-	// and "Sukkot III (CH''M)" => "Sukkot".
-	// For many holidays the basename and the event description are
-	// the same.
+	// GetDate returns the Hebrew date on which the event occurs.
+	GetDate() hdate.HDate
+	// Desc returns the untranslated description, the event's stable
+	// identifier: "Erev Pesach", "Sukkot III (CH''M)", "Parashat Bereshit",
+	// "Omer 7", "29 Elul 5786", "Molad Cheshvan 5787", "Candle lighting".
+	// Unlike Basename, it tells apart the days of one holiday.
+	Desc() string
+	// Basename returns a simplified, untranslated description that groups
+	// related events: "Pesach" for "Erev Pesach", "Sukkot" for "Sukkot III
+	// (CH''M)". For many events it is the same as Desc.
 	Basename() string
+	// Render returns the description translated to locale, e.g. "Pesach
+	// III (CH’’M)".
+	Render(locale string) string
+	// GetFlags returns the event's flag bitmask.
+	GetFlags() HolidayFlags
+	// GetEmoji returns the event's emoji, or "" if it has none.
+	GetEmoji() string
 	// GetCategories returns the category and optional sub-categories for this
 	// event, e.g. ["holiday", "major", "fast"] or ["roshchodesh"]. The first
 	// element is the primary category.
 	GetCategories() []string
+	// URL returns the absolute URL of the event's page (on hebcal.com for
+	// the events of this module), or "" if it has none: a Molad, for
+	// example, or a date outside the range the website covers.
+	URL() string
 }
 
 // Timed is implemented by events that occur at a clock time:

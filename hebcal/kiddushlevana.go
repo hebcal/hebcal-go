@@ -110,9 +110,6 @@ func (ev KiddushLevanaEvent) Kind() TimedKind { return KiddushLevana }
 // Desc returns the untranslated description, "Latest Kiddush Levana".
 func (ev KiddushLevanaEvent) Desc() string { return latestKiddushLevana }
 
-// GetDesc returns the same as Desc.
-func (ev KiddushLevanaEvent) GetDesc() string { return latestKiddushLevana }
-
 // Basename returns the untranslated description, "Latest Kiddush Levana".
 func (ev KiddushLevanaEvent) Basename() string { return latestKiddushLevana }
 
@@ -176,7 +173,7 @@ func isShabbatOrChag(hd hdate.HDate, il bool) bool {
 		return true
 	}
 	for _, ev := range GetHolidaysOnDate(hd, il) {
-		if ev.Flags.Has(event.CHAG) {
+		if ev.GetFlags().Has(event.CHAG) {
 			return true
 		}
 	}

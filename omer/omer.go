@@ -31,7 +31,7 @@ import (
 
 // OmerEvent represents a single day of the Counting of the Omer.
 type OmerEvent struct {
-	Date            hdate.HDate
+	date            hdate.HDate
 	OmerDay         int
 	WeekNumber      int
 	DaysWithinWeeks int
@@ -48,11 +48,12 @@ func NewOmerEvent(hd hdate.HDate, omerDay int) OmerEvent {
 	if days == 0 {
 		days = 7
 	}
-	return OmerEvent{Date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
+	return OmerEvent{date: hd, OmerDay: omerDay, WeekNumber: week, DaysWithinWeeks: days}
 }
 
+// GetDate returns the Hebrew date of the day counted.
 func (ev OmerEvent) GetDate() hdate.HDate {
-	return ev.Date
+	return ev.date
 }
 
 func (ev OmerEvent) Render(locale string) string {
@@ -105,11 +106,11 @@ func (ev OmerEvent) GetEmoji() string {
 
 // Basename returns the untranslated description, e.g. "Omer 22".
 func (ev OmerEvent) Basename() string {
-	return ev.GetDesc()
+	return ev.Desc()
 }
 
-// GetDesc returns the untranslated description, e.g. "Omer 22".
-func (ev OmerEvent) GetDesc() string {
+// Desc returns the untranslated description, e.g. "Omer 22".
+func (ev OmerEvent) Desc() string {
 	return "Omer " + strconv.Itoa(ev.OmerDay)
 }
 

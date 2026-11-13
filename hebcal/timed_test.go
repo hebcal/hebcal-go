@@ -33,19 +33,19 @@ func TestTimedInterfaceAndKind(t *testing.T) {
 	for _, ev := range events {
 		timed, ok := ev.(event.Timed)
 		kinded, hasKind := ev.(interface{ Kind() hebcal.TimedKind })
-		assert.Equal(t, ok, hasKind, event.Desc(ev))
+		assert.Equal(t, ok, hasKind, ev.Desc())
 		if !ok {
 			continue
 		}
-		assert.False(t, timed.Time().IsZero(), event.Desc(ev))
+		assert.False(t, timed.Time().IsZero(), ev.Desc())
 		kind := kinded.Kind()
 		seen[kind]++
 		if want, ok := wantDesc[kind]; ok {
-			assert.Equal(t, want, event.Desc(ev))
+			assert.Equal(t, want, ev.Desc())
 		}
 		switch kind {
 		case hebcal.ChanukahCandles:
-			assert.Contains(t, event.Desc(ev), "Chanukah: ")
+			assert.Contains(t, ev.Desc(), "Chanukah: ")
 			assert.True(t, ev.GetFlags().Has(event.CHANUKAH_CANDLES))
 			assert.Equal(t, "Chanukah", ev.Basename())
 		case hebcal.Zman:
@@ -58,7 +58,7 @@ func TestTimedInterfaceAndKind(t *testing.T) {
 		te, ok := hebcal.AsTimedEvent(ev)
 		require.True(t, ok)
 		assert.Equal(t, timed.Time(), te.Time())
-		assert.Equal(t, event.Desc(ev), te.Desc())
+		assert.Equal(t, ev.Desc(), te.Desc())
 	}
 	for kind := hebcal.CandleLighting; kind <= hebcal.Zman; kind++ {
 		assert.NotZero(t, seen[kind], kind.String())
@@ -79,7 +79,7 @@ func TestLinkedInterface(t *testing.T) {
 		if l, ok := ev.(event.Linked); ok && l.LinkedEvent() != nil {
 			y, m, d := ev.GetDate().Greg()
 			if y == 2026 && (m == 9 || m == 10 || m == 7) {
-				linked[ev.GetDate().String()+" "+event.Desc(ev)] = event.Desc(l.LinkedEvent())
+				linked[ev.GetDate().String()+" "+ev.Desc()] = l.LinkedEvent().Desc()
 			}
 			_ = d
 		}

@@ -10,11 +10,11 @@ import (
 )
 
 func TestHolidayEvent_Basename(t *testing.T) {
-	ev := event.HolidayEvent{Desc: "Sukkot III (CH''M)"}
+	ev := event.NewHolidayEvent(hdate.HDate{}, "Sukkot III (CH''M)", 0, "")
 	assert.Equal(t, "Sukkot", ev.Basename())
-	ev = event.HolidayEvent{Desc: "Chanukah: 1 Candle"}
+	ev = event.NewHolidayEvent(hdate.HDate{}, "Chanukah: 1 Candle", 0, "")
 	assert.Equal(t, "Chanukah", ev.Basename())
-	ev = event.HolidayEvent{Desc: "Chanukah: 7 Candles"}
+	ev = event.NewHolidayEvent(hdate.HDate{}, "Chanukah: 7 Candles", 0, "")
 	assert.Equal(t, "Chanukah", ev.Basename())
 }
 
@@ -40,13 +40,16 @@ func TestHebrewDateEvent(t *testing.T) {
 }
 
 func TestRenderBrief(t *testing.T) {
-	ykk := event.HolidayEvent{Date: hdate.New(5786, hdate.Kislev, 29), Desc: "Yom Kippur Katan Tevet",
-		Flags: event.MINOR_FAST | event.YOM_KIPPUR_KATAN}
+	ykk := event.NewHolidayEvent(
+		hdate.New(5786, hdate.Kislev, 29),
+		"Yom Kippur Katan Tevet",
+		event.MINOR_FAST|event.YOM_KIPPUR_KATAN,
+		"")
 	assert.Equal(t, "Yom Kippur Katan Tevet", ykk.Render("en"))
 	assert.Equal(t, "Yom Kippur Katan", event.RenderBrief(ykk, "en"))
 	assert.Equal(t, "יוֹם כִּפּוּר קָטָן", event.RenderBrief(ykk, "he"))
 	// an event with no brief form renders in full
-	purim := event.HolidayEvent{Date: hdate.New(5786, hdate.Adar1, 14), Desc: "Purim", Flags: event.MINOR_HOLIDAY}
+	purim := event.NewHolidayEvent(hdate.New(5786, hdate.Adar1, 14), "Purim", event.MINOR_HOLIDAY, "")
 	assert.Equal(t, "Purim", event.RenderBrief(purim, "en"))
 	parsha := event.NewParshaEvent(hdate.New(5786, hdate.Cheshvan, 5),
 		sedra.Parsha{Name: []string{"Noach"}, Num: []int{2}}, false)
@@ -68,10 +71,11 @@ func TestParshaEvent_Render(t *testing.T) {
 
 func TestYomKippurKatanEvent(t *testing.T) {
 	hd := hdate.New(5771, hdate.Tevet, 29)
-	ev := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Yom Kippur Katan Sivan",
-		Flags: event.MINOR_FAST | event.YOM_KIPPUR_KATAN}
+	ev := event.NewHolidayEvent(
+		hd,
+		"Yom Kippur Katan Sivan",
+		event.MINOR_FAST|event.YOM_KIPPUR_KATAN,
+		"")
 	assert.Equal(t, "Yom Kippur Katan Sivan", ev.Basename())
 	assert.Equal(t, "Yom Kippur Katan Sivan", ev.Render("en"))
 	assert.Equal(t, "יוֹם כִּפּוּר קָטָן סִיוָן", ev.Render("he"))
@@ -81,14 +85,36 @@ func TestYomKippurKatanEvent(t *testing.T) {
 
 func TestRoshHashanaLocale(t *testing.T) {
 	hd := hdate.New(5771, hdate.Tishrei, 1)
-	ev := event.HolidayEvent{
-		Date:  hd,
-		Desc:  "Rosh Hashana 5771",
-		Flags: event.CHAG | event.LIGHT_CANDLES_TZEIS,
-		Emoji: "🍏🍯"}
+	ev := event.NewHolidayEvent(
+		hd,
+		"Rosh Hashana 5771",
+		event.CHAG|event.LIGHT_CANDLES_TZEIS,
+		"🍏🍯")
 	assert.Equal(t, "Rosh Hashana", ev.Basename())
 	assert.Equal(t, "Rosh Hashana 5771", ev.Render("en"))
 	assert.Equal(t, "רֹאשׁ הַשָּׁנָה תשע״א", ev.Render("he"))
 	assert.Equal(t, "ראש השנה תשע״א", ev.Render("he-x-NoNikud"))
 	assert.Equal(t, "Рош-А-Шана 5771", ev.Render("ru"))
+}
+
+// The deprecated helpers answer exactly as the methods they wrap.
+func TestDeprecatedDescAndURLHelpers(t *testing.T) {
+	events := []event.CalEvent{
+		event.NewHolidayEvent(hdate.New(5787, hdate.Tishrei, 17), "Sukkot III (CH''M)", event.CHOL_HAMOED, ""),
+		event.NewUserEvent(hdate.New(5787, hdate.Tishrei, 17), "Birthday"),
+		event.NewHebrewDateEvent(hdate.New(5786, hdate.Elul, 29)),
+	}
+	want := []struct{ desc, url string }{
+		{"Sukkot III (CH''M)", "https://www.hebcal.com/holidays/sukkot-2026"},
+		{"Birthday", ""},
+		{"29 Elul 5786", "https://www.hebcal.com/converter?hd=29&hm=Elul&hy=5786&h2g=1"},
+	}
+	for i, ev := range events {
+		assert.Equal(t, want[i].desc, ev.Desc())
+		assert.Equal(t, want[i].url, ev.URL())
+		assert.Equal(t, ev.Desc(), event.Desc(ev))
+		assert.Equal(t, ev.URL(), event.URL(ev))
+		var _ event.Descer = ev
+		var _ event.URLer = ev
+	}
 }

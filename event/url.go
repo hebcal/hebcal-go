@@ -10,25 +10,19 @@ import (
 	"github.com/hebcal/hdate"
 )
 
-// URLer is implemented by events that have a canonical page on hebcal.com.
+// URLer is the URL method of CalEvent.
 //
-// It is deliberately a separate interface rather than a method on CalEvent:
-// CalEvent is implemented outside this package, and widening it would break
-// those implementations. Callers should use the URL helper below, which
-// returns "" for events that do not carry a URL.
+// Deprecated: every CalEvent has a URL method. URLer will be removed in the
+// next minor release.
 type URLer interface {
-	// URL returns the absolute hebcal.com URL for this event, or "" if the
-	// event has no page (for example a Molad, or a date outside the range the
-	// website covers).
 	URL() string
 }
 
-// URL returns the canonical hebcal.com URL for ev, or "" if it has none.
+// URL returns the canonical URL for ev, or "" if it has none.
+//
+// Deprecated: call ev.URL(). URL will be removed in the next minor release.
 func URL(ev CalEvent) string {
-	if u, ok := ev.(URLer); ok {
-		return u.URL()
-	}
-	return ""
+	return ev.URL()
 }
 
 // slugOverrides maps a generated slug onto the spelling hebcal.com actually
@@ -62,20 +56,20 @@ func urlFriendly(s string) string {
 //
 // Israel-only observances carry ?i=on so the page shows the Israel schedule.
 func (ev HolidayEvent) URL() string {
-	hy := ev.Date.Year()
+	hy := ev.date.Year()
 	if hy < 5513 || hy > 6260 {
 		return ""
 	}
 	// Yom Kippur Katan and Ta'anit BeHaB have no page on the website.
-	if strings.HasPrefix(ev.Desc, "Yom Kippur Katan") || ev.Flags.Has(BEHAB) {
+	if strings.HasPrefix(ev.desc, "Yom Kippur Katan") || ev.flags.Has(BEHAB) {
 		return ""
 	}
-	gy, gm, gd := ev.Date.ProlepticGreg()
+	gy, gm, gd := ev.date.ProlepticGreg()
 	var suffix string
 	switch {
-	case ev.Desc == "Asara B'Tevet":
+	case ev.desc == "Asara B'Tevet":
 		suffix = fmt.Sprintf("%04d%02d%02d", gy, int(gm), gd)
-	case strings.HasPrefix(ev.Desc, "Chanukah"):
+	case strings.HasPrefix(ev.desc, "Chanukah"):
 		year := gy
 		if gm == time.January {
 			year--
@@ -97,9 +91,9 @@ func (ev HolidayEvent) URL() string {
 	//
 	// A common year has a single Adar and keeps the undecorated slug, even
 	// though hdate numbers that month Adar1.
-	if slug == "rosh-chodesh-adar" && hdate.IsLeapYear(ev.Date.Year()) {
-		m := ev.Date.Month()
-		if ev.Date.Day() == 30 {
+	if slug == "rosh-chodesh-adar" && hdate.IsLeapYear(ev.date.Year()) {
+		m := ev.date.Month()
+		if ev.date.Day() == 30 {
 			m++
 		}
 		switch m {
@@ -110,7 +104,7 @@ func (ev HolidayEvent) URL() string {
 		}
 	}
 	url := "https://www.hebcal.com/holidays/" + slug + "-" + suffix
-	if ev.Flags.Has(IL_ONLY) {
+	if ev.flags.Has(IL_ONLY) {
 		url += "?i=on"
 	}
 	return url

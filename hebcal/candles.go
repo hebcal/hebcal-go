@@ -211,11 +211,6 @@ func (ev TimedEvent) Desc() string {
 	return ev.desc
 }
 
-// GetDesc returns the same as Desc.
-func (ev TimedEvent) GetDesc() string {
-	return ev.desc
-}
-
 // NewTimedEvent constructs a timed event, or the zero TimedEvent if t is the
 // zero time. Its kind follows from desc ("Candle lighting", "Havdalah",
 // "Fast begins", ...) or, for a daily zman, from flags. opts chooses the
@@ -411,7 +406,7 @@ func makeCandleEvent(hd hdate.HDate, opts *calConfig, ev event.CalEvent) TimedEv
 // candles are lit: at regular candle-lighting time on Friday, at Havdalah
 // time on Saturday night, and at dusk on other days.
 func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEvent {
-	hd := ev.Date
+	hd := ev.GetDate()
 	dow := hd.Weekday()
 	if dow == time.Friday || dow == time.Saturday {
 		timedEv := makeCandleEvent(hd, opts, ev)
@@ -419,8 +414,8 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEve
 			return timedEv // no sunset
 		}
 		timedEv.kind = ChanukahCandles
-		timedEv.desc = ev.Desc
-		timedEv.emoji = ev.Emoji
+		timedEv.desc = ev.Desc()
+		timedEv.emoji = ev.GetEmoji()
 		timedEv.ChanukahDay = ev.ChanukahDay
 		return timedEv
 	}
@@ -430,10 +425,10 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEve
 		return TimedEvent{} // no sunset
 	}
 	return TimedEvent{
-		date:  ev.Date,
-		desc:  ev.Desc,
-		flags: ev.Flags,
-		emoji: ev.Emoji,
+		date:  ev.GetDate(),
+		desc:  ev.Desc(),
+		flags: ev.GetFlags(),
+		emoji: ev.GetEmoji(),
 		kind:  ChanukahCandles,
 		// Round to the nearest minute, as NewTimedEvent does and as
 		// @hebcal/core's TimedChanukahEvent does with Zmanim.roundTime.
@@ -447,7 +442,7 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEve
 func makeFastStartEnd(ev event.CalEvent, opts *calConfig) (TimedEvent, TimedEvent) {
 	hd := ev.GetDate()
 	z := newZmanim(hd, opts)
-	desc := event.Desc(ev)
+	desc := ev.Desc()
 	flags := ev.GetFlags()
 	var startEvent, endEvent TimedEvent
 	if desc == "Erev Tish'a B'Av" {
@@ -592,6 +587,14 @@ func (ev riseSetEvent) Basename() string {
 	return ev.Render("en")
 }
 
+func (ev riseSetEvent) Desc() string {
+	return ev.Basename()
+}
+
+func (ev riseSetEvent) URL() string {
+	return ""
+}
+
 func (ev riseSetEvent) GetCategories() []string {
 	return []string{"zmanim"}
 }
@@ -639,5 +642,5 @@ func (ev TimedEvent) URL() string {
 	if !ev.isChanukah() {
 		return ""
 	}
-	return event.URL(ev.linked)
+	return ev.linked.URL()
 }

@@ -8,7 +8,7 @@ import "fmt"
 // The site only has pages for Hebrew years it covers, so years outside that
 // range return "" rather than a link that would 404.
 func (ev OmerEvent) URL() string {
-	hy := ev.Date.Year()
+	hy := ev.date.Year()
 	if hy < 5513 || hy > 6260 {
 		return ""
 	}

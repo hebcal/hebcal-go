@@ -12,7 +12,7 @@ import (
 // MoladEvent is the announcement of the molad (new moon) of the coming Hebrew
 // month, made on the Shabbat before Rosh Chodesh.
 type MoladEvent struct {
-	Date        hdate.HDate // the Shabbat on which the molad is announced
+	date        hdate.HDate // the Shabbat on which the molad is announced
 	Molad       molad.Molad // the molad of the coming month
 	MonthName   string      // untranslated name of the coming month
 	CountryCode string      // used to pick a 12- or 24-hour clock for the announcement
@@ -26,7 +26,7 @@ type MoladEvent struct {
 // @hebcal/core. Clock12 and Clock24 override the country's convention.
 func NewMoladEvent(date hdate.HDate, m molad.Molad, monthName string, countryCode string, clock ClockFormat) MoladEvent {
 	return MoladEvent{
-		Date:        date,
+		date:        date,
 		Molad:       m,
 		MonthName:   monthName,
 		CountryCode: countryCode,
@@ -34,8 +34,9 @@ func NewMoladEvent(date hdate.HDate, m molad.Molad, monthName string, countryCod
 	}
 }
 
+// GetDate returns the Shabbat on which the molad is announced.
 func (ev MoladEvent) GetDate() hdate.HDate {
-	return ev.Date
+	return ev.date
 }
 
 var heDayNames = []string{
@@ -121,13 +122,18 @@ func (ev MoladEvent) GetEmoji() string {
 // Basename returns the untranslated description with the Hebrew year, e.g.
 // "Molad Cheshvan 5787".
 func (ev MoladEvent) Basename() string {
-	return ev.GetDesc()
+	return ev.Desc()
 }
 
-// GetDesc returns the untranslated description with the Hebrew year, e.g.
+// Desc returns the untranslated description with the Hebrew year, e.g.
 // "Molad Cheshvan 5787".
-func (ev MoladEvent) GetDesc() string {
-	return fmt.Sprintf("Molad %s %d", ev.MonthName, ev.Date.Year())
+func (ev MoladEvent) Desc() string {
+	return fmt.Sprintf("Molad %s %d", ev.MonthName, ev.date.Year())
+}
+
+// URL returns "": a molad has no page on hebcal.com.
+func (ev MoladEvent) URL() string {
+	return ""
 }
 
 func (ev MoladEvent) GetCategories() []string {
