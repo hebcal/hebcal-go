@@ -35,10 +35,15 @@ func TestTimedInterfaceAndKind(t *testing.T) {
 		kinded, hasKind := ev.(interface{ Kind() hebcal.TimedKind })
 		assert.Equal(t, ok, hasKind, ev.Desc())
 		if !ok {
+			_, isKind := hebcal.TimedKindOf(ev)
+			assert.False(t, isKind, ev.Desc())
 			continue
 		}
 		assert.False(t, timed.Time().IsZero(), ev.Desc())
 		kind := kinded.Kind()
+		k, ok := hebcal.TimedKindOf(ev)
+		assert.True(t, ok)
+		assert.Equal(t, kind, k)
 		seen[kind]++
 		if want, ok := wantDesc[kind]; ok {
 			assert.Equal(t, want, ev.Desc())
