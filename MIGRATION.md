@@ -8,21 +8,24 @@ Nothing about the calendar itself changed. Every event has the same date,
 description, flags, categories, URL, rendered text and time as before, and the
 events come in the same order. Only the Go API around them is different.
 
-If you only call `hebcal.HebrewCalendar` and print `ev.Render(locale)`, the one
-thing you may have to change is the 12/24-hour option ([section 5](#5-clock-format)).
+Most of the upgrade is renaming. [Section 12](#12-quick-reference) is a table
+of every rename, and [section 11](#11-doing-the-renames-mechanically) has
+commands that do most of them for you.
 
 ## Contents
 
 1. [Read this first: code that compiles but is wrong](#1-read-this-first-code-that-compiles-but-is-wrong)
-2. [`Desc()` and `URL()` are part of `CalEvent`](#2-desc-and-url-are-part-of-calevent)
-3. [Event fields became methods and constructors](#3-event-fields-became-methods-and-constructors)
-4. [Timed events: `event.Timed`, `event.Linked`, `TimedKind`](#4-timed-events-eventtimed-eventlinked-timedkind)
-5. [Clock format](#5-clock-format)
-6. [`HebrewCalendar` no longer modifies your options](#6-hebrewcalendar-no-longer-modifies-your-options)
-7. [Constructors return concrete types](#7-constructors-return-concrete-types)
-8. [If you implement `event.CalEvent` yourself](#8-if-you-implement-eventcalevent-yourself)
-9. [Deprecated, still present](#9-deprecated-still-present)
-10. [Quick reference](#10-quick-reference)
+2. [The `CalEvent` interface](#2-the-calevent-interface)
+3. [Flags: `event.Flags` and MixedCaps constants](#3-flags-eventflags-and-mixedcaps-constants)
+4. [Event fields became methods and constructors](#4-event-fields-became-methods-and-constructors)
+5. [Timed events: `event.Timed`, `event.Linked`, `TimedKind`](#5-timed-events-eventtimed-eventlinked-timedkind)
+6. [Clock format](#6-clock-format)
+7. [`HebrewCalendar` no longer modifies your options](#7-hebrewcalendar-no-longer-modifies-your-options)
+8. [Errors instead of panics](#8-errors-instead-of-panics)
+9. [Other renames](#9-other-renames)
+10. [If you implement `event.CalEvent` or register a schedule](#10-if-you-implement-eventcalevent-or-register-a-schedule)
+11. [Doing the renames mechanically](#11-doing-the-renames-mechanically)
+12. [Quick reference](#12-quick-reference)
 
 ## 1. Read this first: code that compiles but is wrong
 
@@ -48,28 +51,33 @@ After upgrading, run `go vet ./...`, and search your code for these names
 without a following parenthesis:
 
 ```bash
-grep -rnE '\.(Desc|LinkedEvent)\b[^(]' --include='*.go' .
+grep -rnE '\.(Desc|LinkedEvent|Date|Flags|Emoji)\b[^(]' --include='*.go' .
 ```
 
-## 2. `Desc()` and `URL()` are part of `CalEvent`
+That search also finds fields of your own types with those names; only the
+ones on hebcal-go events matter.
 
-`event.CalEvent` now has eight methods. `Desc` and `URL` are new:
+## 2. The `CalEvent` interface
+
+`event.CalEvent` has eight methods. `Desc` and `URL` are new, and the four
+getters lost their `Get` prefix:
 
 ```go
 type CalEvent interface {
-    GetDate() hdate.HDate
-    Desc() string                // untranslated description, the stable identifier
+    Date() hdate.HDate           // was GetDate
+    Desc() string                // new: untranslated description, the stable identifier
     Basename() string
     Render(locale string) string
-    GetFlags() HolidayFlags
-    GetEmoji() string
-    GetCategories() []string
-    URL() string                 // "" when the event has no page
+    Flags() Flags                // was GetFlags() HolidayFlags
+    Emoji() string               // was GetEmoji
+    Categories() []string        // was GetCategories
+    URL() string                 // new: "" when the event has no page
 }
 ```
 
-They replace the optional interfaces `event.Descer` and `event.URLer` and the
-helper functions that went with them:
+`Desc` and `URL` replace the optional interfaces `event.Descer` and
+`event.URLer` and the helper functions that went with them, all of which are
+removed:
 
 | Before | After |
 |---|---|
@@ -78,16 +86,53 @@ helper functions that went with them:
 | `ev.(event.Descer)`, then `.GetDesc()` | `ev.Desc()` |
 | `ev.(event.URLer)`, then `.URL()` | `ev.URL()` |
 | `x.GetDesc()` on any event type | `x.Desc()` |
+| `ev.GetDate()` | `ev.Date()` |
+| `ev.GetFlags()` | `ev.Flags()` |
+| `ev.GetEmoji()` | `ev.Emoji()` |
+| `ev.GetCategories()` | `ev.Categories()` |
 
-Each event returns exactly the string the helper returned before. In
-particular the daily-learning events of `github.com/hebcal/learning` return
-their `Basename()`, which is what `event.Desc` fell back to.
+Each event returns exactly the strings it returned before. In particular the
+daily-learning events of `github.com/hebcal/learning` return their
+`Basename()` from `Desc()`, which is what `event.Desc` fell back to.
 
 `event.Memoer` (`Memo`) and `event.BriefRenderer` (`RenderBrief`) are still
 optional interfaces, and `event.Memo(ev, locale)` and
 `event.RenderBrief(ev, locale)` work as before.
 
-## 3. Event fields became methods and constructors
+## 3. Flags: `event.Flags` and MixedCaps constants
+
+`event.HolidayFlags` is now `event.Flags`, and its constants follow Go
+naming:
+
+| Before | After | | Before | After |
+|---|---|---|---|---|
+| `CHAG` | `Chag` | | `MOLAD` | `Molad` |
+| `LIGHT_CANDLES` | `LightCandles` | | `USER_EVENT` | `User` |
+| `YOM_TOV_ENDS` | `YomTovEnds` | | `HEBREW_DATE` | `HebrewDate` |
+| `CHUL_ONLY` | `ChulOnly` | | `MINOR_HOLIDAY` | `MinorHoliday` |
+| `IL_ONLY` | `ILOnly` | | `EREV` | `Erev` |
+| `LIGHT_CANDLES_TZEIS` | `LightCandlesTzeis` | | `CHOL_HAMOED` | `CholHamoed` |
+| `CHANUKAH_CANDLES` | `ChanukahCandles` | | `MISHNA_YOMI` | `MishnaYomi` |
+| `ROSH_CHODESH` | `RoshChodesh` | | `YOM_KIPPUR_KATAN` | `YomKippurKatan` |
+| `MINOR_FAST` | `MinorFast` | | `ZMANIM` | `Zmanim` |
+| `SPECIAL_SHABBAT` | `SpecialShabbat` | | `YERUSHALMI_YOMI` | `YerushalmiYomi` |
+| `PARSHA_HASHAVUA` | `ParshaHashavua` | | `NACH_YOMI` | `NachYomi` |
+| `DAF_YOMI` | `DafYomi` | | `DAILY_LEARNING` | `DailyLearning` |
+| `OMER_COUNT` | `OmerCount` | | `BEHAB` | `BeHaB` |
+| `MODERN_HOLIDAY` | `ModernHoliday` | | `KIDDUSH_LEVANA` | `KiddushLevana` |
+| `MAJOR_FAST` | `MajorFast` | | `YIZKOR` | `Yizkor` |
+| `SHABBAT_MEVARCHIM` | `ShabbatMevarchim` | | | |
+
+Two to notice: `USER_EVENT` is `event.User` (`event.UserEvent` is the event
+type), and `IL_ONLY` is `event.ILOnly`.
+
+**`Flags.String()` did not change.** It still returns the old names, such as
+`"CHAG|LIGHT_CANDLES"` and `"USER_EVENT"`, so anything you log, store or
+compare keeps working. The bit values are the same too.
+
+`Has`, `HasAny`, `With` and `Without` are unchanged.
+
+## 4. Event fields became methods and constructors
 
 A type cannot have a field and a method of the same name, so the fields that
 the interface reads are now unexported. Read them through the methods, and
@@ -102,18 +147,18 @@ if ev.Desc == "Purim" && ev.Flags.Has(event.MINOR_HOLIDAY) { ... }
 day := ev.Date
 
 // After
-ev := event.NewHolidayEvent(hd, "Purim", event.MINOR_HOLIDAY, "🎭")
-if ev.Desc() == "Purim" && ev.GetFlags().Has(event.MINOR_HOLIDAY) { ... }
-day := ev.GetDate()
+ev := event.NewHolidayEvent(hd, "Purim", event.MinorHoliday, "🎭")
+if ev.Desc() == "Purim" && ev.Flags().Has(event.MinorHoliday) { ... }
+day := ev.Date()
 ```
 
-Pass `""` as the emoji to get the default that `GetEmoji()` chooses from the
+Pass `""` as the emoji to get the default that `Emoji()` chooses from the
 flags. `CholHaMoedDay` and `ChanukahDay` are still exported fields; set them
 after constructing the event.
 
-There was no exported way to read the raw `Emoji` field apart from the field
-itself. `GetEmoji()` returns it when it is set, and the flag-based default
-otherwise, as it always did.
+`Emoji()` returns the emoji the event was built with when there is one, and
+the flag-based default otherwise, as `GetEmoji()` always did. The raw field
+is no longer readable.
 
 ### `event.UserEvent`
 
@@ -127,16 +172,34 @@ ev := event.NewUserEvent(hd, "Birthday")
 ### `Date` on the other event types
 
 `MoladEvent.Date`, `MevarchimChodeshEvent.Date` and `omer.OmerEvent.Date` are
-now read with `GetDate()`. Their other fields (`Molad`, `MonthName`,
+now the method `Date()`. Their other fields (`Molad`, `MonthName`,
 `CountryCode`, `OmerDay`, ...) are unchanged. Build them with `NewMoladEvent`,
 `NewMevarchimChodeshEvent` and `omer.NewOmerEvent`.
 
-### `hebcal.YizkorEvent`
+`omer.OmerEvent.GetWeeks()` is now `Weeks()`.
 
-`YizkorEvent.Date` is `GetDate()` and `YizkorEvent.LinkedEvent` is the method
-`LinkedEvent()`.
+### Constructors return concrete types
 
-## 4. Timed events: `event.Timed`, `event.Linked`, `TimedKind`
+| Function | Returned before | Returns now |
+|---|---|---|
+| `event.NewParshaEvent` | `event.CalEvent` | `event.ParshaEvent` |
+| `event.NewHebrewDateEvent` | `event.CalEvent` | `event.HebrewDateEvent` |
+| `event.NewMoladEvent` | `event.CalEvent` | `event.MoladEvent` |
+
+`ParshaEvent` and `HebrewDateEvent` are newly exported, so you can assert them
+and read `ParshaEvent.Parsha` and `ParshaEvent.IL`:
+
+```go
+if pe, ok := ev.(event.ParshaEvent); ok {
+    fmt.Println(pe.Parsha.Name, pe.IL)
+}
+```
+
+Code that assigned the result to a `CalEvent` variable still compiles. Code
+that declared a variable with `:=` and later assigned a different event type
+to it needs an explicit `event.CalEvent` type.
+
+## 5. Timed events: `event.Timed`, `event.Linked`, `TimedKind`
 
 `hebcal.TimedEvent` no longer embeds `event.HolidayEvent`, and
 `hebcal.KiddushLevanaEvent` no longer embeds `TimedEvent`. Both are found
@@ -171,6 +234,8 @@ if te, ok := ev.(event.Timed); ok {
 }
 ```
 
+`hebcal.AsTimedEvent` is removed.
+
 If your code asserted `hebcal.TimedEvent` and you generate Kiddush Levana
 events (`CalOptions.KiddushLevanaMaharil`), switching to `event.Timed` makes
 that event take your timed path for the first time. That is usually the fix
@@ -183,14 +248,15 @@ you want, but check it.
 | `te.EventTime` | `te.Time()` |
 | `te.LinkedEvent` | `te.LinkedEvent()` (may return nil) |
 | `te.Desc` | `te.Desc()` |
-| `te.Date` | `te.GetDate()` |
-| `te.Flags` | `te.GetFlags()` |
-| `te.Emoji` | `te.GetEmoji()` |
+| `te.Date` | `te.Date()` |
+| `te.Flags` | `te.Flags()` |
+| `te.Emoji` | `te.Emoji()` |
 | `te.ChanukahDay` | unchanged |
 | `te.CholHaMoedDay` | removed; it was always 0 |
 
 `KiddushLevanaEvent` has the same methods, plus its `Molad` and `AdjustedTo`
-fields as before.
+fields as before. `YizkorEvent.Date` and `YizkorEvent.LinkedEvent` are the
+methods `Date()` and `LinkedEvent()`.
 
 ### Linked events
 
@@ -224,6 +290,9 @@ zmanim of `CalOptions.DailyZmanim`) and the zero value `TimedOther`.
 `hebcal.TimedKindOf(ev)` reads it from any `CalEvent` and reports false for an
 event that is not timed.
 
+Do not confuse the kinds with the flags of the same name: `hebcal.KiddushLevana`
+is a `TimedKind`, `event.KiddushLevana` is a flag.
+
 `Desc()` is unchanged and remains the translation key and the stable
 identifier. Comparing it still works; the kind is simply the safer thing to
 switch on.
@@ -231,15 +300,15 @@ switch on.
 One case to know about: Chanukah candle-lighting has the kind
 `ChanukahCandles` and the holiday's description ("Chanukah: 3 Candles"). With
 `NoHolidays` set, the Friday and Saturday candle-lighting during Chanukah is
-an ordinary `CandleLighting` whose flags include `CHANUKAH_CANDLES`. That is
-how it behaved before too.
+an ordinary `CandleLighting` whose flags include `event.ChanukahCandles`. That
+is how it behaved before too.
 
 ### `NewTimedEvent`
 
 The signature is unchanged. Its `*CalOptions` argument now only chooses the
 clock format; the event does not keep the pointer. It may be nil.
 
-## 5. Clock format
+## 6. Clock format
 
 Three overlapping settings became one type, `event.ClockFormat`, with the
 values `event.ClockAuto` (follow the country, the zero value), `event.Clock12`
@@ -275,7 +344,7 @@ func clockFormat(hour12 *bool) event.ClockFormat {
 `hebcal.ReformatTimeStr(timeStr, suffix, opts)` keeps its signature and reads
 `opts.Clock`.
 
-## 6. `HebrewCalendar` no longer modifies your options
+## 7. `HebrewCalendar` no longer modifies your options
 
 `HebrewCalendar(opts)` used to write its normalizations back into `*opts`, and
 every timed event kept a pointer to that struct. It now works on a private
@@ -313,32 +382,103 @@ fmt.Println(events[0].Render("en"))
 
 Set `opts.Clock` before calling `HebrewCalendar` instead.
 
-## 7. Constructors return concrete types
+## 8. Errors instead of panics
 
-| Function | Returned before | Returns now |
-|---|---|---|
-| `event.NewParshaEvent` | `event.CalEvent` | `event.ParshaEvent` |
-| `event.NewHebrewDateEvent` | `event.CalEvent` | `event.HebrewDateEvent` |
-| `event.NewMoladEvent` | `event.CalEvent` | `event.MoladEvent` |
+### `zmanim.New` and `zmanim.NewLocation`
 
-`ParshaEvent` and `HebrewDateEvent` are newly exported, so you can assert them
-and read `ParshaEvent.Parsha` and `ParshaEvent.IL`:
+Both used to panic on a coordinate out of range, and `New` on an unknown time
+zone. Both now return an error:
 
 ```go
-if pe, ok := ev.(event.ParshaEvent); ok {
-    fmt.Println(pe.Parsha.Name, pe.IL)
+// Before
+loc := zmanim.NewLocation("Home", "US", lat, long, 0, tzid)   // might panic
+z := zmanim.New(&loc, date)                                   // might panic
+
+// After
+loc, err := zmanim.NewLocation("Home", "US", lat, long, 0, tzid)
+if err != nil {
+    return err
+}
+z, err := zmanim.New(&loc, date)
+if err != nil {
+    return err
 }
 ```
 
-Code that assigned the result to a `CalEvent` variable still compiles. Code
-that declared a slice or variable with `:=` and later assigned a different
-event type to it needs an explicit `event.CalEvent` type.
+The errors are `zmanim.ErrLatitude`, `zmanim.ErrLongitude` and (from `New`,
+wrapped with the identifier) `zmanim.ErrTimeZone`; test with `errors.Is`.
 
-## 8. If you implement `event.CalEvent` yourself
+If the location is known to be good (a `zmanim.LookupCity` result, a constant
+in a test), `zmanim.MustNewLocation` and `zmanim.MustNew` keep the old
+one-value form and panic on failure.
 
-Add the two new methods to each of your event types:
+### `HebrewCalendar`
+
+`HebrewCalendar` checks the location before generating anything, when the
+calendar needs times from it, and returns the zmanim error. An unusable
+location used to panic part-way through.
+
+Its own option errors are now exported values, so you can test for them
+instead of comparing message text. The messages themselves are unchanged.
+
+| Error | When | Also matches |
+|---|---|---|
+| `ErrCandleLightingLocation` | `CandleLighting` without `Location` | `ErrLocationRequired` |
+| `ErrKiddushLevanaLocation` | `KiddushLevanaMaharil` without `Location` | `ErrLocationRequired` |
+| `ErrSunriseSunsetLocation` | `SunriseSunset` without `Location` | `ErrLocationRequired` |
+| `ErrDailyZmanimLocation` | `DailyZmanim` without `Location` | `ErrLocationRequired` |
+| `ErrHavdalahMinsAndDeg` | both Havdalah offsets set | `ErrMutuallyExclusive` |
+| `ErrFastStartMinsAndDeg` | both fast-start offsets set | `ErrMutuallyExclusive` |
+| `ErrFastEndMinsAndDeg` | both fast-end offsets set | `ErrMutuallyExclusive` |
+| `ErrTishaBavEndMinsAndDeg` | both Tish'a B'Av offsets set | `ErrMutuallyExclusive` |
+| `ErrStartRequiresEnd` | only one of `Start` and `End` set | |
+| `ErrInvalidHebrewYear` | `IsHebrewYear` with `Year` below 1 | |
 
 ```go
+_, err := hebcal.HebrewCalendar(&opts)
+if errors.Is(err, hebcal.ErrLocationRequired) {
+    // ask the user for a location
+}
+```
+
+`hebcal.IsAssurBemelacha` (see below) also returns an error for an unusable
+location instead of panicking.
+
+## 9. Other renames
+
+| Before | After | Notes |
+|---|---|---|
+| `zmanim.Location.TimeZoneId` | `TimeZoneID` | field rename; also in struct literals |
+| `hebcal.IsAssurBemlacha` | `hebcal.IsAssurBemelacha` | spelling |
+| `hebcal.UserEvent` | `hebcal.UserEventSpec` | the *input* in `CalOptions.UserEvents`; `event.UserEvent` is the event it produces. The `UserEvents` field keeps its name. |
+| `hebcal.TimeOfDay(ev) int` | `hebcal.DayPartOf(ev) hebcal.DayPart` | typed result |
+| `hebcal.TimeOfDayDawn` ... `TimeOfDayNight` | `hebcal.DayPartDawn` ... `DayPartNight` | same values, same order |
+| `dailylearning.GetCalendars()` | `dailylearning.Calendars()` | |
+| `dailylearning.GetStartDate(name)` | `dailylearning.StartDate(name)` | |
+| `dailylearning.AddCalendar(name, fn, startDate)` | `dailylearning.AddCalendarFrom(name, fn, startDate)` | see section 10 |
+
+If you stored a `TimeOfDay` result in an `int` field or variable, change its
+type to `hebcal.DayPart` (or convert with `int(...)`). A sentinel such as `-1`
+for "before everything" still works as an untyped constant.
+
+`zmanim.AllCities()` now returns a copy of the built-in list. If you relied on
+changing the list in place to change what `LookupCity` returns, that no longer
+works.
+
+`hebcal.GetHolidaysForYear` and `hebcal.GetHolidaysOnDate` keep their names.
+
+## 10. If you implement `event.CalEvent` or register a schedule
+
+### Event types
+
+Rename your four getters and add the two new methods:
+
+```go
+func (ev myEvent) Date() hdate.HDate    { return ev.date }   // was GetDate
+func (ev myEvent) Flags() event.Flags   { return event.DailyLearning } // was GetFlags
+func (ev myEvent) Emoji() string        { return "" }        // was GetEmoji
+func (ev myEvent) Categories() []string { return []string{"mySchedule"} } // was GetCategories
+
 // Desc returns the untranslated description. If you had no GetDesc method,
 // return what Basename returns: that is what event.Desc(ev) gave callers.
 func (ev myEvent) Desc() string { return ev.Basename() }
@@ -347,36 +487,113 @@ func (ev myEvent) Desc() string { return ev.Basename() }
 func (ev myEvent) URL() string { return "" }
 ```
 
+If your struct has a field named `Date`, `Flags`, `Emoji` or `Categories`,
+rename the field (for example to `date`): it now collides with the method.
+
 If your type had a `GetDesc()` method, rename it to `Desc()`. If it embeds
-`event.HolidayEvent` to inherit methods, it keeps compiling, but note that it
-inherits `Desc()` and `URL()` too, and the URL will be a hebcal.com holiday
-page built from your description. Override `URL()` if that is not what you
-want. We stopped embedding event types inside this module for that reason.
+`event.HolidayEvent` to inherit methods, note that it inherits `Desc()` and
+`URL()` too, and the URL will be a hebcal.com holiday page built from your
+description. Override `URL()` if that is not what you want. We stopped
+embedding event types inside this module for that reason.
+
+### Registering a schedule
+
+`AddCalendar` no longer takes an optional start date:
+
+```go
+// Before
+dailylearning.AddCalendar("mySchedule", fn)
+dailylearning.AddCalendar("mySchedule", fn, startDate)
+
+// After
+dailylearning.AddCalendar("mySchedule", fn)
+dailylearning.AddCalendarFrom("mySchedule", fn, startDate)
+```
+
+The registry is now safe to use from several goroutines, including
+registering while calendars are being generated.
 
 `github.com/hebcal/learning` has been updated; use a release of it made for
 hebcal-go v0.50.0 or later.
 
-## 9. Deprecated, still present
+## 11. Doing the renames mechanically
 
-These still work in v0.50.0 and will be removed in a later release:
+`gofmt -r` can do the method and constant renames. Run these from the root of
+your module, with a clean working tree, and review the diff. They rewrite
+every identifier of that name, so check that you have no unrelated methods
+called `GetDate`, `GetFlags`, `GetEmoji` or `GetCategories` (protobuf-generated
+getters are a common example; exclude those files or revert them).
 
-| Deprecated | Use instead |
-|---|---|
-| `event.Desc(ev)` | `ev.Desc()` |
-| `event.URL(ev)` | `ev.URL()` |
-| `event.Descer` | `event.CalEvent` (note: its method is now `Desc()`, not `GetDesc()`) |
-| `event.URLer` | `event.CalEvent` |
-| `hebcal.AsTimedEvent(ev)` | `ev.(event.Timed)` |
+```bash
+gofmt -l -w -r 'a.GetDate() -> a.Date()' .
+```
 
-## 10. Quick reference
+```bash
+gofmt -l -w -r 'a.GetFlags() -> a.Flags()' .
+```
+
+```bash
+gofmt -l -w -r 'a.GetEmoji() -> a.Emoji()' .
+```
+
+```bash
+gofmt -l -w -r 'a.GetCategories() -> a.Categories()' .
+```
+
+```bash
+gofmt -l -w -r 'event.Desc(a) -> a.Desc()' .
+```
+
+```bash
+gofmt -l -w -r 'event.URL(a) -> a.URL()' .
+```
+
+```bash
+gofmt -l -w -r 'event.HolidayFlags -> event.Flags' .
+```
+
+The flag constants, one command for all of them:
+
+```bash
+for pair in CHAG:Chag LIGHT_CANDLES:LightCandles YOM_TOV_ENDS:YomTovEnds \
+  CHUL_ONLY:ChulOnly IL_ONLY:ILOnly LIGHT_CANDLES_TZEIS:LightCandlesTzeis \
+  CHANUKAH_CANDLES:ChanukahCandles ROSH_CHODESH:RoshChodesh MINOR_FAST:MinorFast \
+  SPECIAL_SHABBAT:SpecialShabbat PARSHA_HASHAVUA:ParshaHashavua DAF_YOMI:DafYomi \
+  OMER_COUNT:OmerCount MODERN_HOLIDAY:ModernHoliday MAJOR_FAST:MajorFast \
+  SHABBAT_MEVARCHIM:ShabbatMevarchim MOLAD:Molad USER_EVENT:User \
+  HEBREW_DATE:HebrewDate MINOR_HOLIDAY:MinorHoliday EREV:Erev \
+  CHOL_HAMOED:CholHamoed MISHNA_YOMI:MishnaYomi YOM_KIPPUR_KATAN:YomKippurKatan \
+  ZMANIM:Zmanim YERUSHALMI_YOMI:YerushalmiYomi NACH_YOMI:NachYomi \
+  DAILY_LEARNING:DailyLearning BEHAB:BeHaB KIDDUSH_LEVANA:KiddushLevana YIZKOR:Yizkor
+do
+  gofmt -l -w -r "event.${pair%%:*} -> event.${pair##*:}" .
+done
+```
+
+`gofmt -r` only rewrites expressions. It does not touch method declarations
+(`func (ev myEvent) GetDate()`), struct literals with removed fields, or
+comments; the compiler will point at the first two.
+
+Then fix what remains by following the compiler: field reads that became
+methods (sections 4 and 5), `zmanim.New` and `NewLocation` now returning two
+values (section 8), and the `Hour12`/`Hour24` options (section 6). Finish with
+`go vet ./...` and the search in section 1.
+
+## 12. Quick reference
 
 | Before | After |
 |---|---|
+| `ev.GetDate()`, `ev.GetFlags()`, `ev.GetEmoji()`, `ev.GetCategories()` | `ev.Date()`, `ev.Flags()`, `ev.Emoji()`, `ev.Categories()` |
 | `event.Desc(ev)` / `event.URL(ev)` | `ev.Desc()` / `ev.URL()` |
 | `x.GetDesc()` | `x.Desc()` |
+| `event.Descer`, `event.URLer` | removed; use `event.CalEvent` |
+| `event.HolidayFlags` | `event.Flags` |
+| `event.CHAG`, `event.LIGHT_CANDLES`, ... | `event.Chag`, `event.LightCandles`, ... (table in section 3) |
+| `event.USER_EVENT` | `event.User` |
 | `event.HolidayEvent{Date: d, Desc: s, Flags: f, Emoji: e}` | `event.NewHolidayEvent(d, s, f, e)` |
 | `event.UserEvent{Date: d, Desc: s}` | `event.NewUserEvent(d, s)` |
-| `he.Date`, `he.Desc`, `he.Flags`, `he.Emoji` | `he.GetDate()`, `he.Desc()`, `he.GetFlags()`, `he.GetEmoji()` |
+| `he.Date`, `he.Desc`, `he.Flags`, `he.Emoji` | `he.Date()`, `he.Desc()`, `he.Flags()`, `he.Emoji()` |
+| `omerEv.GetWeeks()` | `omerEv.Weeks()` |
 | `ev.(hebcal.TimedEvent)`, `hebcal.AsTimedEvent(ev)` | `ev.(event.Timed)` |
 | `te.EventTime` | `te.Time()` |
 | `te.LinkedEvent`, `yizkor.LinkedEvent` | `ev.(event.Linked)`, then `.LinkedEvent()` |
@@ -385,3 +602,12 @@ These still work in v0.50.0 and will be removed in a later release:
 | `*bool` hour12 arguments and fields | `event.ClockFormat` |
 | `event.NewMoladEventHour12(...)` | `event.NewMoladEvent(..., clock)` |
 | reading `opts.IL`, `opts.Mask`, ... after `HebrewCalendar` | no longer written; compute them yourself |
+| `zmanim.NewLocation(...)` (one result) | `loc, err := zmanim.NewLocation(...)` or `zmanim.MustNewLocation(...)` |
+| `zmanim.New(loc, date)` (one result) | `z, err := zmanim.New(loc, date)` or `zmanim.MustNew(loc, date)` |
+| comparing `err.Error()` from `HebrewCalendar` | `errors.Is(err, hebcal.ErrLocationRequired)` and the others in section 8 |
+| `loc.TimeZoneId` | `loc.TimeZoneID` |
+| `hebcal.IsAssurBemlacha` | `hebcal.IsAssurBemelacha` |
+| `hebcal.UserEvent` | `hebcal.UserEventSpec` |
+| `hebcal.TimeOfDay(ev)`, `hebcal.TimeOfDayDawn` ... | `hebcal.DayPartOf(ev)`, `hebcal.DayPartDawn` ... |
+| `dailylearning.GetCalendars()` / `GetStartDate(n)` | `dailylearning.Calendars()` / `StartDate(n)` |
+| `dailylearning.AddCalendar(n, fn, start)` | `dailylearning.AddCalendarFrom(n, fn, start)` |
