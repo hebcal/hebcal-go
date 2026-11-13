@@ -1,7 +1,11 @@
 // Hebcal's event package provides an interface for calendar events.
 package event
 
-import "github.com/hebcal/hdate"
+import (
+	"time"
+
+	"github.com/hebcal/hdate"
+)
 
 // Hebcal - A Jewish Calendar Generator
 // Copyright (c) 2022 Michael J. Radwin
@@ -35,6 +39,25 @@ type CalEvent interface {
 	// event, e.g. ["holiday", "major", "fast"] or ["roshchodesh"]. The first
 	// element is the primary category.
 	GetCategories() []string
+}
+
+// Timed is implemented by events that occur at a clock time:
+// candle-lighting, Havdalah, the start or end of a fast, the latest time
+// for Kiddush Levana. Assert it rather than a concrete type, so that every
+// timed event is found, whatever package defines it.
+type Timed interface {
+	CalEvent
+	// Time returns the time at which the event occurs, in the time zone of
+	// the calendar's location.
+	Time() time.Time
+}
+
+// Linked is implemented by events that belong to another event: the
+// candle-lighting of a holiday, the end of a fast, Yizkor on Yom Kippur.
+type Linked interface {
+	// LinkedEvent returns the event this one belongs to, or nil if it has
+	// none.
+	LinkedEvent() CalEvent
 }
 
 // BriefRenderer is implemented by events that have a shorter description than

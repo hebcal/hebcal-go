@@ -30,8 +30,8 @@ func kiddushLevanaMonth(t *testing.T, loc *zmanim.Location, hyear int, hmonth hd
 }
 
 func klSummary(ev KiddushLevanaEvent) string {
-	return ev.Date.String() + " | " + ev.Date.Gregorian().Format("Mon Jan 02 2006") +
-		" | " + ev.EventTime.Format("15:04")
+	return ev.GetDate().String() + " | " + ev.GetDate().Gregorian().Format("Mon Jan 02 2006") +
+		" | " + ev.Time().Format("15:04")
 }
 
 func TestKiddushLevana(t *testing.T) {
@@ -82,8 +82,8 @@ func TestKiddushLevanaMatchesCandleLighting(t *testing.T) {
 	newYork := zmanim.LookupCity("New York")
 	ev := kiddushLevanaMonth(t, newYork, 5787, hdate.Tishrei)
 	opts := CalOptions{
-		Start:          ev.Date,
-		End:            ev.Date,
+		Start:          ev.GetDate(),
+		End:            ev.GetDate(),
 		Location:       newYork,
 		CandleLighting: true,
 		NoHolidays:     true,
@@ -92,8 +92,8 @@ func TestKiddushLevanaMatchesCandleLighting(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, events, 1)
 	candles := events[0].(TimedEvent)
-	assert.Equal(t, "Candle lighting", candles.Desc)
-	assert.Equal(t, candles.EventTime, ev.EventTime)
+	assert.Equal(t, "Candle lighting", candles.Desc())
+	assert.Equal(t, candles.Time(), ev.Time())
 }
 
 func TestKiddushLevanaMemo(t *testing.T) {
@@ -165,7 +165,7 @@ func TestKiddushLevanaMask(t *testing.T) {
 	events, err := HebrewCalendar(&opts)
 	require.NoError(t, err)
 	require.Len(t, events, 1)
-	assert.Equal(t, "21:44", events[0].(KiddushLevanaEvent).EventTime.Format("15:04"))
+	assert.Equal(t, "21:44", events[0].(KiddushLevanaEvent).Time().Format("15:04"))
 }
 
 func TestKiddushLevanaRequiresLocation(t *testing.T) {
@@ -197,7 +197,7 @@ func TestKiddushLevanaIgnoresCandleOnlyOptions(t *testing.T) {
 	}))
 	require.NoError(t, err)
 	require.Len(t, events, 1)
-	assert.Equal(t, "21:44", events[0].(KiddushLevanaEvent).EventTime.Format("15:04"))
+	assert.Equal(t, "21:44", events[0].(KiddushLevanaEvent).Time().Format("15:04"))
 	_, err = HebrewCalendar(conflicting(CalOptions{
 		Year:                 5787,
 		IsHebrewYear:         true,

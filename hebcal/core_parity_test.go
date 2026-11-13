@@ -40,17 +40,17 @@ func TestTimedEventEmoji(t *testing.T) {
 		if !ok {
 			continue
 		}
-		dow := te.Date.Weekday()
-		switch te.Desc {
+		dow := te.GetDate().Weekday()
+		switch te.Desc() {
 		case "Candle lighting":
 			candles++
-			assert.Equal(t, "🕯️", ev.GetEmoji(), te.Date.String())
+			assert.Equal(t, "🕯️", ev.GetEmoji(), te.GetDate().String())
 			if dow != time.Friday {
 				erevYomTov++
 			}
 		case "Havdalah":
 			havdalah++
-			assert.Equal(t, "✨", ev.GetEmoji(), te.Date.String())
+			assert.Equal(t, "✨", ev.GetEmoji(), te.GetDate().String())
 			if dow != time.Saturday {
 				yomTovHavdalah++
 			}
@@ -87,7 +87,7 @@ func TestCandleLightingMemo(t *testing.T) {
 	memos := func(events []event.CalEvent, locale string) []string {
 		var out []string
 		for _, ev := range events {
-			if te, ok := ev.(hebcal.TimedEvent); ok && te.Desc == "Candle lighting" {
+			if te, ok := ev.(hebcal.TimedEvent); ok && te.Desc() == "Candle lighting" {
 				out = append(out, event.Memo(ev, locale))
 			}
 		}

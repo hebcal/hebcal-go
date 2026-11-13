@@ -29,7 +29,7 @@ func TestYizkor(t *testing.T) {
 			assert.Equal(t, "יִזְכּוֹר", y.Render("he"))
 			assert.Equal(t, event.YIZKOR, y.GetFlags())
 			assert.Equal(t, []string{"yizkor"}, y.GetCategories())
-			got = append(got, y.LinkedEvent.(event.HolidayEvent).Desc)
+			got = append(got, y.LinkedEvent().(event.HolidayEvent).Desc)
 		}
 		assert.Equal(t, tc.want, got, "il=%v", tc.il)
 	}

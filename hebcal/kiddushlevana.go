@@ -76,8 +76,12 @@ func (a KiddushLevanaAdjustment) String() string {
 //
 // Memo lists the unadjusted earliest (3 and 7 days after the molad) and
 // latest (Maharil and 15 days after the molad) times.
+// It satisfies event.Timed.
 type KiddushLevanaEvent struct {
-	TimedEvent
+	// timed carries the date, time and clock format. It is a field rather
+	// than an embedded TimedEvent so that every method of this type is
+	// written out below.
+	timed TimedEvent
 	// The molad of the month this event belongs to
 	Molad molad.Molad
 	// Why the event time was moved earlier than the Maharil's time,
@@ -85,6 +89,48 @@ type KiddushLevanaEvent struct {
 	// rounding down to the minute).
 	AdjustedTo KiddushLevanaAdjustment
 }
+
+var (
+	_ event.Timed         = KiddushLevanaEvent{}
+	_ event.Memoer        = KiddushLevanaEvent{}
+	_ event.BriefRenderer = KiddushLevanaEvent{}
+)
+
+// GetDate returns the Hebrew date of the event, which is earlier than the
+// date of the Maharil's time when that falls on Shabbat or a Yom Tov.
+func (ev KiddushLevanaEvent) GetDate() hdate.HDate { return ev.timed.date }
+
+// Time returns the latest time, adjusted as the type's documentation
+// describes, in the time zone of the calendar's location.
+func (ev KiddushLevanaEvent) Time() time.Time { return ev.timed.eventTime }
+
+// Kind returns KiddushLevana.
+func (ev KiddushLevanaEvent) Kind() TimedKind { return KiddushLevana }
+
+// Desc returns the untranslated description, "Latest Kiddush Levana".
+func (ev KiddushLevanaEvent) Desc() string { return latestKiddushLevana }
+
+// GetDesc returns the same as Desc.
+func (ev KiddushLevanaEvent) GetDesc() string { return latestKiddushLevana }
+
+// Basename returns the untranslated description, "Latest Kiddush Levana".
+func (ev KiddushLevanaEvent) Basename() string { return latestKiddushLevana }
+
+// Render returns the translated description and the time, e.g. "Latest
+// Kiddush Levana: 9:44pm".
+func (ev KiddushLevanaEvent) Render(locale string) string { return ev.timed.Render(locale) }
+
+// RenderBrief returns the translated description without its time.
+func (ev KiddushLevanaEvent) RenderBrief(locale string) string { return ev.timed.RenderBrief(locale) }
+
+// GetFlags returns event.KIDDUSH_LEVANA.
+func (ev KiddushLevanaEvent) GetFlags() event.HolidayFlags { return event.KIDDUSH_LEVANA }
+
+// GetEmoji returns a waxing gibbous moon.
+func (ev KiddushLevanaEvent) GetEmoji() string { return "🌔" }
+
+// URL returns "": the event has no page on hebcal.com.
+func (ev KiddushLevanaEvent) URL() string { return "" }
 
 // GetCategories returns ["zmanim", "kiddushLevana"].
 func (ev KiddushLevanaEvent) GetCategories() []string {
@@ -96,7 +142,7 @@ func (ev KiddushLevanaEvent) GetCategories() []string {
 // "Earliest Kiddush Levana (3 days): Mon, Sep 14, 2026, 2:39pm".
 // Earliest times are rounded up to the minute and latest times down.
 func (ev KiddushLevanaEvent) Memo(locale string) string {
-	tz := ev.EventTime.Location()
+	tz := ev.timed.eventTime.Location()
 	times := []struct {
 		label string
 		t     time.Time
@@ -110,7 +156,7 @@ func (ev KiddushLevanaEvent) Memo(locale string) string {
 	for i, zman := range times {
 		label, _ := locales.LookupTranslation(zman.label, locale)
 		t := zman.t.In(tz)
-		timeStr := ev.clock.formatTime(t)
+		timeStr := ev.timed.clock.formatTime(t)
 		lines[i] = label + ": " + t.Format("Mon, Jan 2, 2006") + ", " + timeStr
 	}
 	return strings.Join(lines, "\n")
@@ -138,9 +184,9 @@ func isShabbatOrChag(hd hdate.HDate, il bool) bool {
 }
 
 func newKiddushLevanaEvent(hd hdate.HDate, t time.Time, m molad.Molad, opts *calConfig, adjustedTo KiddushLevanaAdjustment) KiddushLevanaEvent {
-	timedEv := newTimedEvent(hd, latestKiddushLevana, event.KIDDUSH_LEVANA, t, 0, nil, opts.clock)
-	timedEv.Emoji = "🌔"
-	return KiddushLevanaEvent{TimedEvent: timedEv, Molad: m, AdjustedTo: adjustedTo}
+	timedEv := newTimedEvent(hd, KiddushLevana, latestKiddushLevana, event.KIDDUSH_LEVANA, t, 0, nil, opts.clock)
+	timedEv.emoji = "🌔"
+	return KiddushLevanaEvent{timed: timedEv, Molad: m, AdjustedTo: adjustedTo}
 }
 
 // makeKiddushLevanaEvent makes the "Latest Kiddush Levana" event for one

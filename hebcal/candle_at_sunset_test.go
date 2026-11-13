@@ -25,11 +25,11 @@ func candleTimes(t *testing.T, opts CalOptions, start, end string) string {
 	var out []string
 	for _, ev := range events {
 		te, ok := ev.(TimedEvent)
-		if !ok || strings.HasPrefix(te.Desc, "Fast ") || strings.Contains(te.Desc, "Chametz") ||
-			te.Desc == "Finish eating chametz" {
+		if !ok || strings.HasPrefix(te.Desc(), "Fast ") || strings.Contains(te.Desc(), "Chametz") ||
+			te.Desc() == "Finish eating chametz" {
 			continue
 		}
-		out = append(out, te.EventTime.Format("01-02 15:04 ")+te.Desc)
+		out = append(out, te.Time().Format("01-02 15:04 ")+te.Desc())
 	}
 	return strings.Join(out, ",")
 }

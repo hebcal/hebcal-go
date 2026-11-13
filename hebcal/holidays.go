@@ -311,14 +311,14 @@ func untimedTimeOfDay(f event.HolidayFlags, desc string) int {
 }
 
 // timedTimeOfDay ranks an event that occurs at clock time t.
-func timedTimeOfDay(f event.HolidayFlags, desc string, t time.Time) int {
+func timedTimeOfDay(f event.HolidayFlags, kind TimedKind, t time.Time) int {
 	switch {
 	case f.Has(event.CHANUKAH_CANDLES):
 		// Chanukah candle-lighting sits with the evening holidays
 		return TimeOfDayEvening
-	case desc == "Finish eating chametz" || desc == "Biur Chametz":
+	case kind == FinishChametz || kind == BiurChametz:
 		return TimeOfDayMidday
-	case desc == "Fast begins" || f.Has(event.KIDDUSH_LEVANA):
+	case kind == FastBegins || kind == KiddushLevana:
 		// A minor fast begins at dawn, but Tish'a B'Av at sunset the day
 		// before. Latest Kiddush Levana is either before dawn or after
 		// nightfall.
@@ -350,9 +350,9 @@ func timedTimeOfDay(f event.HolidayFlags, desc string, t time.Time) int {
 func TimeOfDay(ev event.CalEvent) int {
 	switch e := ev.(type) {
 	case TimedEvent:
-		return timedTimeOfDay(e.Flags, e.Desc, e.EventTime)
+		return timedTimeOfDay(e.flags, e.kind, e.eventTime)
 	case KiddushLevanaEvent:
-		return timedTimeOfDay(e.Flags, e.Desc, e.EventTime)
+		return timedTimeOfDay(e.GetFlags(), KiddushLevana, e.Time())
 	case event.HolidayEvent:
 		return holidayTimeOfDay(e)
 	case riseSetEvent:

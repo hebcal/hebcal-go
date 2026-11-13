@@ -35,14 +35,14 @@ func TestCandleParshaLink(t *testing.T) {
 	var found bool
 	for _, ev := range shabbatWeekEvents(t) {
 		te, ok := ev.(TimedEvent)
-		if !ok || te.Desc != "Candle lighting" {
+		if !ok || te.Desc() != "Candle lighting" {
 			continue
 		}
 		found = true
-		if te.LinkedEvent == nil {
+		if te.LinkedEvent() == nil {
 			t.Fatal("Candle lighting has no LinkedEvent")
 		}
-		if got := te.LinkedEvent.Render("en"); got != "Parashat Sh’lach" {
+		if got := te.LinkedEvent().Render("en"); got != "Parashat Sh’lach" {
 			t.Errorf("candle LinkedEvent.Render = %q, want Parashat Sh’lach", got)
 		}
 	}

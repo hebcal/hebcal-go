@@ -22,10 +22,10 @@ func fastTimes(t *testing.T, city string, opts CalOptions) string {
 	var out []string
 	for _, ev := range events {
 		te, ok := ev.(TimedEvent)
-		if !ok || !strings.HasPrefix(te.Desc, "Fast ") {
+		if !ok || !strings.HasPrefix(te.Desc(), "Fast ") {
 			continue
 		}
-		out = append(out, te.EventTime.Format("01-02 ")+strings.TrimPrefix(te.Desc, "Fast ")+te.EventTime.Format(" 15:04"))
+		out = append(out, te.Time().Format("01-02 ")+strings.TrimPrefix(te.Desc(), "Fast ")+te.Time().Format(" 15:04"))
 	}
 	return strings.Join(out, ",")
 }

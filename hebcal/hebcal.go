@@ -278,7 +278,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 			// @hebcal/core), so consumers can render "Parashat X" as its memo.
 			if dow == time.Friday && opts.Sedrot && (candlesEv != TimedEvent{}) {
 				if parsha := sedraYear.LookupByRD(abs); !parsha.Chag {
-					candlesEv.LinkedEvent = event.NewParshaEvent(hd.OnOrAfter(time.Saturday), parsha, il)
+					candlesEv.linked = event.NewParshaEvent(hd.OnOrAfter(time.Saturday), parsha, il)
 				} else {
 					candlesEv.chagReading = parsha.Name[0]
 				}
@@ -288,7 +288,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 		// havdalahMins===0 (which drops any HavdalahEvent). Candle-lighting on
 		// Fridays and yom-tov evenings is unaffected; only the "Havdalah"-titled
 		// events (Saturday night and the end of yom tov) are dropped.
-		if opts.SuppressHavdalah && candlesEv.Desc == "Havdalah" {
+		if opts.SuppressHavdalah && candlesEv.kind == Havdalah {
 			candlesEv = TimedEvent{}
 		}
 		if (candlesEv != TimedEvent{}) {
@@ -302,7 +302,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 				klMonthKey = monthKey
 				klEv, klOk = makeKiddushLevanaEvent(hyear, hd.Month(), opts)
 			}
-			if klOk && klEv.Date == hd {
+			if klOk && klEv.GetDate() == hd {
 				events = append(events, klEv)
 			}
 		}
@@ -698,8 +698,8 @@ func makeMevarchimEvent(ev event.HolidayEvent, opts *calConfig) event.MevarchimC
 
 // eventTime returns the time of a timed event, or false for other events.
 func eventTime(ev event.CalEvent) (time.Time, bool) {
-	if e, ok := AsTimedEvent(ev); ok {
-		return e.EventTime, true
+	if e, ok := ev.(event.Timed); ok {
+		return e.Time(), true
 	}
 	return time.Time{}, false
 }

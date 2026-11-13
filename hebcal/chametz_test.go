@@ -86,8 +86,8 @@ func TestChametzNotLinked(t *testing.T) {
 	n := 0
 	for _, ev := range events {
 		if te, ok := ev.(hebcal.TimedEvent); ok &&
-			(te.Desc == "Finish eating chametz" || te.Desc == "Biur Chametz") {
-			assert.Nil(t, te.LinkedEvent, te.Desc)
+			(te.Desc() == "Finish eating chametz" || te.Desc() == "Biur Chametz") {
+			assert.Nil(t, te.LinkedEvent(), te.Desc())
 			n++
 		}
 	}

@@ -166,7 +166,7 @@ func TestHebrewCalendarSuppressHavdalah(t *testing.T) {
 
 	isHavdalah := func(ev event.CalEvent) bool {
 		te, ok := ev.(hebcal.TimedEvent)
-		return ok && te.Desc == "Havdalah"
+		return ok && te.Desc() == "Havdalah"
 	}
 	// Suppressing must remove at least one Havdalah, and leave no Havdalah behind.
 	var removed int

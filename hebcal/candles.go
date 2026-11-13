@@ -18,6 +18,7 @@ package hebcal
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -28,77 +29,213 @@ import (
 	"github.com/hebcal/locales"
 )
 
-// TimedEvent is used for Candle-lighting, Havdalah, and fast start/end
+// TimedKind says what a TimedEvent is the time of. The untranslated
+// description (TimedEvent.Desc) remains the translation key and the stable
+// identifier; the kind is what code should switch on.
+type TimedKind int
+
+const (
+	// TimedOther is the zero TimedKind: a timed event of no particular kind.
+	TimedOther TimedKind = iota
+	// CandleLighting is candle-lighting before Shabbat or a holiday.
+	CandleLighting
+	// Havdalah is the end of Shabbat or a holiday.
+	Havdalah
+	// ChanukahCandles is the lighting of the Chanukah candles; the event's
+	// description is the holiday's ("Chanukah: 3 Candles").
+	ChanukahCandles
+	// FastBegins is the start of a fast.
+	FastBegins
+	// FastEnds is the end of a fast.
+	FastEnds
+	// FinishChametz is the latest time to eat chametz on Erev Pesach.
+	FinishChametz
+	// BiurChametz is the latest time to burn chametz before Pesach.
+	BiurChametz
+	// KiddushLevana is the latest time to recite Kiddush Levana.
+	KiddushLevana
+	// Zman is one of the daily halachic times of CalOptions.DailyZmanim.
+	Zman
+)
+
+var timedKindNames = [...]string{
+	TimedOther:      "TimedOther",
+	CandleLighting:  "CandleLighting",
+	Havdalah:        "Havdalah",
+	ChanukahCandles: "ChanukahCandles",
+	FastBegins:      "FastBegins",
+	FastEnds:        "FastEnds",
+	FinishChametz:   "FinishChametz",
+	BiurChametz:     "BiurChametz",
+	KiddushLevana:   "KiddushLevana",
+	Zman:            "Zman",
+}
+
+// String returns the name of the constant, e.g. "CandleLighting".
+func (k TimedKind) String() string {
+	if k < 0 || int(k) >= len(timedKindNames) {
+		return "TimedKind(" + strconv.Itoa(int(k)) + ")"
+	}
+	return timedKindNames[k]
+}
+
+// Untranslated descriptions of the timed events whose description follows
+// from their kind.
+const (
+	descCandleLighting = "Candle lighting"
+	descHavdalah       = "Havdalah"
+	descFastBegins     = "Fast begins"
+	descFastEnds       = "Fast ends"
+	descFinishChametz  = "Finish eating chametz"
+	descBiurChametz    = "Biur Chametz"
+)
+
+// timedKindOf is the kind of a timed event built from a description and
+// flags alone, as NewTimedEvent's callers do.
+func timedKindOf(desc string, flags event.HolidayFlags) TimedKind {
+	switch desc {
+	case descCandleLighting:
+		return CandleLighting
+	case descHavdalah:
+		return Havdalah
+	case descFastBegins:
+		return FastBegins
+	case descFastEnds:
+		return FastEnds
+	case descFinishChametz:
+		return FinishChametz
+	case descBiurChametz:
+		return BiurChametz
+	case latestKiddushLevana:
+		return KiddushLevana
+	}
+	switch {
+	case flags.Has(event.KIDDUSH_LEVANA):
+		return KiddushLevana
+	case flags == event.ZMANIM:
+		return Zman
+	}
+	return TimedOther
+}
+
+// TimedEvent is an event that occurs at a clock time: candle-lighting,
+// Havdalah, the start or end of a fast, Chanukah candle-lighting, the
+// deadlines for chametz on Erev Pesach, a daily zman. It satisfies
+// event.Timed and event.Linked.
 type TimedEvent struct {
-	event.HolidayEvent
-	EventTime    time.Time
-	LinkedEvent  event.CalEvent
+	date         hdate.HDate
+	desc         string
+	flags        event.HolidayFlags
+	emoji        string
+	kind         TimedKind
+	eventTime    time.Time
+	linked       event.CalEvent
 	sunsetOffset int
 	clock        clock
 	// chagReading is the untranslated name of the festival reading that
 	// displaces the weekly portion, for erev-Shabbat candle-lighting in a
 	// festival week (see Memo).
 	chagReading string
+	// ChanukahDay is the day of Chanukah (1-8) whose candles the event
+	// lights, or 0 for every other event.
+	ChanukahDay int
 }
 
-// AsTimedEvent returns the TimedEvent ev is or embeds: a TimedEvent itself,
-// or a KiddushLevanaEvent.
+var (
+	_ event.Timed         = TimedEvent{}
+	_ event.Linked        = TimedEvent{}
+	_ event.Memoer        = TimedEvent{}
+	_ event.BriefRenderer = TimedEvent{}
+)
+
+// AsTimedEvent returns ev as a TimedEvent: a TimedEvent itself, or the one
+// that carries a KiddushLevanaEvent's time.
+//
+// Deprecated: assert event.Timed instead, which TimedEvent and
+// KiddushLevanaEvent both satisfy; its Time method is the event's time.
 func AsTimedEvent(ev event.CalEvent) (TimedEvent, bool) {
-	if t, ok := ev.(interface{ timedEvent() TimedEvent }); ok {
-		return t.timedEvent(), true
+	switch e := ev.(type) {
+	case TimedEvent:
+		return e, true
+	case KiddushLevanaEvent:
+		return e.timed, true
 	}
 	return TimedEvent{}, false
 }
 
-func (ev TimedEvent) timedEvent() TimedEvent { return ev }
-
 // isChanukah reports whether ev is the candle-lighting of a night of
 // Chanukah, which stands for the holiday itself.
 func (ev TimedEvent) isChanukah() bool {
-	return ev.Flags.Has(event.CHANUKAH_CANDLES) && ev.LinkedEvent != nil
+	return ev.flags.Has(event.CHANUKAH_CANDLES) && ev.linked != nil
+}
+
+// Kind returns what the event is the time of.
+func (ev TimedEvent) Kind() TimedKind {
+	return ev.kind
+}
+
+// Time returns the time at which the event occurs, in the time zone of the
+// calendar's location.
+func (ev TimedEvent) Time() time.Time {
+	return ev.eventTime
+}
+
+// LinkedEvent returns the event this one belongs to, or nil if there is
+// none: the holiday whose candles are lit, whose end Havdalah marks or
+// whose fast begins or ends, or the parsha of the Shabbat that erev-Shabbat
+// candle-lighting begins.
+func (ev TimedEvent) LinkedEvent() event.CalEvent {
+	return ev.linked
 }
 
 // Memo returns, for erev-Shabbat candle-lighting, the coming Shabbat's Torah
 // portion ("Parashat Vayera"), or the festival reading that displaces it
 // ("Pesach I"). Other timed events have no memo of their own.
 func (ev TimedEvent) Memo(locale string) string {
-	if ev.Desc != "Candle lighting" {
+	if ev.kind != CandleLighting {
 		return ""
 	}
 	if ev.chagReading != "" {
 		s, _ := locales.LookupTranslation(ev.chagReading, locale)
 		return s
 	}
-	if ev.LinkedEvent != nil && ev.LinkedEvent.GetFlags() == event.PARSHA_HASHAVUA {
-		return ev.LinkedEvent.Render(locale)
+	if ev.linked != nil && ev.linked.GetFlags() == event.PARSHA_HASHAVUA {
+		return ev.linked.Render(locale)
 	}
 	return ""
 }
 
-// GetDesc returns the untranslated description, e.g. "Candle lighting" or
+// Desc returns the untranslated description, e.g. "Candle lighting" or
 // "Chanukah: 3 Candles".
-func (ev TimedEvent) GetDesc() string {
-	return ev.Desc
+func (ev TimedEvent) Desc() string {
+	return ev.desc
 }
 
-// NewTimedEvent constructs a timed event. opts chooses the clock format its
-// time is rendered in (see ReformatTimeStr) and may be nil; the event keeps
-// that format, not a reference to opts.
+// GetDesc returns the same as Desc.
+func (ev TimedEvent) GetDesc() string {
+	return ev.desc
+}
+
+// NewTimedEvent constructs a timed event, or the zero TimedEvent if t is the
+// zero time. Its kind follows from desc ("Candle lighting", "Havdalah",
+// "Fast begins", ...) or, for a daily zman, from flags. opts chooses the
+// clock format its time is rendered in (see ReformatTimeStr) and may be nil;
+// the event keeps that format, not a reference to opts.
 func NewTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time.Time,
 	sunsetOffset int, linkedEvent event.CalEvent, opts *CalOptions) TimedEvent {
-	return newTimedEvent(hd, desc, flags, t, sunsetOffset, linkedEvent, clockFor(opts))
+	return newTimedEvent(hd, timedKindOf(desc, flags), desc, flags, t, sunsetOffset, linkedEvent, clockFor(opts))
 }
 
-func newTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time.Time,
+func newTimedEvent(hd hdate.HDate, kind TimedKind, desc string, flags event.HolidayFlags, t time.Time,
 	sunsetOffset int, linkedEvent event.CalEvent, clock clock) TimedEvent {
 	if t.IsZero() {
 		return TimedEvent{}
 	}
 	var emoji string
-	switch desc {
-	case "Candle lighting":
+	switch kind {
+	case CandleLighting:
 		emoji = "🕯️"
-	case "Havdalah":
+	case Havdalah:
 		emoji = "✨"
 	}
 	// Round to the nearest minute, matching @hebcal/core's TimedEvent
@@ -110,14 +247,13 @@ func newTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time
 		t = roundToMinute(t)
 	}
 	return TimedEvent{
-		HolidayEvent: event.HolidayEvent{
-			Date:  hd,
-			Desc:  desc,
-			Flags: flags,
-			Emoji: emoji,
-		},
-		EventTime:    t,
-		LinkedEvent:  linkedEvent,
+		date:         hd,
+		desc:         desc,
+		flags:        flags,
+		emoji:        emoji,
+		kind:         kind,
+		eventTime:    t,
+		linked:       linkedEvent,
 		clock:        clock,
 		sunsetOffset: sunsetOffset,
 	}
@@ -141,19 +277,21 @@ func roundToMinute(t time.Time) time.Time {
 }
 
 func (ev TimedEvent) GetDate() hdate.HDate {
-	return ev.Date
+	return ev.date
 }
 
+// Render returns the translated description and the time, e.g. "Candle
+// lighting: 7:13pm".
 func (ev TimedEvent) Render(locale string) string {
-	timeStr := ev.clock.formatTime(ev.EventTime)
+	timeStr := ev.clock.formatTime(ev.eventTime)
 	return fmt.Sprintf("%s: %s", ev.RenderBrief(locale), timeStr)
 }
 
 // RenderBrief returns the translated description without its time, e.g.
 // "Candle lighting" or "Havdalah (50 min)".
 func (ev TimedEvent) RenderBrief(locale string) string {
-	desc, _ := locales.LookupTranslation(ev.Desc, locale)
-	if ev.Desc == "Havdalah" && ev.sunsetOffset != 0 {
+	desc, _ := locales.LookupTranslation(ev.desc, locale)
+	if ev.kind == Havdalah && ev.sunsetOffset != 0 {
 		minStr, _ := locales.LookupTranslation("min", locale)
 		desc = fmt.Sprintf("%s (%d %s)", desc, ev.sunsetOffset, minStr)
 	}
@@ -161,41 +299,40 @@ func (ev TimedEvent) RenderBrief(locale string) string {
 }
 
 func (ev TimedEvent) GetFlags() event.HolidayFlags {
-	return ev.Flags
+	return ev.flags
 }
 
 func (ev TimedEvent) GetEmoji() string {
-	return ev.Emoji
+	return ev.emoji
 }
 
 // Basename returns the description, or for Chanukah candle-lighting the
 // holiday's basename ("Chanukah").
 func (ev TimedEvent) Basename() string {
 	if ev.isChanukah() {
-		return ev.LinkedEvent.Basename()
+		return ev.linked.Basename()
 	}
-	return ev.Desc
+	return ev.desc
 }
 
 // GetCategories returns the category and sub-categories for a timed event,
-// keyed by its description, matching TimedEvent.getCategories() in
-// @hebcal/core.
+// keyed by its kind, matching TimedEvent.getCategories() in @hebcal/core.
 //
 // Chanukah candle-lighting takes the holiday's categories.
 func (ev TimedEvent) GetCategories() []string {
 	if ev.isChanukah() {
-		return ev.LinkedEvent.GetCategories()
+		return ev.linked.GetCategories()
 	}
-	switch ev.Desc {
-	case "Candle lighting":
+	switch ev.kind {
+	case CandleLighting:
 		return []string{"candles"}
-	case "Havdalah":
+	case Havdalah:
 		return []string{"havdalah"}
-	case "Fast begins", "Fast ends":
+	case FastBegins, FastEnds:
 		return []string{"zmanim", "fast"}
-	case "Finish eating chametz":
+	case FinishChametz:
 		return []string{"zmanim", "achilasChametz"}
-	case "Biur Chametz":
+	case BiurChametz:
 		return []string{"zmanim", "biurChametz"}
 	}
 	return []string{"unknown"}
@@ -251,9 +388,9 @@ func makeCandleEvent(hd hdate.HDate, opts *calConfig, ev event.CalEvent) TimedEv
 	if eventTime.IsZero() {
 		return TimedEvent{} // no sunset
 	}
-	desc := "Candle lighting"
+	kind, desc := CandleLighting, descCandleLighting
 	if havdalahTitle {
-		desc = "Havdalah"
+		kind, desc = Havdalah, descHavdalah
 	} else if !flags.Has(event.CHANUKAH_CANDLES) {
 		// Exactly one of the two candle-lighting flags, chosen by how the
 		// time was computed: LIGHT_CANDLES for minutes before sunset
@@ -267,9 +404,12 @@ func makeCandleEvent(hd hdate.HDate, opts *calConfig, ev event.CalEvent) TimedEv
 			flags = flags.Without(event.LIGHT_CANDLES_TZEIS).With(event.LIGHT_CANDLES)
 		}
 	}
-	return newTimedEvent(hd, desc, flags, eventTime, offset, ev, opts.clock)
+	return newTimedEvent(hd, kind, desc, flags, eventTime, offset, ev, opts.clock)
 }
 
+// makeChanukahCandleLighting returns the Chanukah event ev with the time its
+// candles are lit: at regular candle-lighting time on Friday, at Havdalah
+// time on Saturday night, and at dusk on other days.
 func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEvent {
 	hd := ev.Date
 	dow := hd.Weekday()
@@ -278,8 +418,9 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEve
 		if (timedEv == TimedEvent{}) {
 			return timedEv // no sunset
 		}
-		timedEv.Desc = ev.Desc
-		timedEv.Emoji = ev.Emoji
+		timedEv.kind = ChanukahCandles
+		timedEv.desc = ev.Desc
+		timedEv.emoji = ev.Emoji
 		timedEv.ChanukahDay = ev.ChanukahDay
 		return timedEv
 	}
@@ -289,12 +430,17 @@ func makeChanukahCandleLighting(ev event.HolidayEvent, opts *calConfig) TimedEve
 		return TimedEvent{} // no sunset
 	}
 	return TimedEvent{
-		HolidayEvent: ev,
+		date:  ev.Date,
+		desc:  ev.Desc,
+		flags: ev.Flags,
+		emoji: ev.Emoji,
+		kind:  ChanukahCandles,
 		// Round to the nearest minute, as NewTimedEvent does and as
 		// @hebcal/core's TimedChanukahEvent does with Zmanim.roundTime.
-		EventTime:   roundToMinute(candleLightingTime),
-		LinkedEvent: ev,
+		eventTime:   roundToMinute(candleLightingTime),
+		linked:      ev,
 		clock:       opts.clock,
+		ChanukahDay: ev.ChanukahDay,
 	}
 }
 
@@ -306,13 +452,13 @@ func makeFastStartEnd(ev event.CalEvent, opts *calConfig) (TimedEvent, TimedEven
 	var startEvent, endEvent TimedEvent
 	if desc == "Erev Tish'a B'Av" {
 		sunset := z.Sunset()
-		startEvent = newTimedEvent(hd, "Fast begins", flags, sunset, 0, ev, opts.clock)
+		startEvent = newTimedEvent(hd, FastBegins, descFastBegins, flags, sunset, 0, ev, opts.clock)
 	} else if strings.HasPrefix(desc, "Tish'a B'Av") {
-		endEvent = newTimedEvent(hd, "Fast ends", flags, fastEndTime(&z, true, opts), 0, ev, opts.clock)
+		endEvent = newTimedEvent(hd, FastEnds, descFastEnds, flags, fastEndTime(&z, true, opts), 0, ev, opts.clock)
 	} else {
-		startEvent = newTimedEvent(hd, "Fast begins", flags, fastStartTime(&z, opts), 0, ev, opts.clock)
+		startEvent = newTimedEvent(hd, FastBegins, descFastBegins, flags, fastStartTime(&z, opts), 0, ev, opts.clock)
 		if hd.Weekday() != time.Friday && !(hd.Day() == 14 && hd.Month() == hdate.Nisan) {
-			endEvent = newTimedEvent(hd, "Fast ends", flags, fastEndTime(&z, false, opts), 0, ev, opts.clock)
+			endEvent = newTimedEvent(hd, FastEnds, descFastEnds, flags, fastEndTime(&z, false, opts), 0, ev, opts.clock)
 		}
 	}
 	return startEvent, endEvent
@@ -388,8 +534,8 @@ func makeErevPesachChametz(ev event.CalEvent, opts *calConfig) []event.CalEvent 
 	if achilas.IsZero() {
 		return events
 	}
-	achilasEv := newTimedEvent(hd, "Finish eating chametz", 0, achilas, 0, nil, opts.clock)
-	achilasEv.Emoji = "🍞"
+	achilasEv := newTimedEvent(hd, FinishChametz, descFinishChametz, 0, achilas, 0, nil, opts.clock)
+	achilasEv.emoji = "🍞"
 	events = append(events, achilasEv)
 	if hd.Weekday() != time.Saturday {
 		if biurEv := makeBiurChametz(hd, opts); (biurEv != TimedEvent{}) {
@@ -407,8 +553,8 @@ func makeBiurChametz(hd hdate.HDate, opts *calConfig) TimedEvent {
 	if biur.IsZero() {
 		return TimedEvent{}
 	}
-	biurEv := newTimedEvent(hd, "Biur Chametz", 0, biur, 0, nil, opts.clock)
-	biurEv.Emoji = "🔥"
+	biurEv := newTimedEvent(hd, BiurChametz, descBiurChametz, 0, biur, 0, nil, opts.clock)
+	biurEv.emoji = "🔥"
 	return biurEv
 }
 
@@ -475,7 +621,7 @@ func dailyZemanim(date hdate.HDate, opts *calConfig) []event.CalEvent {
 	events := make([]event.CalEvent, 0, len(times))
 	for _, zman := range times {
 		if !zman.t.IsZero() {
-			ev := newTimedEvent(date, zman.desc, event.ZMANIM, zman.t, 0, nil, opts.clock)
+			ev := newTimedEvent(date, Zman, zman.desc, event.ZMANIM, zman.t, 0, nil, opts.clock)
 			events = append(events, ev)
 		}
 	}
@@ -485,17 +631,13 @@ func dailyZemanim(date hdate.HDate, opts *calConfig) []event.CalEvent {
 // URL returns the Chanukah page for Chanukah candle lighting, and "" for
 // every other timed event.
 //
-// The override matters because TimedEvent embeds event.HolidayEvent and would
-// otherwise inherit its URL(), producing links like /holidays/havdalah-2026
-// for a description that is not a holiday name.
-//
 // Only Chanukah is treated as linkable. Candle lighting before Pesach also
 // carries a LinkedEvent, but a clock time is not itself an observance with a
 // page, and following every link would attach a holiday URL to each Friday
 // evening in the calendar.
 func (ev TimedEvent) URL() string {
-	if !ev.Flags.Has(event.CHANUKAH_CANDLES) || ev.LinkedEvent == nil {
+	if !ev.isChanukah() {
 		return ""
 	}
-	return event.URL(ev.LinkedEvent)
+	return event.URL(ev.linked)
 }
