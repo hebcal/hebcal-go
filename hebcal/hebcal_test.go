@@ -631,7 +631,7 @@ func TestHebrewCalendarInfile(t *testing.T) {
 		End:                     hdate.New(5728, hdate.Tishrei, 30),
 		AddHebrewDatesForEvents: true,
 		NoHolidays:              true,
-		UserEvents: []hebcal.UserEvent{
+		UserEvents: []hebcal.UserEventSpec{
 			// This date was chosen because of an observed bug,
 			// where ev.Render("en") would replace the HolidayEvent.Desc field
 			// with "Rosh Hashnanah 5728", etc. on certain special days.

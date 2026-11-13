@@ -89,9 +89,9 @@ func TestTimeOfDayErevTishaBav(t *testing.T) {
 
 func TestTimeOfDayExported(t *testing.T) {
 	hd := hdate.New(5787, hdate.Tishrei, 14)
-	assert.Equal(t, TimeOfDayLearning,
-		TimeOfDay(event.NewHolidayEvent(hd, "Psalms 1", event.DailyLearning, "")))
-	assert.Equal(t, TimeOfDayEvening,
-		TimeOfDay(event.NewHolidayEvent(hd, "Erev Sukkot", event.Erev|event.LightCandles, "")))
-	assert.Equal(t, TimeOfDayDay, TimeOfDay(event.NewUserEvent(hd, "Birthday")))
+	assert.Equal(t, DayPartLearning,
+		DayPartOf(event.NewHolidayEvent(hd, "Psalms 1", event.DailyLearning, "")))
+	assert.Equal(t, DayPartEvening,
+		DayPartOf(event.NewHolidayEvent(hd, "Erev Sukkot", event.Erev|event.LightCandles, "")))
+	assert.Equal(t, DayPartDay, DayPartOf(event.NewUserEvent(hd, "Birthday")))
 }

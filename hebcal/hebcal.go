@@ -303,7 +303,7 @@ func HebrewCalendar(options *CalOptions) ([]event.CalEvent, error) {
 				events = append(events, klEv)
 			}
 		}
-		sortByTimeOfDay(events[prevEventsLength:])
+		sortByDayPart(events[prevEventsLength:])
 		if sortByTime {
 			sortTimedEvents(events[prevEventsLength:])
 		}
@@ -708,16 +708,16 @@ func eventTime(ev event.CalEvent) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-// sortByTimeOfDay orders one day's events by TimeOfDay. The sort is
+// sortByDayPart orders one day's events by DayPartOf. The sort is
 // stable, so events of equal rank keep the order in which they were added
 // (e.g. the parsha before a special Shabbat); timed events of equal rank are
 // ordered by time.
-func sortByTimeOfDay(events []event.CalEvent) {
+func sortByDayPart(events []event.CalEvent) {
 	if len(events) < 2 {
 		return
 	}
 	sort.SliceStable(events, func(i, j int) bool {
-		ri, rj := TimeOfDay(events[i]), TimeOfDay(events[j])
+		ri, rj := DayPartOf(events[i]), DayPartOf(events[j])
 		if ri != rj {
 			return ri < rj
 		}

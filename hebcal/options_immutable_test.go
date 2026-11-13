@@ -32,7 +32,7 @@ func normalizingOptions() hebcal.CalOptions {
 		YerushalmiYomi:   true,
 		DailyLearning:    []string{"dafYomi"},
 		Yahrzeits:        []hebcal.UserYahrzeit{},
-		UserEvents:       []hebcal.UserEvent{{Month: hdate.Nisan, Day: 20, Desc: "Birthday"}},
+		UserEvents:       []hebcal.UserEventSpec{{Month: hdate.Nisan, Day: 20, Desc: "Birthday"}},
 		Mask: event.RoshChodesh | event.ModernHoliday | event.MinorFast |
 			event.SpecialShabbat | event.ParshaHashavua | event.DafYomi |
 			event.OmerCount | event.ShabbatMevarchim | event.MishnaYomi |

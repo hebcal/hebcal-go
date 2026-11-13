@@ -36,8 +36,10 @@ const (
 	Schottenstein
 )
 
-// UserEvent is used for generating a non-yahrtzeit user event.
-type UserEvent struct {
+// UserEventSpec asks for a personal event that recurs on a Hebrew date every
+// year, such as a birthday or an anniversary (see CalOptions.UserEvents).
+// HebrewCalendar generates an event.UserEvent from it in each year.
+type UserEventSpec struct {
 	Month hdate.HMonth // Hebrew month
 	Day   int          // Day in month (1-30)
 	Desc  string       // Description
@@ -212,7 +214,7 @@ type CalOptions struct {
 	// Add Yahrzeit reminders when the anniversary falls within the date range.
 	Yahrzeits []UserYahrzeit
 	// Add non-yahrtzeit Hebrew user event reminders when the anniversary falls within the date range.
-	UserEvents []UserEvent
+	UserEvents []UserEventSpec
 	// Weekly abbreviated view. Omer, dafyomi, and non-date-specific zemanim are shown once a week,
 	// on the day which corresponds to the first day in the range.
 	WeeklyAbbreviated bool

@@ -272,64 +272,86 @@ func taanitBechorotDate(pesach hdate.HDate) hdate.HDate {
 	return hdate.New(pesach.Year(), hdate.Nisan, 14)
 }
 
-// Ranks returned by TimeOfDay, in the order events appear within a day.
+// DayPart is the part of the day in which an event falls, as far as that
+// decides the order of the events on one date. DayPartOf returns it, and the
+// values compare in the order events appear within a day.
+type DayPart int
+
 const (
-	TimeOfDayDawn = iota
-	TimeOfDayMorning
-	TimeOfDayMevarchim
-	TimeOfDayDay
-	TimeOfDayMidday
-	TimeOfDayLearning
-	TimeOfDayEvening
-	TimeOfDayNight
+	// DayPartDawn: timed events before noon, such as "Fast begins".
+	DayPartDawn DayPart = iota
+	// DayPartMorning: the parsha, special Shabbatot, minor fasts.
+	DayPartMorning
+	// DayPartMevarchim: the Molad and Shabbat Mevarchim.
+	DayPartMevarchim
+	// DayPartDay: everything else, including the Omer and user events.
+	DayPartDay
+	// DayPartMidday: the deadlines for eating and burning chametz.
+	DayPartMidday
+	// DayPartLearning: daily learning.
+	DayPartLearning
+	// DayPartEvening: Erev holidays, Chanukah candle-lighting, Leil Selichot.
+	DayPartEvening
+	// DayPartNight: other timed events, such as candle-lighting and Havdalah.
+	DayPartNight
 )
+
+var dayPartNames = [...]string{"Dawn", "Morning", "Mevarchim", "Day", "Midday", "Learning", "Evening", "Night"}
+
+// String returns the name of the part of the day, e.g. "Morning".
+func (p DayPart) String() string {
+	if p < 0 || int(p) >= len(dayPartNames) {
+		return "DayPart(" + strconv.Itoa(int(p)) + ")"
+	}
+	return dayPartNames[p]
+}
 
 const learningFlags = event.DailyLearning | event.DafYomi | event.MishnaYomi |
 	event.NachYomi | event.YerushalmiYomi
 
-// holidayTimeOfDay returns the approximate time of day of a holiday, used to order
-// holidays on the same date. See TimeOfDay for the full list.
-func holidayTimeOfDay(ev event.HolidayEvent) int {
-	return untimedTimeOfDay(ev.Flags(), ev.Desc())
+// holidayDayPart returns the approximate time of day of a holiday, used to order
+// holidays on the same date. See DayPartOf for the full list.
+func holidayDayPart(ev event.HolidayEvent) DayPart {
+	return untimedDayPart(ev.Flags(), ev.Desc())
 }
 
 // untimedTimeOfDay ranks an event that has no clock time by its flags and
 // untranslated description.
-func untimedTimeOfDay(f event.Flags, desc string) int {
+func untimedDayPart(f event.Flags, desc string) DayPart {
 	switch {
 	case f.HasAny(event.Erev|event.ChanukahCandles) || desc == "Leil Selichot":
-		return TimeOfDayEvening
+		return DayPartEvening
 	case f.HasAny(event.ParshaHashavua|event.SpecialShabbat|event.MinorFast) ||
 		desc == "Birkat Hachamah":
-		return TimeOfDayMorning
+		return DayPartMorning
 	case f.HasAny(event.ShabbatMevarchim | event.Molad):
-		return TimeOfDayMevarchim
+		return DayPartMevarchim
 	case f.HasAny(learningFlags):
-		return TimeOfDayLearning
+		return DayPartLearning
 	}
-	return TimeOfDayDay
+	return DayPartDay
 }
 
 // timedTimeOfDay ranks an event that occurs at clock time t.
-func timedTimeOfDay(f event.Flags, kind TimedKind, t time.Time) int {
+func timedDayPart(f event.Flags, kind TimedKind, t time.Time) DayPart {
 	switch {
 	case f.Has(event.ChanukahCandles):
 		// Chanukah candle-lighting sits with the evening holidays
-		return TimeOfDayEvening
+		return DayPartEvening
 	case kind == FinishChametz || kind == BiurChametz:
-		return TimeOfDayMidday
+		return DayPartMidday
 	case kind == FastBegins || kind == KiddushLevana:
 		// A minor fast begins at dawn, but Tish'a B'Av at sunset the day
 		// before. Latest Kiddush Levana is either before dawn or after
 		// nightfall.
 		if t.Hour() < 12 {
-			return TimeOfDayDawn
+			return DayPartDawn
 		}
 	}
-	return TimeOfDayNight
+	return DayPartNight
 }
 
-// TimeOfDay returns the approximate time of day of an event, used to order
+// DayPartOf returns the approximate time of day of an event, used to order
 // the events on one date. HebrewCalendar sorts each day's events by it:
 // events of equal rank keep the order in which they were created, and timed
 // events of equal rank are ordered by time. A caller merging events of its
@@ -347,21 +369,21 @@ func timedTimeOfDay(f event.Flags, kind TimedKind, t time.Time) int {
 //   - evening: Erev holidays, Chanukah candle-lighting and Leil Selichot
 //   - night: other timed events such as candle-lighting, Havdalah, Fast ends
 //     and a Latest Kiddush Levana after noon
-func TimeOfDay(ev event.CalEvent) int {
+func DayPartOf(ev event.CalEvent) DayPart {
 	switch e := ev.(type) {
 	case TimedEvent:
-		return timedTimeOfDay(e.flags, e.kind, e.eventTime)
+		return timedDayPart(e.flags, e.kind, e.eventTime)
 	case KiddushLevanaEvent:
-		return timedTimeOfDay(e.Flags(), KiddushLevana, e.Time())
+		return timedDayPart(e.Flags(), KiddushLevana, e.Time())
 	case event.HolidayEvent:
-		return holidayTimeOfDay(e)
+		return holidayDayPart(e)
 	case riseSetEvent:
-		return TimeOfDayDawn
+		return DayPartDawn
 	}
-	return untimedTimeOfDay(ev.Flags(), "")
+	return untimedDayPart(ev.Flags(), "")
 }
 
-// sortHolidays orders events by date, then by holidayTimeOfDay. Events on the same
+// sortHolidays orders events by date, then by holidayDayPart. Events on the same
 // date and at the same time of day keep the order in which they were added.
 func sortHolidays(events []event.HolidayEvent) {
 	sort.SliceStable(events, func(i, j int) bool {
@@ -369,7 +391,7 @@ func sortHolidays(events []event.HolidayEvent) {
 		if abs1 != abs2 {
 			return abs1 < abs2
 		}
-		return holidayTimeOfDay(events[i]) < holidayTimeOfDay(events[j])
+		return holidayDayPart(events[i]) < holidayDayPart(events[j])
 	})
 }
 
