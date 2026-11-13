@@ -43,7 +43,7 @@ func GetHolidaysOnDate(hd hdate.HDate, il bool) []event.HolidayEvent {
 
 // lightCandlesMask matches @hebcal/core: an event that begins a candle-lighting
 // (erev) period.
-const lightCandlesMask = event.LIGHT_CANDLES | event.LIGHT_CANDLES_TZEIS
+const lightCandlesMask = event.LightCandles | event.LightCandlesTzeis
 
 // isTomorrowShabbosOrYomTov reports whether the following day is Shabbat or a Yom
 // Tov (i.e. the given day is erev Shabbat / erev Yom Tov / Yom Tov sheni).
@@ -66,7 +66,7 @@ func isTodayAssurBemelacha(dow time.Weekday, events []event.HolidayEvent) bool {
 		return true
 	}
 	for _, ev := range events {
-		if ev.GetFlags().Has(event.CHAG) {
+		if ev.GetFlags().Has(event.Chag) {
 			return true
 		}
 	}

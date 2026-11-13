@@ -15,7 +15,7 @@ import (
 type HolidayEvent struct {
 	date          hdate.HDate
 	desc          string
-	flags         HolidayFlags
+	flags         Flags
 	emoji         string
 	CholHaMoedDay int // used only for Pesach and Sukkot
 	ChanukahDay   int // used only for Chanukah
@@ -25,7 +25,7 @@ type HolidayEvent struct {
 // description (e.g. "Pesach III (CH”M)"), which is also the key of its
 // translations. emoji is a holiday-specific emoji, or "" for the default
 // that GetEmoji chooses from flags.
-func NewHolidayEvent(date hdate.HDate, desc string, flags HolidayFlags, emoji string) HolidayEvent {
+func NewHolidayEvent(date hdate.HDate, desc string, flags Flags, emoji string) HolidayEvent {
 	return HolidayEvent{date: date, desc: desc, flags: flags, emoji: emoji}
 }
 
@@ -51,11 +51,11 @@ func (ev HolidayEvent) Render(locale string) string {
 
 func (ev HolidayEvent) render(locale string) string {
 	switch {
-	case ev.flags.Has(ROSH_CHODESH):
+	case ev.flags.Has(RoshChodesh):
 		rchStr, _ := locales.LookupTranslation("Rosh Chodesh", locale)
 		monthStr, _ := locales.LookupTranslation(ev.desc[13:], locale)
 		return rchStr + " " + monthStr
-	case ev.flags.Has(SHABBAT_MEVARCHIM):
+	case ev.flags.Has(ShabbatMevarchim):
 		mevarchimStr, _ := locales.LookupTranslation(
 			"Shabbat Mevarchim Chodesh",
 			locale,
@@ -73,7 +73,7 @@ func (ev HolidayEvent) render(locale string) string {
 			return s + " " + gematriya.Gematriya(year)
 		}
 		return s + " " + strconv.Itoa(year)
-	case ev.flags.Has(YOM_KIPPUR_KATAN):
+	case ev.flags.Has(YomKippurKatan):
 		rchStr, _ := locales.LookupTranslation("Yom Kippur Katan", locale)
 		monthStr, _ := locales.LookupTranslation(ev.desc[17:], locale)
 		return rchStr + " " + monthStr
@@ -85,14 +85,14 @@ func (ev HolidayEvent) render(locale string) string {
 // RenderBrief returns the same as Render except for Yom Kippur Katan, which
 // drops the month it precedes ("Yom Kippur Katan Tevet" => "Yom Kippur Katan").
 func (ev HolidayEvent) RenderBrief(locale string) string {
-	if ev.flags.Has(YOM_KIPPUR_KATAN) {
+	if ev.flags.Has(YomKippurKatan) {
 		s, _ := locales.LookupTranslation("Yom Kippur Katan", locale)
 		return SmartApostrophe(s)
 	}
 	return ev.Render(locale)
 }
 
-func (ev HolidayEvent) GetFlags() HolidayFlags {
+func (ev HolidayEvent) GetFlags() Flags {
 	return ev.flags
 }
 
@@ -101,11 +101,11 @@ func (ev HolidayEvent) GetEmoji() string {
 		return ev.emoji
 	}
 	switch ev.flags {
-	case SPECIAL_SHABBAT:
+	case SpecialShabbat:
 		return "🕍"
-	case ROSH_CHODESH:
+	case RoshChodesh:
 		return "🌒"
-	case SHABBAT_MEVARCHIM, YOM_KIPPUR_KATAN | MINOR_FAST:
+	case ShabbatMevarchim, YomKippurKatan | MinorFast:
 		return ""
 	default:
 		return "✡️"
@@ -129,7 +129,7 @@ var regexes = []*regexp.Regexp{
 // Adar I" and "Rosh Chodesh Adar II" stay distinct, matching @hebcal/core's
 // RoshChodeshEvent and YomKippurKatanEvent.
 func (ev HolidayEvent) Basename() string {
-	if ev.flags.HasAny(ROSH_CHODESH | YOM_KIPPUR_KATAN) {
+	if ev.flags.HasAny(RoshChodesh | YomKippurKatan) {
 		return ev.desc
 	}
 	str := ev.desc

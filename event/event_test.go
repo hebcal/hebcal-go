@@ -43,13 +43,13 @@ func TestRenderBrief(t *testing.T) {
 	ykk := event.NewHolidayEvent(
 		hdate.New(5786, hdate.Kislev, 29),
 		"Yom Kippur Katan Tevet",
-		event.MINOR_FAST|event.YOM_KIPPUR_KATAN,
+		event.MinorFast|event.YomKippurKatan,
 		"")
 	assert.Equal(t, "Yom Kippur Katan Tevet", ykk.Render("en"))
 	assert.Equal(t, "Yom Kippur Katan", event.RenderBrief(ykk, "en"))
 	assert.Equal(t, "יוֹם כִּפּוּר קָטָן", event.RenderBrief(ykk, "he"))
 	// an event with no brief form renders in full
-	purim := event.NewHolidayEvent(hdate.New(5786, hdate.Adar1, 14), "Purim", event.MINOR_HOLIDAY, "")
+	purim := event.NewHolidayEvent(hdate.New(5786, hdate.Adar1, 14), "Purim", event.MinorHoliday, "")
 	assert.Equal(t, "Purim", event.RenderBrief(purim, "en"))
 	parsha := event.NewParshaEvent(hdate.New(5786, hdate.Cheshvan, 5),
 		sedra.Parsha{Name: []string{"Noach"}, Num: []int{2}}, false)
@@ -74,7 +74,7 @@ func TestYomKippurKatanEvent(t *testing.T) {
 	ev := event.NewHolidayEvent(
 		hd,
 		"Yom Kippur Katan Sivan",
-		event.MINOR_FAST|event.YOM_KIPPUR_KATAN,
+		event.MinorFast|event.YomKippurKatan,
 		"")
 	assert.Equal(t, "Yom Kippur Katan Sivan", ev.Basename())
 	assert.Equal(t, "Yom Kippur Katan Sivan", ev.Render("en"))
@@ -88,7 +88,7 @@ func TestRoshHashanaLocale(t *testing.T) {
 	ev := event.NewHolidayEvent(
 		hd,
 		"Rosh Hashana 5771",
-		event.CHAG|event.LIGHT_CANDLES_TZEIS,
+		event.Chag|event.LightCandlesTzeis,
 		"🍏🍯")
 	assert.Equal(t, "Rosh Hashana", ev.Basename())
 	assert.Equal(t, "Rosh Hashana 5771", ev.Render("en"))
@@ -100,7 +100,7 @@ func TestRoshHashanaLocale(t *testing.T) {
 // The deprecated helpers answer exactly as the methods they wrap.
 func TestDeprecatedDescAndURLHelpers(t *testing.T) {
 	events := []event.CalEvent{
-		event.NewHolidayEvent(hdate.New(5787, hdate.Tishrei, 17), "Sukkot III (CH''M)", event.CHOL_HAMOED, ""),
+		event.NewHolidayEvent(hdate.New(5787, hdate.Tishrei, 17), "Sukkot III (CH''M)", event.CholHamoed, ""),
 		event.NewUserEvent(hdate.New(5787, hdate.Tishrei, 17), "Birthday"),
 		event.NewHebrewDateEvent(hdate.New(5786, hdate.Elul, 29)),
 	}

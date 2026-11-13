@@ -81,9 +81,9 @@ func (ev YizkorEvent) Render(locale string) string {
 	return "Yizkor"
 }
 
-func (ev YizkorEvent) GetFlags() event.HolidayFlags { return event.YIZKOR }
-func (ev YizkorEvent) GetEmoji() string             { return "🕯️" }
-func (ev YizkorEvent) Basename() string             { return "Yizkor" }
+func (ev YizkorEvent) GetFlags() event.Flags { return event.Yizkor }
+func (ev YizkorEvent) GetEmoji() string      { return "🕯️" }
+func (ev YizkorEvent) Basename() string      { return "Yizkor" }
 
 // Desc returns the untranslated description, "Yizkor".
 func (ev YizkorEvent) Desc() string { return "Yizkor" }
@@ -92,4 +92,4 @@ func (ev YizkorEvent) Desc() string { return "Yizkor" }
 func (ev YizkorEvent) URL() string { return "" }
 
 // GetCategories returns ["yizkor"].
-func (ev YizkorEvent) GetCategories() []string { return event.CategoriesFromFlags(event.YIZKOR) }
+func (ev YizkorEvent) GetCategories() []string { return event.CategoriesFromFlags(event.Yizkor) }

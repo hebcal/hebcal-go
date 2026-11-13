@@ -61,7 +61,7 @@ func (ev HolidayEvent) URL() string {
 		return ""
 	}
 	// Yom Kippur Katan and Ta'anit BeHaB have no page on the website.
-	if strings.HasPrefix(ev.desc, "Yom Kippur Katan") || ev.flags.Has(BEHAB) {
+	if strings.HasPrefix(ev.desc, "Yom Kippur Katan") || ev.flags.Has(BeHaB) {
 		return ""
 	}
 	gy, gm, gd := ev.date.ProlepticGreg()
@@ -104,7 +104,7 @@ func (ev HolidayEvent) URL() string {
 		}
 	}
 	url := "https://www.hebcal.com/holidays/" + slug + "-" + suffix
-	if ev.flags.Has(IL_ONLY) {
+	if ev.flags.Has(ILOnly) {
 		url += "?i=on"
 	}
 	return url

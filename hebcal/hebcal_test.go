@@ -222,7 +222,7 @@ func TestHebrewCalendarChanukahCandles(t *testing.T) {
 func TestHebrewCalendarMask(t *testing.T) {
 	opts := &hebcal.CalOptions{
 		Year: 2020,
-		Mask: event.ROSH_CHODESH | event.SPECIAL_SHABBAT,
+		Mask: event.RoshChodesh | event.SpecialShabbat,
 	}
 	checkEvents(t, "en", opts, []string{
 		"2020-01-27 Rosh Chodesh Sh’vat",
@@ -648,7 +648,7 @@ func TestHebrewCalendarInfile(t *testing.T) {
 // day has a reading, and AddHebrewDatesForEvents would otherwise date them all.
 func TestAddHebrewDatesForEventsIgnoresLearning(t *testing.T) {
 	dailylearning.AddCalendar("testLearningEveryDay", func(hd hdate.HDate, il bool) event.CalEvent {
-		return event.NewHolidayEvent(hd, "Reading", event.DAILY_LEARNING, "")
+		return event.NewHolidayEvent(hd, "Reading", event.DailyLearning, "")
 	})
 	opts := &hebcal.CalOptions{
 		Start:                   hdate.New(5787, hdate.Tishrei, 9),
@@ -701,7 +701,7 @@ func TestChanukahEmojiKeycap(t *testing.T) {
 	assert.NoError(t, err)
 	actual := map[string]string{}
 	for _, ev := range events {
-		if ev.GetFlags().Has(event.CHANUKAH_CANDLES) || ev.Render("en") == "Chanukah: 8th Day" {
+		if ev.GetFlags().Has(event.ChanukahCandles) || ev.Render("en") == "Chanukah: 8th Day" {
 			actual[ev.Render("en")] = ev.GetEmoji()
 		}
 	}

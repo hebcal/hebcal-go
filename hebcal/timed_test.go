@@ -51,10 +51,10 @@ func TestTimedInterfaceAndKind(t *testing.T) {
 		switch kind {
 		case hebcal.ChanukahCandles:
 			assert.Contains(t, ev.Desc(), "Chanukah: ")
-			assert.True(t, ev.GetFlags().Has(event.CHANUKAH_CANDLES))
+			assert.True(t, ev.GetFlags().Has(event.ChanukahCandles))
 			assert.Equal(t, "Chanukah", ev.Basename())
 		case hebcal.Zman:
-			assert.Equal(t, event.ZMANIM, ev.GetFlags())
+			assert.Equal(t, event.Zmanim, ev.GetFlags())
 		case hebcal.KiddushLevana:
 			_, isKL := ev.(hebcal.KiddushLevanaEvent)
 			assert.True(t, isKL)

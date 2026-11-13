@@ -120,8 +120,8 @@ func (ev KiddushLevanaEvent) Render(locale string) string { return ev.timed.Rend
 // RenderBrief returns the translated description without its time.
 func (ev KiddushLevanaEvent) RenderBrief(locale string) string { return ev.timed.RenderBrief(locale) }
 
-// GetFlags returns event.KIDDUSH_LEVANA.
-func (ev KiddushLevanaEvent) GetFlags() event.HolidayFlags { return event.KIDDUSH_LEVANA }
+// GetFlags returns event.KiddushLevana.
+func (ev KiddushLevanaEvent) GetFlags() event.Flags { return event.KiddushLevana }
 
 // GetEmoji returns a waxing gibbous moon.
 func (ev KiddushLevanaEvent) GetEmoji() string { return "🌔" }
@@ -173,7 +173,7 @@ func isShabbatOrChag(hd hdate.HDate, il bool) bool {
 		return true
 	}
 	for _, ev := range GetHolidaysOnDate(hd, il) {
-		if ev.GetFlags().Has(event.CHAG) {
+		if ev.GetFlags().Has(event.Chag) {
 			return true
 		}
 	}
@@ -181,7 +181,7 @@ func isShabbatOrChag(hd hdate.HDate, il bool) bool {
 }
 
 func newKiddushLevanaEvent(hd hdate.HDate, t time.Time, m molad.Molad, opts *calConfig, adjustedTo KiddushLevanaAdjustment) KiddushLevanaEvent {
-	timedEv := newTimedEvent(hd, KiddushLevana, latestKiddushLevana, event.KIDDUSH_LEVANA, t, 0, nil, opts.clock)
+	timedEv := newTimedEvent(hd, KiddushLevana, latestKiddushLevana, event.KiddushLevana, t, 0, nil, opts.clock)
 	timedEv.emoji = "🌔"
 	return KiddushLevanaEvent{timed: timedEv, Molad: m, AdjustedTo: adjustedTo}
 }

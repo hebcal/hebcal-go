@@ -92,7 +92,7 @@ const (
 
 // timedKindOf is the kind of a timed event built from a description and
 // flags alone, as NewTimedEvent's callers do.
-func timedKindOf(desc string, flags event.HolidayFlags) TimedKind {
+func timedKindOf(desc string, flags event.Flags) TimedKind {
 	switch desc {
 	case descCandleLighting:
 		return CandleLighting
@@ -110,9 +110,9 @@ func timedKindOf(desc string, flags event.HolidayFlags) TimedKind {
 		return KiddushLevana
 	}
 	switch {
-	case flags.Has(event.KIDDUSH_LEVANA):
+	case flags.Has(event.KiddushLevana):
 		return KiddushLevana
-	case flags == event.ZMANIM:
+	case flags == event.Zmanim:
 		return Zman
 	}
 	return TimedOther
@@ -125,7 +125,7 @@ func timedKindOf(desc string, flags event.HolidayFlags) TimedKind {
 type TimedEvent struct {
 	date         hdate.HDate
 	desc         string
-	flags        event.HolidayFlags
+	flags        event.Flags
 	emoji        string
 	kind         TimedKind
 	eventTime    time.Time
@@ -178,7 +178,7 @@ func TimedKindOf(ev event.CalEvent) (TimedKind, bool) {
 // isChanukah reports whether ev is the candle-lighting of a night of
 // Chanukah, which stands for the holiday itself.
 func (ev TimedEvent) isChanukah() bool {
-	return ev.flags.Has(event.CHANUKAH_CANDLES) && ev.linked != nil
+	return ev.flags.Has(event.ChanukahCandles) && ev.linked != nil
 }
 
 // Kind returns what the event is the time of.
@@ -211,7 +211,7 @@ func (ev TimedEvent) Memo(locale string) string {
 		s, _ := locales.LookupTranslation(ev.chagReading, locale)
 		return s
 	}
-	if ev.linked != nil && ev.linked.GetFlags() == event.PARSHA_HASHAVUA {
+	if ev.linked != nil && ev.linked.GetFlags() == event.ParshaHashavua {
 		return ev.linked.Render(locale)
 	}
 	return ""
@@ -228,12 +228,12 @@ func (ev TimedEvent) Desc() string {
 // "Fast begins", ...) or, for a daily zman, from flags. opts chooses the
 // clock format its time is rendered in (see ReformatTimeStr) and may be nil;
 // the event keeps that format, not a reference to opts.
-func NewTimedEvent(hd hdate.HDate, desc string, flags event.HolidayFlags, t time.Time,
+func NewTimedEvent(hd hdate.HDate, desc string, flags event.Flags, t time.Time,
 	sunsetOffset int, linkedEvent event.CalEvent, opts *CalOptions) TimedEvent {
 	return newTimedEvent(hd, timedKindOf(desc, flags), desc, flags, t, sunsetOffset, linkedEvent, clockFor(opts))
 }
 
-func newTimedEvent(hd hdate.HDate, kind TimedKind, desc string, flags event.HolidayFlags, t time.Time,
+func newTimedEvent(hd hdate.HDate, kind TimedKind, desc string, flags event.Flags, t time.Time,
 	sunsetOffset int, linkedEvent event.CalEvent, clock clock) TimedEvent {
 	if t.IsZero() {
 		return TimedEvent{}
@@ -248,9 +248,9 @@ func newTimedEvent(hd hdate.HDate, kind TimedKind, desc string, flags event.Holi
 	// Round to the nearest minute, matching @hebcal/core's TimedEvent
 	// (this.eventTime = Zmanim.roundTime(eventTime)). SunsetOffset already
 	// yields a whole minute, so in practice this only affects the degree-based
-	// tzeit times (havdalah, fast begin/end, chametz). The ZMANIM daily-times
+	// tzeit times (havdalah, fast begin/end, chametz). The Zmanim daily-times
 	// feature has no @hebcal/core equivalent and keeps its unrounded times.
-	if flags != event.ZMANIM {
+	if flags != event.Zmanim {
 		t = roundToMinute(t)
 	}
 	return TimedEvent{
@@ -305,7 +305,7 @@ func (ev TimedEvent) RenderBrief(locale string) string {
 	return desc
 }
 
-func (ev TimedEvent) GetFlags() event.HolidayFlags {
+func (ev TimedEvent) GetFlags() event.Flags {
 	return ev.flags
 }
 
@@ -364,20 +364,20 @@ func makeCandleEvent(hd hdate.HDate, opts *calConfig, ev event.CalEvent) TimedEv
 	if dow == time.Saturday {
 		useHavdalahOffset = true
 	}
-	flags := event.LIGHT_CANDLES
+	flags := event.LightCandles
 	if ev != nil {
 		flags = ev.GetFlags()
 		if dow != time.Friday {
-			if flags.HasAny(event.LIGHT_CANDLES_TZEIS | event.CHANUKAH_CANDLES) {
+			if flags.HasAny(event.LightCandlesTzeis | event.ChanukahCandles) {
 				useHavdalahOffset = true
-			} else if flags.Has(event.YOM_TOV_ENDS) {
+			} else if flags.Has(event.YomTovEnds) {
 				havdalahTitle = true
 				useHavdalahOffset = true
 			}
 		}
 	} else if dow == time.Saturday {
 		havdalahTitle = true
-		flags = event.LIGHT_CANDLES_TZEIS
+		flags = event.LightCandlesTzeis
 	}
 	// A zero Havdalah offset means tzeit. A zero candle-lighting offset
 	// means sunset itself (CandleLightingAtSunset).
@@ -398,17 +398,17 @@ func makeCandleEvent(hd hdate.HDate, opts *calConfig, ev event.CalEvent) TimedEv
 	kind, desc := CandleLighting, descCandleLighting
 	if havdalahTitle {
 		kind, desc = Havdalah, descHavdalah
-	} else if !flags.Has(event.CHANUKAH_CANDLES) {
+	} else if !flags.Has(event.ChanukahCandles) {
 		// Exactly one of the two candle-lighting flags, chosen by how the
-		// time was computed: LIGHT_CANDLES for minutes before sunset
-		// (Shabbat or the start of a chag), LIGHT_CANDLES_TZEIS for
+		// time was computed: LightCandles for minutes before sunset
+		// (Shabbat or the start of a chag), LightCandlesTzeis for
 		// nightfall / Havdalah time (the second night of Yom Tov, or a chag
 		// that begins Saturday night). Chanukah keeps its own flags: its
 		// Friday and Saturday events reuse this event as the Chanukah event.
 		if useHavdalahOffset {
-			flags = flags.Without(event.LIGHT_CANDLES).With(event.LIGHT_CANDLES_TZEIS)
+			flags = flags.Without(event.LightCandles).With(event.LightCandlesTzeis)
 		} else {
-			flags = flags.Without(event.LIGHT_CANDLES_TZEIS).With(event.LIGHT_CANDLES)
+			flags = flags.Without(event.LightCandlesTzeis).With(event.LightCandles)
 		}
 	}
 	return newTimedEvent(hd, kind, desc, flags, eventTime, offset, ev, opts.clock)
@@ -587,8 +587,8 @@ func (ev riseSetEvent) Render(locale string) string {
 	return fmt.Sprintf("Sunrise: %s; Sunset %s", riseStr, setStr)
 }
 
-func (ev riseSetEvent) GetFlags() event.HolidayFlags {
-	return event.ZMANIM
+func (ev riseSetEvent) GetFlags() event.Flags {
+	return event.Zmanim
 }
 
 func (ev riseSetEvent) GetEmoji() string {
@@ -636,7 +636,7 @@ func dailyZemanim(date hdate.HDate, opts *calConfig) []event.CalEvent {
 	events := make([]event.CalEvent, 0, len(times))
 	for _, zman := range times {
 		if !zman.t.IsZero() {
-			ev := newTimedEvent(date, Zman, zman.desc, event.ZMANIM, zman.t, 0, nil, opts.clock)
+			ev := newTimedEvent(date, Zman, zman.desc, event.Zmanim, zman.t, 0, nil, opts.clock)
 			events = append(events, ev)
 		}
 	}

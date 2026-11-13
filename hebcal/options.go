@@ -165,7 +165,7 @@ type CalOptions struct {
 	/* print the Hebrew date for dates with some events */
 	AddHebrewDatesForEvents bool
 	/* use bitmask from flags to filter events */
-	Mask event.HolidayFlags
+	Mask event.Flags
 	// include Yom Kippur Katan (default false).
 	// יוֹם כִּפּוּר קָטָן is a minor day of atonement occurring monthly on the day preceeding each Rosh Chodesh.
 	//

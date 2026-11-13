@@ -85,8 +85,8 @@ func translate(s, locale string) string {
 	return s
 }
 
-func (ev OmerEvent) GetFlags() event.HolidayFlags {
-	return event.OMER_COUNT
+func (ev OmerEvent) GetFlags() event.Flags {
+	return event.OmerCount
 }
 
 func (ev OmerEvent) GetEmoji() string {

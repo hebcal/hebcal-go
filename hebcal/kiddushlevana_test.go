@@ -116,7 +116,7 @@ func TestKiddushLevanaEvent(t *testing.T) {
 	assert.Equal("סוֹף זְמַן קִדּוּשׁ לְבָנָה: 9:44pm", ev.Render("he"))
 	assert.Equal([]string{"zmanim", "kiddushLevana"}, ev.GetCategories())
 	assert.Equal("🌔", ev.GetEmoji())
-	assert.Equal(event.KIDDUSH_LEVANA, ev.GetFlags())
+	assert.Equal(event.KiddushLevana, ev.GetFlags())
 	assert.Equal("KIDDUSH_LEVANA", ev.GetFlags().String())
 	assert.Equal(molad.New(5787, hdate.Cheshvan), ev.Molad)
 }
@@ -160,7 +160,7 @@ func TestKiddushLevanaMask(t *testing.T) {
 		Start:    hdate.New(5787, hdate.Cheshvan, 1),
 		End:      hdate.New(5787, hdate.Cheshvan, 29),
 		Location: zmanim.LookupCity("New York"),
-		Mask:     event.KIDDUSH_LEVANA,
+		Mask:     event.KiddushLevana,
 	}
 	events, err := HebrewCalendar(&opts)
 	require.NoError(t, err)

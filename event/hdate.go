@@ -78,8 +78,8 @@ func monthName(hd hdate.HDate, locale string) string {
 	return en
 }
 
-func (ev HebrewDateEvent) GetFlags() HolidayFlags {
-	return HEBREW_DATE
+func (ev HebrewDateEvent) GetFlags() Flags {
+	return HebrewDate
 }
 
 func (ev HebrewDateEvent) GetEmoji() string {

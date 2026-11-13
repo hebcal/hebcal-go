@@ -33,12 +33,12 @@ func normalizingOptions() hebcal.CalOptions {
 		DailyLearning:    []string{"dafYomi"},
 		Yahrzeits:        []hebcal.UserYahrzeit{},
 		UserEvents:       []hebcal.UserEvent{{Month: hdate.Nisan, Day: 20, Desc: "Birthday"}},
-		Mask: event.ROSH_CHODESH | event.MODERN_HOLIDAY | event.MINOR_FAST |
-			event.SPECIAL_SHABBAT | event.PARSHA_HASHAVUA | event.DAF_YOMI |
-			event.OMER_COUNT | event.SHABBAT_MEVARCHIM | event.MISHNA_YOMI |
-			event.NACH_YOMI | event.YOM_KIPPUR_KATAN | event.BEHAB |
-			event.YERUSHALMI_YOMI | event.KIDDUSH_LEVANA | event.YIZKOR |
-			event.LIGHT_CANDLES | event.LIGHT_CANDLES_TZEIS | event.YOM_TOV_ENDS,
+		Mask: event.RoshChodesh | event.ModernHoliday | event.MinorFast |
+			event.SpecialShabbat | event.ParshaHashavua | event.DafYomi |
+			event.OmerCount | event.ShabbatMevarchim | event.MishnaYomi |
+			event.NachYomi | event.YomKippurKatan | event.BeHaB |
+			event.YerushalmiYomi | event.KiddushLevana | event.Yizkor |
+			event.LightCandles | event.LightCandlesTzeis | event.YomTovEnds,
 	}
 }
 

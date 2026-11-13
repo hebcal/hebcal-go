@@ -37,8 +37,8 @@ func (ev UserEvent) URL() string {
 	return ""
 }
 
-func (ev UserEvent) GetFlags() HolidayFlags {
-	return USER_EVENT
+func (ev UserEvent) GetFlags() Flags {
+	return User
 }
 
 func (ev UserEvent) GetEmoji() string {

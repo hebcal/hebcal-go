@@ -47,7 +47,7 @@ type CalEvent interface {
 	// III (CH’’M)".
 	Render(locale string) string
 	// GetFlags returns the event's flag bitmask.
-	GetFlags() HolidayFlags
+	GetFlags() Flags
 	// GetEmoji returns the event's emoji, or "" if it has none.
 	GetEmoji() string
 	// GetCategories returns the category and optional sub-categories for this
@@ -100,30 +100,30 @@ func RenderBrief(ev CalEvent, locale string) string {
 // priority order (the first matching flag wins). It mirrors the flagToCategory
 // table in @hebcal/core.
 var flagToCategory = []struct {
-	flag HolidayFlags
+	flag Flags
 	cats []string
 }{
-	{MAJOR_FAST, []string{"holiday", "major", "fast"}},
-	{CHANUKAH_CANDLES, []string{"holiday", "minor"}},
-	{HEBREW_DATE, []string{"hebdate"}},
-	{MINOR_FAST, []string{"holiday", "fast"}},
-	{MINOR_HOLIDAY, []string{"holiday", "minor"}},
-	{MODERN_HOLIDAY, []string{"holiday", "modern"}},
-	{MOLAD, []string{"molad"}},
-	{OMER_COUNT, []string{"omer"}},
-	{PARSHA_HASHAVUA, []string{"parashat"}},
-	{ROSH_CHODESH, []string{"roshchodesh"}},
-	{SHABBAT_MEVARCHIM, []string{"mevarchim"}},
-	{SPECIAL_SHABBAT, []string{"holiday", "shabbat"}},
-	{USER_EVENT, []string{"user"}},
-	{YIZKOR, []string{"yizkor"}},
+	{MajorFast, []string{"holiday", "major", "fast"}},
+	{ChanukahCandles, []string{"holiday", "minor"}},
+	{HebrewDate, []string{"hebdate"}},
+	{MinorFast, []string{"holiday", "fast"}},
+	{MinorHoliday, []string{"holiday", "minor"}},
+	{ModernHoliday, []string{"holiday", "modern"}},
+	{Molad, []string{"molad"}},
+	{OmerCount, []string{"omer"}},
+	{ParshaHashavua, []string{"parashat"}},
+	{RoshChodesh, []string{"roshchodesh"}},
+	{ShabbatMevarchim, []string{"mevarchim"}},
+	{SpecialShabbat, []string{"holiday", "shabbat"}},
+	{User, []string{"user"}},
+	{Yizkor, []string{"yizkor"}},
 }
 
 // CategoriesFromFlags returns the category and sub-categories implied by an
 // event's flag bitmask, matching the base Event.getCategories() in
 // @hebcal/core. It returns ["unknown"] when no flag matches. The returned
 // slice is a fresh copy that the caller may modify.
-func CategoriesFromFlags(mask HolidayFlags) []string {
+func CategoriesFromFlags(mask Flags) []string {
 	for _, fc := range flagToCategory {
 		if mask.HasAny(fc.flag) {
 			return append([]string(nil), fc.cats...)

@@ -17,22 +17,22 @@ func TestHolidayEventURL(t *testing.T) {
 	}{
 		{
 			name: "ordinary holiday uses the Gregorian year",
-			ev:   NewHolidayEvent(hdate.New(5787, hdate.Tishrei, 15), "Sukkot I", CHAG, ""),
+			ev:   NewHolidayEvent(hdate.New(5787, hdate.Tishrei, 15), "Sukkot I", Chag, ""),
 			want: "https://www.hebcal.com/holidays/sukkot-2026",
 		},
 		{
 			name: "apostrophes are dropped from the slug",
-			ev:   NewHolidayEvent(hdate.New(5786, hdate.Iyyar, 5), "Yom HaAtzma'ut", MODERN_HOLIDAY, ""),
+			ev:   NewHolidayEvent(hdate.New(5786, hdate.Iyyar, 5), "Yom HaAtzma'ut", ModernHoliday, ""),
 			want: "https://www.hebcal.com/holidays/yom-haatzmaut-2026",
 		},
 		{
 			name: "Israel-only observance carries i=on",
-			ev:   NewHolidayEvent(hdate.New(5786, hdate.Iyyar, 5), "Yom HaAtzma'ut", MODERN_HOLIDAY|IL_ONLY, ""),
+			ev:   NewHolidayEvent(hdate.New(5786, hdate.Iyyar, 5), "Yom HaAtzma'ut", ModernHoliday|ILOnly, ""),
 			want: "https://www.hebcal.com/holidays/yom-haatzmaut-2026?i=on",
 		},
 		{
 			name: "Yom Kippur Katan has no page",
-			ev:   NewHolidayEvent(hdate.New(5780, hdate.Shvat, 29), "Yom Kippur Katan Adar", MINOR_FAST, ""),
+			ev:   NewHolidayEvent(hdate.New(5780, hdate.Shvat, 29), "Yom Kippur Katan Adar", MinorFast, ""),
 			want: "",
 		},
 	}
@@ -48,7 +48,7 @@ func TestHolidayEventURL(t *testing.T) {
 // Asara B'Tevet can fall twice in one Gregorian year, so its URL is
 // disambiguated with a full date rather than just the year.
 func TestAsaraBTevetURLUsesFullDate(t *testing.T) {
-	ev := NewHolidayEvent(hdate.New(5787, hdate.Tevet, 10), "Asara B'Tevet", MINOR_FAST, "")
+	ev := NewHolidayEvent(hdate.New(5787, hdate.Tevet, 10), "Asara B'Tevet", MinorFast, "")
 	want := "https://www.hebcal.com/holidays/asara-btevet-20261220"
 	if got := ev.URL(); got != want {
 		t.Errorf("URL() = %q, want %q", got, want)
@@ -59,12 +59,12 @@ func TestAsaraBTevetURLUsesFullDate(t *testing.T) {
 // filed under the year it began, so the January days point back a year.
 func TestChanukahJanuaryDaysUsePreviousYear(t *testing.T) {
 	// 5784: Chanukah runs 7 Dec 2023 - 15 Dec 2023, entirely in December.
-	dec := NewHolidayEvent(hdate.New(5784, hdate.Kislev, 25), "Chanukah: 1 Candle", MINOR_HOLIDAY, "")
+	dec := NewHolidayEvent(hdate.New(5784, hdate.Kislev, 25), "Chanukah: 1 Candle", MinorHoliday, "")
 	if got, want := dec.URL(), "https://www.hebcal.com/holidays/chanukah-2023"; got != want {
 		t.Errorf("December day: URL() = %q, want %q", got, want)
 	}
 	// 5785: the last days fall in January 2025 but still belong to 2024.
-	jan := NewHolidayEvent(hdate.New(5785, hdate.Tevet, 2), "Chanukah: 8th Day", MINOR_HOLIDAY, "")
+	jan := NewHolidayEvent(hdate.New(5785, hdate.Tevet, 2), "Chanukah: 8th Day", MinorHoliday, "")
 	gy, gm, _ := jan.GetDate().ProlepticGreg()
 	if gm != 1 {
 		t.Fatalf("test precondition: expected a January date, got %d-%02d", gy, int(gm))
@@ -86,10 +86,10 @@ func TestLeapYearAdarURLsAreDistinct(t *testing.T) {
 		ev   HolidayEvent
 		want string
 	}{
-		{"Adar I, first day (30 Sh'vat)", NewHolidayEvent(hdate.New(5787, hdate.Shvat, 30), "Rosh Chodesh Adar", ROSH_CHODESH, ""), "rosh-chodesh-adar-i"},
-		{"Adar I, second day", NewHolidayEvent(hdate.New(5787, hdate.Adar1, 1), "Rosh Chodesh Adar", ROSH_CHODESH, ""), "rosh-chodesh-adar-i"},
-		{"Adar II, first day (30 Adar I)", NewHolidayEvent(hdate.New(5787, hdate.Adar1, 30), "Rosh Chodesh Adar", ROSH_CHODESH, ""), "rosh-chodesh-adar-ii"},
-		{"Adar II, second day", NewHolidayEvent(hdate.New(5787, hdate.Adar2, 1), "Rosh Chodesh Adar", ROSH_CHODESH, ""), "rosh-chodesh-adar-ii"},
+		{"Adar I, first day (30 Sh'vat)", NewHolidayEvent(hdate.New(5787, hdate.Shvat, 30), "Rosh Chodesh Adar", RoshChodesh, ""), "rosh-chodesh-adar-i"},
+		{"Adar I, second day", NewHolidayEvent(hdate.New(5787, hdate.Adar1, 1), "Rosh Chodesh Adar", RoshChodesh, ""), "rosh-chodesh-adar-i"},
+		{"Adar II, first day (30 Adar I)", NewHolidayEvent(hdate.New(5787, hdate.Adar1, 30), "Rosh Chodesh Adar", RoshChodesh, ""), "rosh-chodesh-adar-ii"},
+		{"Adar II, second day", NewHolidayEvent(hdate.New(5787, hdate.Adar2, 1), "Rosh Chodesh Adar", RoshChodesh, ""), "rosh-chodesh-adar-ii"},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -106,7 +106,7 @@ func TestCommonYearAdarHasNoNumeral(t *testing.T) {
 	if hdate.IsLeapYear(5780) {
 		t.Fatal("test precondition: 5780 should be a common year")
 	}
-	ev := NewHolidayEvent(hdate.New(5780, hdate.Adar1, 1), "Rosh Chodesh Adar", ROSH_CHODESH, "")
+	ev := NewHolidayEvent(hdate.New(5780, hdate.Adar1, 1), "Rosh Chodesh Adar", RoshChodesh, "")
 	if got, want := ev.URL(), "https://www.hebcal.com/holidays/rosh-chodesh-adar-2020"; got != want {
 		t.Errorf("URL() = %q, want %q", got, want)
 	}
@@ -115,11 +115,11 @@ func TestCommonYearAdarHasNoNumeral(t *testing.T) {
 // hebcal.com spells this month with one m in Rosh Chodesh paths, but the fast
 // keeps the two-m spelling.
 func TestTammuzSlugs(t *testing.T) {
-	rc := NewHolidayEvent(hdate.New(5787, hdate.Tamuz, 1), "Rosh Chodesh Tammuz", ROSH_CHODESH, "")
+	rc := NewHolidayEvent(hdate.New(5787, hdate.Tamuz, 1), "Rosh Chodesh Tammuz", RoshChodesh, "")
 	if !strings.Contains(rc.URL(), "rosh-chodesh-tamuz-") {
 		t.Errorf("Rosh Chodesh: URL() = %q, want rosh-chodesh-tamuz", rc.URL())
 	}
-	fast := NewHolidayEvent(hdate.New(5787, hdate.Tamuz, 17), "Tzom Tammuz", MINOR_FAST, "")
+	fast := NewHolidayEvent(hdate.New(5787, hdate.Tamuz, 17), "Tzom Tammuz", MinorFast, "")
 	if !strings.Contains(fast.URL(), "tzom-tammuz-") {
 		t.Errorf("fast: URL() = %q, want tzom-tammuz", fast.URL())
 	}
@@ -128,7 +128,7 @@ func TestTammuzSlugs(t *testing.T) {
 // Years the website does not cover produce no link rather than one that 404s.
 func TestOutOfRangeYearsHaveNoURL(t *testing.T) {
 	for _, hy := range []int{3000, 8000} {
-		ev := NewHolidayEvent(hdate.New(hy, hdate.Tishrei, 15), "Sukkot I", CHAG, "")
+		ev := NewHolidayEvent(hdate.New(hy, hdate.Tishrei, 15), "Sukkot I", Chag, "")
 		gy, _, _ := ev.GetDate().ProlepticGreg()
 		if gy >= 100 && gy <= 2999 {
 			continue // still in range; nothing to assert

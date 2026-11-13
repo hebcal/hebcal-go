@@ -111,8 +111,8 @@ func RenderMolad(m molad.Molad, monthName, locale, countryCode string, clock Clo
 	return result
 }
 
-func (ev MoladEvent) GetFlags() HolidayFlags {
-	return MOLAD
+func (ev MoladEvent) GetFlags() Flags {
+	return Molad
 }
 
 func (ev MoladEvent) GetEmoji() string {

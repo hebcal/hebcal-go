@@ -401,7 +401,7 @@ func TestModernILHolidays(t *testing.T) {
 	events0Israel := hebcal.GetHolidaysForYear(5783, true)
 	eventsIsrael := make([]event.HolidayEvent, 0, 12)
 	for _, ev := range events0Israel {
-		if ev.GetFlags().Has(event.MODERN_HOLIDAY) {
+		if ev.GetFlags().Has(event.ModernHoliday) {
 			eventsIsrael = append(eventsIsrael, ev)
 		}
 	}
@@ -431,7 +431,7 @@ func TestModernILHolidays(t *testing.T) {
 	events0Diaspora := hebcal.GetHolidaysForYear(5783, false)
 	eventsDiaspora := make([]event.HolidayEvent, 0, 12)
 	for _, ev := range events0Diaspora {
-		if ev.GetFlags().Has(event.MODERN_HOLIDAY) {
+		if ev.GetFlags().Has(event.ModernHoliday) {
 			eventsDiaspora = append(eventsDiaspora, ev)
 		}
 	}
@@ -479,7 +479,7 @@ func TestSwordsOfIronWarMemorialDay(t *testing.T) {
 	assert.NotNil(t, ev)
 	assert.Equal(t, "24 Tishrei 5787", ev.GetDate().String())
 	assert.Equal(t, "2026-10-05", hd2iso(ev.GetDate()))
-	assert.Equal(t, event.MODERN_HOLIDAY, ev.GetFlags())
+	assert.Equal(t, event.ModernHoliday, ev.GetFlags())
 	assert.Equal(t, "🇮🇱", ev.GetEmoji())
 	// also observed in the Diaspora
 	ev = find(5787, false)
@@ -692,7 +692,7 @@ func TestBeHaB(t *testing.T) {
 		var got []string
 		for _, ev := range events {
 			got = append(got, ev.GetDate().Gregorian().Format("2006-01-02")+" "+ev.Render("en"))
-			assert.Equal(event.MINOR_FAST|event.BEHAB, ev.GetFlags())
+			assert.Equal(event.MinorFast|event.BeHaB, ev.GetFlags())
 			assert.Equal([]string{"holiday", "fast"}, ev.GetCategories())
 			// no holiday page on hebcal.com, matching @hebcal/core
 			assert.Equal("", event.URL(ev))
@@ -708,7 +708,7 @@ func TestBeHaB(t *testing.T) {
 		"2024-05-20 Ta’anit BeHaB",
 	}
 	check(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5784, IsHebrewYear: true}, want5784)
-	check(&hebcal.CalOptions{Mask: event.BEHAB, Year: 5784, IsHebrewYear: true}, want5784)
+	check(&hebcal.CalOptions{Mask: event.BeHaB, Year: 5784, IsHebrewYear: true}, want5784)
 	// Pesach Sheni (14 Iyyar) is skipped
 	check(&hebcal.CalOptions{BeHaB: true, NoHolidays: true, Year: 5785, IsHebrewYear: true,
 		Start: hdate.New(5785, hdate.Iyyar, 1), End: hdate.New(5785, hdate.Iyyar, 29)}, []string{

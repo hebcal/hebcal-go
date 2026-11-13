@@ -46,8 +46,8 @@ func (ev MevarchimChodeshEvent) URL() string {
 	return ""
 }
 
-func (ev MevarchimChodeshEvent) GetFlags() HolidayFlags {
-	return SHABBAT_MEVARCHIM
+func (ev MevarchimChodeshEvent) GetFlags() Flags {
+	return ShabbatMevarchim
 }
 
 func (ev MevarchimChodeshEvent) GetEmoji() string {

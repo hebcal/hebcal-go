@@ -37,7 +37,7 @@ func Memo(ev CalEvent, locale string) string {
 // name carries a typographic apostrophe, as in a rendered title ("Sh’vat").
 // Other holidays have no memo of their own.
 func (ev HolidayEvent) Memo(locale string) string {
-	if !ev.flags.Has(YOM_KIPPUR_KATAN) || len(ev.desc) <= len(yomKippurKatanPrefix) {
+	if !ev.flags.Has(YomKippurKatan) || len(ev.desc) <= len(yomKippurKatanPrefix) {
 		return ""
 	}
 	return "Minor Day of Atonement on the day preceeding Rosh Chodesh " +

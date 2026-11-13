@@ -35,8 +35,8 @@ func (ev ParshaEvent) Render(locale string) string {
 	return prefix + " " + SmartApostrophe(ev.Parsha.Render(locale))
 }
 
-func (ev ParshaEvent) GetFlags() HolidayFlags {
-	return PARSHA_HASHAVUA
+func (ev ParshaEvent) GetFlags() Flags {
+	return ParshaHashavua
 }
 
 func (ev ParshaEvent) GetEmoji() string {
