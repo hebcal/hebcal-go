@@ -126,9 +126,12 @@ naming:
 Two to notice: `USER_EVENT` is `event.User` (`event.UserEvent` is the event
 type), and `IL_ONLY` is `event.ILOnly`.
 
-**`Flags.String()` did not change.** It still returns the old names, such as
-`"CHAG|LIGHT_CANDLES"` and `"USER_EVENT"`, so anything you log, store or
-compare keeps working. The bit values are the same too.
+**`Flags.String()` changed with them.** It prints the constants' names, so
+what was `"CHAG|LIGHT_CANDLES"` is now `"Chag|LightCandles"`, and
+`"USER_EVENT"` is `"User"`. If you store, parse or compare that text (in a
+log pipeline, a golden file, a database column), update it; if you only print
+it, there is nothing to do. The bit values are unchanged, so a stored number
+still means the same flags.
 
 `Has`, `HasAny`, `With` and `Without` are unchanged.
 
@@ -622,6 +625,7 @@ values (section 8), and the `Hour12`/`Hour24` options (section 6). Finish with
 | `event.HolidayFlags` | `event.Flags` |
 | `event.CHAG`, `event.LIGHT_CANDLES`, ... | `event.Chag`, `event.LightCandles`, ... (table in section 3) |
 | `event.USER_EVENT` | `event.User` |
+| `flags.String()` giving `"CHAG\|LIGHT_CANDLES"` | gives `"Chag\|LightCandles"` |
 | `event.HolidayEvent{Date: d, Desc: s, Flags: f, Emoji: e}` | `event.NewHolidayEvent(d, s, f, e)` |
 | `event.UserEvent{Date: d, Desc: s}` | `event.NewUserEvent(d, s)` |
 | `he.Date`, `he.Desc`, `he.Flags`, `he.Emoji` | `he.Date()`, `he.Desc()`, `he.Flags()`, `he.Emoji()` |

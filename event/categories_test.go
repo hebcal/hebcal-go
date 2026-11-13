@@ -43,7 +43,7 @@ func TestCategoriesFromFlags(t *testing.T) {
 		t.Errorf("CategoriesFromFlags(0) = %v, want [unknown]", got)
 	}
 	if got := CategoriesFromFlags(ParshaHashavua); !reflect.DeepEqual(got, []string{"parashat"}) {
-		t.Errorf("CategoriesFromFlags(PARSHA_HASHAVUA) = %v", got)
+		t.Errorf("CategoriesFromFlags(ParshaHashavua) = %v", got)
 	}
 	// the returned slice must be a copy the caller can mutate safely
 	a := CategoriesFromFlags(MajorFast)

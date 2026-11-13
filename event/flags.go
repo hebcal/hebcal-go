@@ -47,7 +47,7 @@ const (
 	// Molad
 	Molad
 	// A personal event: a Yahrzeit, birthday or Hebrew anniversary
-	// (see UserEvent). Its String name is "USER_EVENT".
+	// (see UserEvent).
 	User
 	// Daily Hebrew date ("11th of Sivan, 5780")
 	HebrewDate
@@ -103,46 +103,43 @@ func (f Flags) Without(flags Flags) Flags {
 	return f &^ flags
 }
 
-// flagNames holds the name String reports for each flag, indexed by bit
-// position. These are the constants' original upper-case names, and they do
-// not change when a constant is renamed: the output of String may be logged,
-// stored or compared.
+// flagNames holds the name of each flag's constant, indexed by bit position.
 var flagNames = [...]string{
-	"CHAG",
-	"LIGHT_CANDLES",
-	"YOM_TOV_ENDS",
-	"CHUL_ONLY",
-	"IL_ONLY",
-	"LIGHT_CANDLES_TZEIS",
-	"CHANUKAH_CANDLES",
-	"ROSH_CHODESH",
-	"MINOR_FAST",
-	"SPECIAL_SHABBAT",
-	"PARSHA_HASHAVUA",
-	"DAF_YOMI",
-	"OMER_COUNT",
-	"MODERN_HOLIDAY",
-	"MAJOR_FAST",
-	"SHABBAT_MEVARCHIM",
-	"MOLAD",
-	"USER_EVENT",
-	"HEBREW_DATE",
-	"MINOR_HOLIDAY",
-	"EREV",
-	"CHOL_HAMOED",
-	"MISHNA_YOMI",
-	"YOM_KIPPUR_KATAN",
-	"ZMANIM",
-	"YERUSHALMI_YOMI",
-	"NACH_YOMI",
-	"DAILY_LEARNING",
-	"BEHAB",
-	"KIDDUSH_LEVANA",
-	"YIZKOR",
+	"Chag",
+	"LightCandles",
+	"YomTovEnds",
+	"ChulOnly",
+	"ILOnly",
+	"LightCandlesTzeis",
+	"ChanukahCandles",
+	"RoshChodesh",
+	"MinorFast",
+	"SpecialShabbat",
+	"ParshaHashavua",
+	"DafYomi",
+	"OmerCount",
+	"ModernHoliday",
+	"MajorFast",
+	"ShabbatMevarchim",
+	"Molad",
+	"User",
+	"HebrewDate",
+	"MinorHoliday",
+	"Erev",
+	"CholHamoed",
+	"MishnaYomi",
+	"YomKippurKatan",
+	"Zmanim",
+	"YerushalmiYomi",
+	"NachYomi",
+	"DailyLearning",
+	"BeHaB",
+	"KiddushLevana",
+	"Yizkor",
 }
 
 // String returns the names of the flags set in f joined by "|",
-// e.g. "CHAG|LIGHT_CANDLES". It returns "0" when no flags are set.
+// e.g. "Chag|LightCandles". It returns "0" when no flags are set.
 // Bits without a defined flag are rendered in hex.
 func (f Flags) String() string {
 	if f == 0 {

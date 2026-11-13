@@ -34,7 +34,7 @@ Four abilities are optional interfaces, found with a type assertion or a helper:
 
 To find the events with a clock time, assert `event.Timed`, never the concrete `hebcal.TimedEvent`: that assertion misses Kiddush Levana.
 
-`event.Flags` is a bitmask (`event/flags.go`) with MixedCaps constants — `Chag`, `LightCandles`, `YomTovEnds`, `ChulOnly`/`ILOnly`, `ChanukahCandles`, `ParshaHashavua`, `DafYomi`, `Erev`, `CholHamoed`, etc. (`User`, not `UserEvent`, because that is the event type). Flags drive downstream filtering and rendering. **`Flags.String()` prints the original upper-case names (`"CHAG|LIGHT_CANDLES"`, `"USER_EVENT"`) and must keep doing so**: its output may be logged, stored or compared. Adding a flag means adding its upper-case name to `flagNames` (same file) and handling it in `getMaskFromOptions` in `hebcal/hebcal.go`.
+`event.Flags` is a bitmask (`event/flags.go`) with MixedCaps constants — `Chag`, `LightCandles`, `YomTovEnds`, `ChulOnly`/`ILOnly`, `ChanukahCandles`, `ParshaHashavua`, `DafYomi`, `Erev`, `CholHamoed`, etc. (`User`, not `UserEvent`, because that is the event type). Flags drive downstream filtering and rendering. `Flags.String()` prints the constants' names (`"Chag|LightCandles"`), for logs and test failures; nothing should parse it. Adding a flag means adding its name to `flagNames` (same file) and handling it in `getMaskFromOptions` in `hebcal/hebcal.go`.
 
 Concrete event types live in `event/`: `HolidayEvent`, `ParshaEvent`, `HebrewDateEvent`, `MevarchimChodeshEvent`, `MoladEvent`, `UserEvent` (yahrzeit/birthday). Conventions for an event type:
 
@@ -61,7 +61,7 @@ URL generation lives in `event/url.go` (holidays, parsha, Hebrew date) and `omer
 - `sedra/` — `sedra.New(year, il)` then `Lookup(hd)` / `LookupByRD(rd)` for weekly Torah reading; encodes the fixed parsha schedules for all year types.
 - `zmanim/` — halachic times from lat/long/elevation. `zmanim.New` and `zmanim.NewLocation` return an error (`ErrLatitude`, `ErrLongitude`, `ErrTimeZone`) rather than panic; `MustNew`/`MustNewLocation` are for locations known to be good. `HebrewCalendar` checks the location once in `newCalConfig`, which is what lets the internal `newZmanim` use `MustNew`. `zmanim/cities.go` + `location.go` hold the small built-in city database with timezones.
 - `omer/`, `molad/` — Sefirat HaOmer and molad (new-moon) calculations.
-- `dailylearning/` — a **plugin registry** only, guarded by a `sync.RWMutex`. `AddCalendar(name, fn)` or `AddCalendarFrom(name, fn, startDate)` registers a schedule; `Lookup(name, hd, il)` retrieves an event. Names are case-insensitive. The actual schedules (929, Daily Rambam, etc.) live in the separate module `github.com/hebcal/learning`, which calls `AddCalendar` from its `init`; importing that module is what enables `DAILY_LEARNING` events here.
+- `dailylearning/` — a **plugin registry** only, guarded by a `sync.RWMutex`. `AddCalendar(name, fn)` or `AddCalendarFrom(name, fn, startDate)` registers a schedule; `Lookup(name, hd, il)` retrieves an event. Names are case-insensitive. The actual schedules (929, Daily Rambam, etc.) live in the separate module `github.com/hebcal/learning`, which calls `AddCalendar` from its `init`; importing that module is what enables `event.DailyLearning` events here.
 
 ### External hebcal modules this depends on
 

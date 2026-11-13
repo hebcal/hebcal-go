@@ -39,19 +39,19 @@ func TestHolidayFlagsWithWithout(t *testing.T) {
 	assert.Equal(event.Erev, f)
 }
 
-func TestHolidayFlagsString(t *testing.T) {
+func TestFlagsString(t *testing.T) {
 	assert := assert.New(t)
 	assert.Equal("0", event.Flags(0).String())
-	assert.Equal("CHAG", event.Chag.String())
-	assert.Equal("CHAG|LIGHT_CANDLES", (event.LightCandles | event.Chag).String())
-	assert.Equal("DAILY_LEARNING", event.DailyLearning.String())
-	assert.Equal("MINOR_FAST|BEHAB", (event.MinorFast | event.BeHaB).String())
-	assert.Equal("EREV|0x80000000", (event.Erev | 1<<31).String())
-	assert.Equal("MAJOR_FAST", fmt.Sprintf("%v", event.MajorFast))
+	assert.Equal("Chag", event.Chag.String())
+	assert.Equal("Chag|LightCandles", (event.LightCandles | event.Chag).String())
+	assert.Equal("DailyLearning", event.DailyLearning.String())
+	assert.Equal("MinorFast|BeHaB", (event.MinorFast | event.BeHaB).String())
+	assert.Equal("Erev|0x80000000", (event.Erev | 1<<31).String())
+	assert.Equal("MajorFast", fmt.Sprintf("%v", event.MajorFast))
 }
 
 // Every flag through Yizkor (currently the last one) must have a name.
-func TestHolidayFlagsStringCoversAllFlags(t *testing.T) {
+func TestFlagsStringCoversAllFlags(t *testing.T) {
 	last := bits.TrailingZeros32(uint32(event.Yizkor))
 	for i := 0; i <= last; i++ {
 		s := (event.Flags(1) << i).String()

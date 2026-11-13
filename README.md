@@ -26,7 +26,7 @@ output is unchanged; the Go API around it is cleaner:
   - `event.CalEvent` gained `Desc()` and `URL()`, and its getters lost their
     `Get` prefix: `Date()`, `Flags()`, `Emoji()`, `Categories()`.
   - `event.HolidayFlags` is `event.Flags`, with MixedCaps constants
-    (`event.Chag`, `event.LightCandles`). `String()` still prints the old names.
+    (`event.Chag`, `event.LightCandles`), which `String()` prints too.
   - Several event fields became methods, and events are built with
     constructors such as `event.NewHolidayEvent`.
   - Timed events are found through the `event.Timed` interface and told apart

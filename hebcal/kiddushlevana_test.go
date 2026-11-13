@@ -117,7 +117,7 @@ func TestKiddushLevanaEvent(t *testing.T) {
 	assert.Equal([]string{"zmanim", "kiddushLevana"}, ev.Categories())
 	assert.Equal("🌔", ev.Emoji())
 	assert.Equal(event.KiddushLevana, ev.Flags())
-	assert.Equal("KIDDUSH_LEVANA", ev.Flags().String())
+	assert.Equal("KiddushLevana", ev.Flags().String())
 	assert.Equal(molad.New(5787, hdate.Cheshvan), ev.Molad)
 }
 
