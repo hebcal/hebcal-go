@@ -330,15 +330,19 @@ func (ev TimedEvent) Categories() []string {
 	return []string{"unknown"}
 }
 
-// newZmanim builds a Zmanim for the Gregorian date of hd at the options'
-// Location, honoring opts.UseElevation so that sunrise/sunset-based times
+// newZmanim builds a Zmanim for the proleptic Gregorian date of hd at the
+// options' Location, honoring opts.UseElevation so that sunrise/sunset-based times
 // account for the location's elevation when requested. Degree-based zmanim are
 // never affected by elevation.
 //
 // newCalConfig has already checked that the location can be used, so
 // constructing the Zmanim cannot fail here.
+//
+// The civil date is always proleptic Gregorian, whatever opts.NoJulian says:
+// zmanim and time.Time count days that way, and a Julian date before
+// 14 September 1752 would put the times on the wrong day (and weekday).
 func newZmanim(hd hdate.HDate, opts *calConfig) zmanim.Zmanim {
-	year, month, day := hd.Greg()
+	year, month, day := hd.ProlepticGreg()
 	gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 	z := zmanim.MustNew(opts.Location, gregDate)
 	z.UseElevation = opts.UseElevation

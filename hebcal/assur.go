@@ -100,7 +100,8 @@ func IsAssurBemelacha(currentTime time.Time, loc *zmanim.Location, il bool, useE
 	if sunset.IsZero() {
 		return false, errors.New("could not determine sunset")
 	}
-	hd := hdate.FromTime(currentTime)
+	// time.Time is proleptic Gregorian, so convert without the Julian switch.
+	hd := hdate.FromProlepticGregorian(currentTime.Date())
 	dow := hd.Weekday()
 	events := HolidaysOnDate(hd, il)
 	// erev Shabbat, Yom Tov or Yom Tov sheni and after shkiah
